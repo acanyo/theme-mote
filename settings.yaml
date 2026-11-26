@@ -111,6 +111,11 @@ spec:
           label: 无刷新平滑切页（Swup）
           value: true
           help: 切页时顶栏与雨声白噪音保持不断流。
+        - $formkit: switch
+          name: show_login
+          label: 顶栏显示登录 / 账号入口
+          value: true
+          help: 未登录时显示登录图标，登录后自动切换为用户头像并展开个人中心与后台菜单。
 
     - group: home
       label: 首页与首屏

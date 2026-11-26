@@ -283,6 +283,86 @@ const fallbackMenu = [
           <Icon name="sliders" size={15} />
         </button>
 
+        <div
+          class="header-user"
+          data-user-menu
+          th:if="${theme.config.basic?.show_login != false}"
+        >
+          <a
+            class="dock-btn user-dock-btn"
+            href="/login"
+            data-user-trigger
+            data-no-swup
+            data-tip="登录"
+            aria-label="登录"
+          >
+            <span class="user-dock-icon" data-user-icon aria-hidden="true">
+              <Icon name="user" size={15} />
+            </span>
+            <img
+              class="user-dock-avatar"
+              data-user-avatar
+              data-img-placeholder-ignore
+              width="20"
+              height="20"
+              alt=""
+              hidden
+            />
+            <span
+              class="user-dock-initial"
+              data-user-initial
+              aria-hidden="true"
+              hidden></span>
+          </a>
+
+          <div
+            class="user-popover"
+            data-user-popover
+            role="menu"
+            aria-label="账号菜单"
+            hidden
+          >
+            <div class="user-popover-head">
+              <span class="user-popover-name" data-user-name></span>
+              <span class="user-popover-handle num" data-user-handle></span>
+            </div>
+            <div class="user-popover-group">
+              <a
+                class="user-popover-item"
+                href="/uc"
+                data-no-swup
+                role="menuitem"
+              >
+                <Icon name="user" size={13} />
+                <span>个人中心</span>
+              </a>
+              <a
+                class="user-popover-item"
+                href="/console"
+                data-no-swup
+                data-user-console
+                role="menuitem"
+                hidden
+              >
+                <Icon name="sliders" size={13} />
+                <span>管理后台</span>
+              </a>
+            </div>
+            <div class="user-popover-sep" aria-hidden="true"></div>
+            <div class="user-popover-group">
+              <a
+                class="user-popover-item is-danger"
+                href="/logout"
+                data-no-swup
+                role="menuitem"
+              >
+                <Icon name="logout" size={13} />
+                <span>退出登录</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
         <button
           class="dock-btn menu-btn"
           type="button"

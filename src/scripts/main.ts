@@ -14,6 +14,7 @@ import {
 } from "./image-placeholder";
 import { initTooltip } from "./tooltip";
 import { initMoteGlobal, initMotePage } from "./mote";
+import { initUserMenu } from "./user";
 import { initSwup } from "./swup";
 import { animatePageEnter } from "./animation/mote-motion";
 
@@ -26,6 +27,7 @@ export function initSite() {
   initPageTransition();
   initImagePlaceholdersGlobal();
   initMoteGlobal();
+  initUserMenu();
   const imageCursor = initImageCursor();
   const tooltip = initTooltip();
 
