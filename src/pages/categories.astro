@@ -1,22 +1,117 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import PageHead from "../components/common/PageHead.astro";
+import Icon from "../components/common/Icon.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import "../styles/taxonomy.css";
 ---
 
-<Layout pageTitle="分类">
-  <Fragment slot="head">
-    <title th:text="|分类 - ${site.title}|"></title>
-  </Fragment>
+<Layout page="categories" title="|分类 - ${site.title}|">
+  <SeoHead
+    slot="head"
+    type="website"
+    titleExpr="'分类 - ' + (site.title ?: 'Mote')"
+    descExpr="site.subtitle ?: ''"
+    pathExpr="'/categories'"
+  />
+  <div
+    class="taxonomy-page"
+    th:with="totalCats = ${categories != null ? #lists.size(categories) : 0}, stats = ${siteStatsFinder.getStats()}, totalPosts = ${stats?.post ?: 0}"
+  >
+    <PageHead title="'分类'" fallback="分类">
+      <div class="taxonomy-head-bar">
+        <p class="taxonomy-summary">
+          按主题浏览文章，共 <span class="num" th:text="${totalCats}">0</span> 个分类
+          <th:block th:if="${totalPosts > 0}">
+            <span class="taxonomy-summary-sep" aria-hidden="true">·</span>
+            <span class="num" th:text="${totalPosts}">0</span> 篇文章
+          </th:block>
+        </p>
 
-  <nav class="taxonomy-list" aria-label="Category list">
-    <div th:each="category : ${categories}" class="taxonomy-list__item">
-      <a
-        class="taxonomy-list__link"
-        th:href="@{${category.status.permalink}}"
-        th:text="${category.spec.displayName}"
+        <div class="taxonomy-search-wrap" th:if="${totalCats > 4}">
+          <Icon name="search" size={13} class="taxonomy-search-icon" />
+          <input
+            type="search"
+            class="taxonomy-search-input"
+            placeholder="筛选分类…"
+            aria-label="筛选分类"
+            data-quick-filter="categories"
+          />
+          <span
+            class="taxonomy-search-count num"
+            data-quick-filter-count="categories"
+            hidden></span>
+        </div>
+      </div>
+    </PageHead>
+
+    <section class="taxonomy wrap" aria-label="全部分类">
+      <ul
+        class="taxonomy-index"
+        data-quick-list="categories"
+        th:if="${not #lists.isEmpty(categories)}"
       >
-      </a>
-      <span class="taxonomy-list__count" th:text="|${category.postCount} 篇|">
-      </span>
-    </div>
-  </nav>
+        <th:block th:each="category : ${categories}">
+          <li
+            class="taxonomy-group"
+            th:classappend="${category.postCount == null or category.postCount == 0} ? 'is-empty'"
+            th:attr="data-filter-text=|${category.spec.displayName} ${category.spec.description ?: ''}|"
+          >
+            <a class="taxonomy-link" th:href="@{${category.status.permalink}}">
+              <div class="taxonomy-head">
+                <span class="taxonomy-name-row">
+                  <span
+                    class="taxonomy-name"
+                    th:text="${category.spec.displayName}">分类</span
+                  >
+                  <span class="taxonomy-arrow" aria-hidden="true">→</span>
+                </span>
+                <span
+                  class="taxonomy-count num"
+                  th:text="|${category.postCount ?: 0} 篇|">0 篇</span
+                >
+              </div>
+              <p
+                class="taxonomy-desc"
+                th:if="${not #strings.isEmpty(category.spec.description)}"
+                th:text="${category.spec.description}"
+              >
+                分类说明
+              </p>
+            </a>
+
+            <ul
+              class="taxonomy-children"
+              th:if="${not #lists.isEmpty(category.children)}"
+            >
+              <li th:each="child : ${category.children}">
+                <a
+                  class="taxonomy-child-link"
+                  th:href="@{${child.status.permalink}}"
+                >
+                  <span
+                    class="taxonomy-name"
+                    th:text="${child.spec.displayName}">子分类</span
+                  >
+                  <span
+                    class="taxonomy-count num"
+                    th:text="|${child.postCount ?: 0} 篇|">0 篇</span
+                  >
+                </a>
+              </li>
+            </ul>
+          </li>
+        </th:block>
+      </ul>
+
+      <p
+        class="empty-note"
+        data-quick-filter-empty="categories"
+        hidden
+      >
+        没有找到匹配的分类。
+      </p>
+      <p class="empty-note" th:if="${#lists.isEmpty(categories)}">还没有分类。</p>
+    </section>
+  </div>
 </Layout>

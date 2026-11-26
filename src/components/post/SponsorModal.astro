@@ -1,0 +1,101 @@
+---
+/**
+ * Quiet sponsor / buy-me-a-coffee modal (rendered only when at least one QR code is configured).
+ */
+import Icon from "../common/Icon.astro";
+---
+
+<th:block
+  th:with="wxQr = ${theme.config.post?.sponsor_wechat ?: ''}, aliQr = ${theme.config.post?.sponsor_alipay ?: ''}, hasWx = ${not #strings.isEmpty(wxQr)}, hasAli = ${not #strings.isEmpty(aliQr)}"
+>
+  <div
+    class="mote-dialog sponsor-modal"
+    data-sponsor-modal
+    th:if="${hasWx or hasAli}"
+    aria-hidden="true"
+    hidden
+  >
+    <div class="mote-dialog-backdrop" data-close></div>
+    <div
+      class="mote-dialog-sheet sponsor-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="sponsor-title"
+    >
+      <div class="mote-dialog-head">
+        <div>
+          <h2 class="mote-dialog-title" id="sponsor-title">请喝杯咖啡</h2>
+          <p
+            class="mote-dialog-sub"
+            th:text="${not #strings.isEmpty(theme.config.post?.sponsor_note) ? theme.config.post.sponsor_note : '如果这篇文章对你有帮助，欢迎请我喝杯咖啡。'}"
+          >
+            如果这篇文章对你有帮助，欢迎请我喝杯咖啡。
+          </p>
+        </div>
+        <button
+          type="button"
+          class="mote-dialog-close"
+          data-close
+          aria-label="关闭赞赏窗口"
+        >
+          <Icon name="close" size={16} />
+        </button>
+      </div>
+
+      <div
+        class="sponsor-tabs"
+        role="tablist"
+        aria-label="支付方式"
+        th:if="${hasWx and hasAli}"
+      >
+        <button
+          type="button"
+          class="sponsor-tab is-active"
+          data-sponsor-tab="wechat"
+          aria-selected="true"
+        >
+          微信赞赏
+        </button>
+        <button
+          type="button"
+          class="sponsor-tab"
+          data-sponsor-tab="alipay"
+          aria-selected="false"
+        >
+          支付宝
+        </button>
+      </div>
+
+      <div class="sponsor-qr-stage">
+        <figure
+          class="sponsor-qr-card"
+          th:if="${hasWx}"
+          data-sponsor-panel="wechat"
+        >
+          <img
+            th:src="${wxQr}"
+            alt="微信赞赏二维码"
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption>打开微信扫一扫</figcaption>
+        </figure>
+
+        <figure
+          class="sponsor-qr-card"
+          th:if="${hasAli}"
+          data-sponsor-panel="alipay"
+          th:hidden="${hasWx}"
+        >
+          <img
+            th:src="${aliQr}"
+            alt="支付宝收款二维码"
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption>打开支付宝扫一扫</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</th:block>

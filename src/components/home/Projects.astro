@@ -1,0 +1,137 @@
+---
+import Icon from "../common/Icon.astro";
+---
+
+<!-- Mode A: Powered by Portfolio Plugin (liuyiwuqing/halo-plugin-portfolio) -->
+<th:block
+  th:if="${theme.config.modules?.show_projects != false and pluginFinder.available('portfolio')}"
+  th:with="featuredRes = ${projectFinder.featured(1, 6)}, portfolioItems = ${featuredRes != null and not #lists.isEmpty(featuredRes.items) ? featuredRes.items : projectFinder.list(1, 6).items}, typeLabels = ${projectFinder.typeLabels()}, platformLabels = ${projectFinder.platformLabels()}"
+>
+  <section
+    class="home-section home-projects"
+    id="projects"
+    aria-labelledby="projects-title"
+    th:if="${not #lists.isEmpty(portfolioItems)}"
+  >
+    <header class="section-bar">
+      <h2 class="section-label" id="projects-title">在做的小东西</h2>
+      <a class="quiet-link" href="/portfolio" th:href="@{/portfolio}">
+        <span>全部</span>
+        <span class="quiet-arrow" aria-hidden="true">→</span>
+      </a>
+    </header>
+
+    <ul class="minimal-grid">
+      <li th:each="project : ${portfolioItems}">
+        <a
+          class="minimal-project"
+          th:href="@{/portfolio/{slug}(slug=${project.slug})}"
+        >
+          <div class="minimal-project-head">
+            <span class="minimal-project-name">
+              <span class="minimal-project-icon" aria-hidden="true">
+                <img
+                  th:if="${not #strings.isEmpty(project.cover)}"
+                  th:src="${project.cover}"
+                  width="18"
+                  height="18"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+                <th:block th:if="${#strings.isEmpty(project.cover)}">
+                  <Icon name="cube" size={15} />
+                </th:block>
+              </span>
+              <strong th:text="${project.title}">项目名称</strong>
+              <span
+                class="minimal-project-status"
+                th:if="${not #strings.isEmpty(project.type)}"
+                th:text="${typeLabels != null and typeLabels[project.type] != null ? typeLabels[project.type] : project.type}"
+                >项目</span
+              >
+            </span>
+            <span
+              class="minimal-project-stars num"
+              th:if="${project.repository != null and project.repository.stars > 0}"
+            >
+              <Icon name="star" size={11} />
+              <span th:text="${project.repository.stars}">0</span>
+            </span>
+            <th:block
+              th:if="${project.repository == null or project.repository.stars <= 0}"
+            >
+              <Icon name="arrowRight" size={13} class="minimal-ext" />
+            </th:block>
+          </div>
+          <p
+            class="minimal-project-desc"
+            th:if="${not #strings.isEmpty(project.summary)}"
+            th:text="${project.summary}"
+          >
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</th:block>
+
+<!-- Mode B: Silent backward-compatible fallback when portfolio plugin is not installed -->
+<th:block
+  th:if="${theme.config.modules?.show_projects != false and not pluginFinder.available('portfolio')}"
+  th:with="projectItems = ${not #lists.isEmpty(theme.config.modules?.project_items) ? theme.config.modules.project_items : theme.config.projects?.items}"
+>
+  <section
+    class="home-section home-projects"
+    id="projects"
+    aria-labelledby="projects-title"
+    th:if="${not #lists.isEmpty(projectItems)}"
+  >
+    <header class="section-bar">
+      <h2 class="section-label" id="projects-title">在做的小东西</h2>
+    </header>
+
+    <ul class="minimal-grid">
+      <li th:each="project : ${projectItems}">
+        <a
+          class="minimal-project"
+          th:href="${project.url}"
+          target="_blank"
+          rel="noopener"
+        >
+          <div class="minimal-project-head">
+            <span class="minimal-project-name">
+              <span class="minimal-project-icon" aria-hidden="true">
+                <img
+                  th:if="${not #strings.isEmpty(project.icon)}"
+                  th:src="${project.icon}"
+                  width="16"
+                  height="16"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+                <th:block th:if="${#strings.isEmpty(project.icon)}">
+                  <Icon name="cube" size={15} />
+                </th:block>
+              </span>
+              <strong th:text="${project.name}">项目名称</strong>
+              <span
+                class="minimal-project-status"
+                th:if="${not #strings.isEmpty(project.status)}"
+                th:text="${project.status}">状态</span
+              >
+            </span>
+            <Icon name="external" size={13} class="minimal-ext" />
+          </div>
+          <p
+            class="minimal-project-desc"
+            th:if="${not #strings.isEmpty(project.description)}"
+            th:text="${project.description}"
+          >
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</th:block>

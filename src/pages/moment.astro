@@ -1,0 +1,34 @@
+---
+/** templates/moment.html: detail route provided by plugin-moments. */
+import Layout from "../layouts/Layout.astro";
+import MomentItem from "../components/moment/MomentItem.astro";
+import Comments from "../components/post/Comments.astro";
+import Icon from "../components/common/Icon.astro";
+import "../styles/moments.css";
+---
+
+<Layout
+  page="moment"
+  title="|${moment.owner?.displayName ?: site.title} 的瞬间 - ${site.title}|"
+>
+  <section class="moments moments--detail wrap--text" aria-label="瞬间">
+    <header class="moment-detail-bar">
+      <a class="moment-back" href="/moments" th:href="@{/moments}">
+        <span class="back-arrow" aria-hidden="true">←</span>
+        <span>全部瞬间</span>
+      </a>
+      <button
+        type="button"
+        class="moment-copy-btn"
+        data-copy-link
+        data-tip="复制这条瞬间链接"
+        aria-label="复制瞬间链接"
+      >
+        <Icon name="link" size={13} />
+        <span>复制链接</span>
+      </button>
+    </header>
+    <MomentItem detail />
+  </section>
+  <Comments kind="Moment" item="moment" />
+</Layout>

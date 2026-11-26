@@ -1,0 +1,78 @@
+/* ==========================================================================
+   Minimal Plus · Subpage Head & Pagination
+   ========================================================================== */
+
+.page-head {
+  padding: 26px 0 24px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid var(--line);
+}
+
+.page-title {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 640;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.page-lede {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+.page-lede:empty {
+  display: none;
+}
+
+.page-lede p {
+  margin: 0;
+}
+
+.page-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+  transition:
+    color 0.16s ease,
+    border-color 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.page-btn:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+  background: var(--hover-soft);
+}
+
+.page-count {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  margin-inline: auto;
+}
+
+.page-sep {
+  margin-inline: 4px;
+  opacity: 0.5;
+}
+
+@media (max-width: 640px) {
+  .page-head {
+    padding: 14px 0 18px;
+    margin-bottom: 22px;
+  }
+  .page-title {
+    font-size: 22px;
+  }
+}

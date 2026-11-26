@@ -1,0 +1,119 @@
+/* ==========================================================================
+   Mote Minimal Plus · Publication-Grade Print Stylesheet (@media print)
+   ========================================================================== */
+
+@media print {
+  @page {
+    margin: 18mm 16mm;
+  }
+
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+    font-family: "Noto Serif SC", "Songti SC", "STSong", Georgia, serif !important;
+    font-size: 11pt !important;
+    line-height: 1.75 !important;
+  }
+
+  .site-header,
+  .site-footer,
+  .ambient-bg,
+  .site-shell::before,
+  .read-progress,
+  .article-topbar,
+  .reader-tools,
+  .article-aside,
+  .article-cover-stage::before,
+  .colophon-actions,
+  .post-nav,
+  .related-posts,
+  .comments,
+  .mobile-reading-bar,
+  .mobile-toc-modal,
+  .mobile-float-dock,
+  .minimal-lightbox,
+  .cc-modal,
+  .shortcuts-modal,
+  .mote-dialog,
+  .hover-cover-preview,
+  .code-copy-btn,
+  .toast-stack {
+    display: none !important;
+  }
+
+  .wrap,
+  .wrap--text,
+  .article-cover-stage {
+    width: 100% !important;
+    max-width: none !important;
+    margin-inline: 0 !important;
+  }
+
+  .article {
+    padding-top: 0 !important;
+  }
+
+  .article-title {
+    font-size: 20pt !important;
+    color: #000000 !important;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  .article-byline {
+    border-color: #d4d4d4 !important;
+    color: #444444 !important;
+  }
+
+  .article-cover {
+    border: 1px solid #e0e0e0 !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .article-cover img {
+    max-height: 95mm !important;
+  }
+
+  .prose h2,
+  .prose h3,
+  .prose h4 {
+    color: #000000 !important;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .prose p,
+  .prose li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  .prose pre,
+  .prose blockquote,
+  .prose figure,
+  .prose table,
+  .colophon-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border-color: #d4d4d4 !important;
+  }
+
+  .prose a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #555555;
+    word-break: break-all;
+  }
+}

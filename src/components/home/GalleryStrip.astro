@@ -1,0 +1,47 @@
+---
+---
+
+<th:block
+  th:if="${theme.config.modules?.show_gallery != false and pluginFinder.available('PluginPhotos')}"
+>
+  <th:block th:with="pluginPhotos = ${photoFinder.listAll()}">
+    <section
+      class="home-section home-gallery"
+      id="gallery"
+      aria-labelledby="gallery-title"
+      th:if="${pluginPhotos != null and not #lists.isEmpty(pluginPhotos)}"
+    >
+      <header class="section-bar">
+        <h2 class="section-label" id="gallery-title">近期光影</h2>
+        <a class="quiet-link" href="/photos" th:href="@{/photos}">
+          <span>全部图库</span>
+          <span class="quiet-arrow" aria-hidden="true">→</span>
+        </a>
+      </header>
+
+      <div class="filmstrip-grid" data-lightbox-gallery>
+        <th:block th:each="photo, iter : ${pluginPhotos}">
+          <button
+            type="button"
+            class="filmstrip-frame"
+            th:if="${iter.index < 4}"
+            th:attr="data-lightbox-trigger=${photo.spec.url}"
+            th:aria-label="|查看原图：${photo.spec.displayName ?: '图库照片'}|"
+          >
+            <img
+              th:src="${not #strings.isEmpty(photo.spec.cover) ? photo.spec.cover : photo.spec.url}"
+              th:alt="${photo.spec.displayName ?: ''}"
+              loading="lazy"
+              decoding="async"
+            />
+            <span
+              class="filmstrip-cap"
+              th:if="${not #strings.isEmpty(photo.spec.displayName)}"
+              th:text="${photo.spec.displayName}">图库</span
+            >
+          </button>
+        </th:block>
+      </div>
+    </section>
+  </th:block>
+</th:block>

@@ -1,0 +1,161 @@
+---
+import Icon from "../common/Icon.astro";
+import { momentText } from "../../lib/expressions";
+---
+
+<th:block
+  th:with={`showMoments = \${theme.config.sidebar?.show_moments != false and pluginFinder.available('PluginMoments')}, now = \${theme.config.home?.now ?: theme.config.sidebar?.bio ?: theme.config.home?.status}, reading = \${theme.config.home?.reading}, motto = \${theme.config.home?.motto}, since = \${theme.config.sidebar?.since}, showStats = \${theme.config.home?.show_stats != false}, hasNowCard = \${not #strings.isEmpty(now) or not #strings.isEmpty(reading) or not #strings.isEmpty(motto) or showStats}`}
+>
+  <th:block
+    th:with="momentList = ${showMoments ? momentFinder.list({page: 1, size: 4, sort: {'spec.releaseTime,desc'}}).items : null}, hasMoments = ${momentList != null and not #lists.isEmpty(momentList)}"
+  >
+    <section
+      class="home-section home-life wrap"
+      id="moments"
+      aria-labelledby="moments-title"
+      th:if="${hasMoments or hasNowCard}"
+    >
+      <header class="section-head">
+        <div class="section-head-left">
+          <h2
+            class="section-title"
+            id="moments-title"
+            th:text="${hasMoments ? '光影瞬间与近况' : '近况与站点'}"
+          >
+            光影瞬间与近况
+          </h2>
+          <p class="section-sub">随手留下的碎片与此刻正在做的事</p>
+        </div>
+        <a
+          class="text-link"
+          href="/moments"
+          th:href="@{/moments}"
+          th:if="${hasMoments}"
+        >
+          <span>查看全部瞬间</span>
+          <Icon name="arrowRight" size={14} />
+        </a>
+      </header>
+
+      <div
+        class="life-grid"
+        th:classappend="${hasMoments and hasNowCard} ? 'is-split' : 'is-single'"
+      >
+        <div class="life-moments" th:if="${hasMoments}">
+          <article
+            class="life-moment-card glass-lens"
+            th:each="moment, iter : ${momentList}"
+            th:with={`preview = ${momentText(140)}, media = \${moment.spec.content.medium}, firstPhoto = \${not #lists.isEmpty(media) and media[0].type.name == 'PHOTO' ? media[0].url : null}`}
+            th:classappend="${firstPhoto != null} ? 'has-photo' : 'is-text'"
+          >
+            <div class="life-moment-media" th:if="${firstPhoto != null}">
+              <img
+                th:src="${firstPhoto}"
+                alt=""
+                loading="lazy"
+                decoding="async"
+                data-lightbox-src
+              />
+              <span class="mote-post-melt" aria-hidden="true"></span>
+              <button
+                type="button"
+                class="glass-media-badge life-moment-zoom"
+                th:attr="data-lightbox-trigger=${firstPhoto}"
+                aria-label="放大查看原图"
+              >
+                <Icon name="image" size={14} />
+              </button>
+            </div>
+            <a
+              class="life-moment-body"
+              th:href="@{|/moments/${moment.metadata.name}|}"
+            >
+              <p
+                class="life-moment-text"
+                th:text="${not #strings.isEmpty(preview) ? preview : '查看这条瞬间'}"
+              >
+                查看这条瞬间
+              </p>
+              <div class="life-moment-foot num">
+                <time
+                  th:datetime="${moment.spec.releaseTime}"
+                  th:text="${#temporals.format(moment.spec.releaseTime, 'yyyy-MM-dd')}"
+                  >2026-11-24</time
+                >
+                <span th:if="${moment.stats.approvedComment > 0}">
+                  · <span th:text="${moment.stats.approvedComment}">0</span> 评论
+                </span>
+              </div>
+            </a>
+          </article>
+        </div>
+
+        <aside
+          class="now-panel glass-lens"
+          aria-label="近况与站点脉搏"
+          th:if="${hasNowCard}"
+        >
+          <div class="now-block" th:if="${not #strings.isEmpty(now)}">
+            <div class="now-label">
+              <span class="now-pulse" aria-hidden="true"></span>
+              <span>此刻在做</span>
+            </div>
+            <p class="now-text" th:text="${now}"></p>
+          </div>
+
+          <div class="now-block" th:if="${not #strings.isEmpty(reading)}">
+            <div class="now-label">
+              <Icon name="book" size={14} />
+              <span>最近在读</span>
+            </div>
+            <p class="now-reading" th:text="${reading}"></p>
+          </div>
+
+          <blockquote
+            class="now-motto"
+            th:if="${not #strings.isEmpty(motto)}"
+            th:text="${motto}"
+          >
+          </blockquote>
+
+          <div
+            class="now-stats-wrap"
+            th:if="${showStats}"
+            th:with="stats = ${siteStatsFinder.getStats()}"
+          >
+            <dl class="now-stats">
+              <div class="now-stat-cell">
+                <dd class="num" th:text="${stats.post}">0</dd>
+                <dt>篇文章</dt>
+              </div>
+              <div class="now-stat-cell">
+                <dd class="num" th:text="${stats.category}">0</dd>
+                <dt>个分类</dt>
+              </div>
+              <div
+                class="now-stat-cell"
+                th:if="${not #strings.isEmpty(since)}"
+              >
+                <dd class="num" th:attr="data-since=${since}">—</dd>
+                <dt>天运行</dt>
+              </div>
+            </dl>
+            <div
+              class="now-decade"
+              th:if="${not #strings.isEmpty(since)}"
+              th:attr="data-decade=${since}"
+            >
+              <div class="now-decade-head">
+                <span>十年之约进度</span>
+                <span class="num" data-decade-pct>—</span>
+              </div>
+              <div class="now-decade-track" aria-hidden="true">
+                <div class="now-decade-fill" data-decade-bar></div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </th:block>
+</th:block>

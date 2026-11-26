@@ -1,0 +1,450 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: theme-mote-setting
+spec:
+  forms:
+    - group: basic
+      label: 基本与外观
+      formSchema:
+        - $formkit: text
+          name: title
+          label: 博主 / 站点名
+          value: ""
+          help: 显示在顶栏与页脚。留空使用系统站点名称。
+        - $formkit: attachment
+          name: avatar
+          label: 头像
+          value: ""
+          accepts:
+            - "image/*"
+          help: 显示在顶栏左侧。留空使用系统站点 Logo。
+        - $formkit: radio
+          name: color_scheme
+          label: 默认明暗
+          value: light
+          options:
+            - label: 纯净亮色（推荐）
+              value: light
+            - label: 柔和暗色
+              value: dark
+            - label: 跟随系统
+              value: auto
+        - $formkit: color
+          name: primary_color
+          label: 主配色
+          value: "#2563eb"
+          help: 用于导航当前标记、阅读进度与右上漫射窗光（暗色模式自动提亮适配）。
+        - $formkit: color
+          name: secondary_color
+          label: 副配色
+          value: "#f0b890"
+          help: 用于左下对角漫射窗光与双色渐变细节。
+        - $formkit: switch
+          name: cover_palette
+          label: 文章 / 单页随封面图自动取色
+          value: true
+          help: 进入带封面图的文章或独立页时，自动提取封面主副色调适配当前页强调色、顶部氛围光带、浏览器状态栏与评论/搜索组件（自动持久化缓存；离开页面恢复全局配色）。
+        - $formkit: text
+          name: cover_palette_api
+          label: 图床主色接口（可选）
+          value: ""
+          placeholder: "?imageAve"
+          help: 留空默认本地 Canvas 自动取色；若使用外链图床未开跨域，可填七牛/OSS/COS 主色参数（如 ?imageAve 或 ?x-oss-process=image/average-hue）。
+        - $formkit: radio
+          name: ambient_bg
+          label: 桌面留白窗光背景
+          value: home
+          options:
+            - label: 仅首页开启（推荐）
+              value: home
+            - label: 全站开启
+              value: all
+            - label: 关闭
+              value: none
+        - $formkit: toggle
+          name: image_cursor
+          label: 图片悬停光标样式
+          render-type: image
+          size: 84
+          gap: 10
+          value: viewfinder
+          help: 鼠标悬停在首页光影、图库、文章或瞬间配图时显示的专属看图光标（A/B/C 为原生 SVG 零延迟，D/E/F 为阻尼跟随浮标；触屏设备自动禁用）。
+          options:
+            - label: A · 取景框
+              value: viewfinder
+              render: /themes/theme-mote/assets/cursors/viewfinder.svg
+            - label: B · 放大镜
+              value: loupe
+              render: /themes/theme-mote/assets/cursors/loupe.svg
+            - label: C · 展开圆标
+              value: expand
+              render: /themes/theme-mote/assets/cursors/expand.svg
+            - label: D · 毛玻璃
+              value: frosted
+              render: /themes/theme-mote/assets/cursors/frosted.svg
+            - label: E · 光圈环
+              value: aperture
+              render: /themes/theme-mote/assets/cursors/aperture.svg
+            - label: F · 查看胶囊
+              value: pill
+              render: /themes/theme-mote/assets/cursors/pill.svg
+            - label: 系统默认
+              value: system
+              render: /themes/theme-mote/assets/cursors/system.svg
+        - $formkit: attachment
+          name: image_loading_placeholder
+          label: 图片加载中占位图（可选）
+          value: ""
+          accepts:
+            - "image/*"
+          help: 图片加载时显示的占位图；留空使用内置极简骨架微光。
+        - $formkit: attachment
+          name: image_error_placeholder
+          label: 图片加载失败占位图（可选）
+          value: ""
+          accepts:
+            - "image/*"
+          help: 图片无法加载时显示的替换占位图；留空使用内置破图提示（支持点击重试）。
+        - $formkit: switch
+          name: page_transition
+          label: 无刷新平滑切页（Swup）
+          value: true
+          help: 切页时顶栏与雨声白噪音保持不断流。
+
+    - group: home
+      label: 首页与首屏
+      formSchema:
+        - $formkit: select
+          name: intro_mode
+          id: intro_mode
+          label: 首屏模式
+          value: default
+          options:
+            - label: 默认简介与近况（支持内联 HTML）
+              value: default
+            - label: 自定义 HTML / CSS / JS
+              value: custom
+            - label: 隐藏首屏简介
+              value: hidden
+        - $formkit: textarea
+          if: "$get(intro_mode).value !== 'custom' && $get(intro_mode).value !== 'hidden'"
+          name: lede
+          label: 自我介绍（第一段）
+          value: ""
+          help: 支持内联 HTML，留空使用站点副标题。
+        - $formkit: textarea
+          if: "$get(intro_mode).value !== 'custom' && $get(intro_mode).value !== 'hidden'"
+          name: now
+          label: 近期近况（第二段）
+          value: ""
+          help: 支持内联 HTML，聊一句最近在忙的事。
+        - $formkit: code
+          if: "$get(intro_mode).value === 'custom'"
+          name: intro_custom_html
+          label: 自定义首屏 HTML
+          language: html
+          height: 220px
+          value: ""
+        - $formkit: code
+          if: "$get(intro_mode).value === 'custom'"
+          name: intro_custom_css
+          label: 自定义首屏 CSS（可选）
+          language: css
+          height: 160px
+          value: ""
+          help: 无需写 <style> 标签，可直接复用 var(--ink)、var(--surface) 等变量。
+        - $formkit: code
+          if: "$get(intro_mode).value === 'custom'"
+          name: intro_custom_js
+          label: 自定义首屏 JS（可选）
+          language: javascript
+          height: 160px
+          value: ""
+          help: 无需写 <script> 标签，首屏渲染后自动执行。
+        - $formkit: switch
+          if: "$get(intro_mode).value === 'custom'"
+          name: intro_custom_show_now
+          id: intro_custom_show_now
+          label: 下方保留近况微条
+          value: false
+        - $formkit: text
+          if: "$get(intro_mode).value !== 'hidden' && ($get(intro_mode).value !== 'custom' || $get(intro_custom_show_now).value === true)"
+          name: location
+          label: 此刻状态
+          value: ""
+          help: 显示在绿点旁，如「杭州 · 正在打磨博客主题」。留空不显示。
+        - $formkit: text
+          if: "$get(intro_mode).value !== 'hidden' && ($get(intro_mode).value !== 'custom' || $get(intro_custom_show_now).value === true)"
+          name: reading
+          label: 最近在读
+          value: ""
+          help: 如「《设计的法则》」。留空不显示。
+        - $formkit: switch
+          if: "$get(intro_mode).value !== 'hidden' && ($get(intro_mode).value !== 'custom' || $get(intro_custom_show_now).value === true)"
+          name: enable_rain
+          label: 显示「雨声」白噪音开关
+          value: true
+        - $formkit: switch
+          name: show_excerpt_default
+          label: 默认展开文章摘录
+          value: false
+        - $formkit: switch
+          name: enable_hover_cover
+          label: 桌面端悬停文章行预览封面
+          value: true
+
+    - group: modules
+      label: 首页分区
+      formSchema:
+        - $formkit: switch
+          name: show_moments
+          label: 显示「最近瞬间」
+          value: true
+          help: 需安装 Halo 官方瞬间插件（PluginMoments），未安装时自动隐藏。
+        - $formkit: switch
+          name: show_gallery
+          label: 显示「近期光影」
+          value: true
+          help: 需安装 Halo 官方图库插件（PluginPhotos），未安装时自动隐藏。
+        - $formkit: switch
+          name: show_links
+          label: 显示「常逛的朋友」
+          value: true
+          help: 需安装 Halo 官方友链插件（PluginLinks），未安装时自动隐藏。
+        - $formkit: select
+          name: links_group
+          label: 首页展示友链分组
+          value: ""
+          clearable: true
+          autoSelect: false
+          placeholder: 请选择要展示的友链分组（留空默认展示第一个分组）
+          help: 首页「常逛的朋友」仅展示所选的单个分组；全部友链与分组可在友链页查看。
+          action: /apis/core.halo.run/v1alpha1/linkgroups
+          requestOption:
+            method: GET
+            pageField: page
+            sizeField: size
+            totalField: total
+            itemsField: items
+            labelField: spec.displayName
+            valueField: metadata.name
+        - $formkit: switch
+          name: show_projects
+          label: 显示「在做的小东西」
+          value: true
+          help: 需安装项目集插件（portfolio），优先展示推荐项目并提供 /portfolio 列表与详情页，未安装时自动隐藏。
+        - $formkit: switch
+          name: show_closing
+          id: show_closing
+          label: 显示底部「谢谢你看到这里」收尾卡
+          value: true
+        - $formkit: text
+          if: "$get(show_closing).value === true"
+          name: closing_title
+          label: 收尾标题
+          value: ""
+          help: 留空默认显示「谢谢你看到这里」。
+        - $formkit: text
+          if: "$get(show_closing).value === true"
+          name: closing_text
+          label: 收尾文案
+          value: ""
+          help: 留空默认显示「如果这里的某段文字刚好引起共鸣，欢迎写信聊聊，或者订阅更新。」
+        - $formkit: text
+          if: "$get(show_closing).value === true"
+          name: closing_email
+          label: 联系邮箱（点击一键复制，留空隐藏）
+          value: ""
+        - $formkit: text
+          if: "$get(show_closing).value === true"
+          name: closing_link
+          label: 留言 / 关于页面链接（可选）
+          value: ""
+          help: 例如 /about 或 /guestbook。留空不显示。
+        - $formkit: text
+          if: "$get(show_closing).value === true"
+          name: closing_link_label
+          label: 留言按钮文字
+          value: "去留言"
+
+    - group: links
+      label: 友链信息
+      formSchema:
+        - $formkit: text
+          name: site_name
+          label: 友链展示名称
+          value: ""
+          help: 显示在友链申请弹窗的「本站信息」中。留空默认使用博主 / 站点名。
+        - $formkit: text
+          name: site_url
+          label: 友链展示网址
+          value: ""
+          help: 如 https://example.com。留空默认使用系统站点网址。
+        - $formkit: attachment
+          name: site_avatar
+          label: 友链展示头像
+          value: ""
+          accepts:
+            - "image/*"
+          help: 留空默认使用站点头像。
+        - $formkit: text
+          name: site_desc
+          label: 友链展示简介
+          value: ""
+          help: 留空默认使用站点副标题。
+        - $formkit: text
+          name: site_feed
+          label: 友链展示订阅地址（RSS）
+          value: ""
+          help: 如 https://example.com/feed.xml。留空在已装 RSS 插件（PluginFeed）时自动使用 /feed.xml。
+        - $formkit: textarea
+          name: apply_notice
+          label: 申请友链提示语（可选）
+          value: ""
+          help: 显示在友链申请弹窗顶部，可用于说明互链要求或审核说明。
+        - $formkit: text
+          name: friends_url
+          label: 独立朋友圈页面路径（可选）
+          value: ""
+          placeholder: "/friends"
+          help: 在后台「页面」新建独立页（例如别名填 friends）并选用「朋友圈（友链订阅动态）」模板后，在此填写访问路径（如 /friends），即可在首页与友链页显示直达入口；留空则隐藏入口。
+        - $formkit: select
+          name: feeds_page_size
+          label: 朋友圈每页加载条数
+          value: "15"
+          options:
+            - label: 10 条
+              value: "10"
+            - label: 15 条（推荐）
+              value: "15"
+            - label: 20 条
+              value: "20"
+            - label: 30 条
+              value: "30"
+
+    - group: footer
+      label: 页脚与社交
+      formSchema:
+        - $formkit: text
+          name: since
+          label: 建站日期
+          value: ""
+          help: 如 2024-01-01，用于显示「运行第 X 天」。留空不显示。
+        - $formkit: array
+          name: socials
+          label: 社交与底部链接
+          value: []
+          itemLabels:
+            - type: text
+              label: $value.name
+          children:
+            - $formkit: iconify
+              name: icon
+              label: 图标（可选）
+              format: name
+              valueOnly: true
+              help: 使用 Halo 官方 Iconify 组件选择图标（也支持手动粘贴内联 SVG）；留空则仅显示文字。
+            - $formkit: text
+              name: name
+              label: 名称
+              validation: required
+            - $formkit: text
+              name: url
+              label: 链接
+              validation: required
+        - $formkit: text
+          name: icp
+          label: ICP 备案号（可选）
+          value: ""
+        - $formkit: text
+          name: police_icp
+          label: 公安备案号（可选）
+          value: ""
+        - $formkit: text
+          name: note
+          label: 页脚补充文案（可选）
+          value: ""
+          help: 支持内联 HTML。
+        - $formkit: switch
+          name: show_random
+          label: 页脚显示「随机读一篇」入口
+          value: false
+          help: 开启后在页脚链接栏显示「随机读一篇」按钮（顶栏与首页收尾卡已内置该入口）。
+        - $formkit: switch
+          name: show_powered_by
+          label: 显示「Powered by Halo · Mote」版权信息
+          value: true
+
+    - group: post
+      label: 文章与互动
+      formSchema:
+        - $formkit: switch
+          name: show_related_posts
+          label: 文末显示「继续阅读」相关推荐
+          value: true
+          help: 在上一篇 / 下一篇下方展示最多 3 篇同分类或同标签文章。
+        - $formkit: switch
+          name: enable_share_card
+          label: 文末显示「书签图」分享按钮
+          value: true
+          help: 纯前端生成带当前封面配色与扫码直达链接的极简刊物风书签海报，支持复制图片与保存 PNG。
+        - $formkit: attachment
+          name: sponsor_wechat
+          label: 微信赞赏码（可选）
+          value: ""
+          accepts:
+            - "image/*"
+          help: 上传后在文末作者卡片显示「赞赏」按钮；微信与支付宝均留空则自动隐藏。
+        - $formkit: attachment
+          name: sponsor_alipay
+          label: 支付宝收款码（可选）
+          value: ""
+          accepts:
+            - "image/*"
+        - $formkit: text
+          name: sponsor_note
+          label: 赞赏寄语（可选）
+          value: ""
+          placeholder: "如果这篇文章对你有帮助，欢迎请我喝杯咖啡。"
+
+    - group: seo
+      label: 阅读与 SEO / GEO
+      formSchema:
+        - $formkit: select
+          name: post_outdated_days
+          label: 文章时效提示阈值
+          value: "180"
+          help: 文章发布超过设定天数后，在正文开头显示一条克制的时效提醒（可在单篇文章设置中单独覆盖）。
+          options:
+            - label: 关闭全局时效提示
+              value: "0"
+            - label: 90 天
+              value: "90"
+            - label: 180 天（推荐）
+              value: "180"
+            - label: 365 天
+              value: "365"
+        - $formkit: switch
+          name: enable_seo_meta
+          label: 输出 SEO / GEO Meta 与机器发现链接
+          value: true
+          help: 自动输出 canonical、Open Graph、Twitter Card、完整摘要抓取声明（max-snippet:-1）及 RSS 发现链接（不重复 Halo 系统自带的 description / keywords）；若使用第三方 SEO 插件请关闭。
+        - $formkit: switch
+          name: enable_json_ld
+          label: 输出 Schema.org @graph 知识图谱（JSON-LD）
+          value: true
+          help: 为首页（WebSite + Person/sameAs）、文章（BlogPosting + Speakable + BreadcrumbList）、单页、分类/标签和作者页输出实体互联的结构化数据，提升搜索引擎与 AI 引用准确度。
+        - $formkit: text
+          name: llms_txt_url
+          label: LLMs.txt 索引地址（GEO，可选）
+          value: ""
+          placeholder: "/llms.txt"
+          help: 若站点通过插件或反代提供了 /llms.txt，填写路径后会在全站 <head> 注入 alternate text/plain 声明，方便 AI 爬虫发现站点索引。
+        - $formkit: attachment
+          name: default_og_image
+          label: 默认社交分享封面图（可选）
+          value: ""
+          accepts:
+            - "image/*"
+          help: 当页面无封面图时用于 og:image / twitter:image 兜底，留空自动回退站点图标。

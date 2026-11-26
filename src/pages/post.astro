@@ -1,26 +1,538 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import ArticleCover from "../components/post/ArticleCover.astro";
+import Toc from "../components/post/Toc.astro";
+import PostNav from "../components/post/PostNav.astro";
+import RelatedPosts from "../components/post/RelatedPosts.astro";
+import ShareCardModal from "../components/post/ShareCardModal.astro";
+import SponsorModal from "../components/post/SponsorModal.astro";
+import Comments from "../components/post/Comments.astro";
+import Icon from "../components/common/Icon.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import { AVATAR } from "../lib/expressions";
+import "../styles/article.css";
 ---
 
-<Layout contentClass="prose">
-  <Fragment slot="head">
-    <title th:text="|${post.spec.title} - ${site.title}|"></title>
-  </Fragment>
-
-  <div class="page-heading">
-    <h1 th:text="${post.spec.title}"></h1>
-    <p class="page-meta">
-      <span th:text="${#dates.format(post.spec.publishTime, 'yyyy-MM-dd')}"
-      ></span>
-    </p>
-  </div>
-
-  <th:block th:utext="${post.content.content}"></th:block>
-
-  <halo:comment
-    group="content.halo.run"
-    kind="Post"
-    th:attr="name=${post.metadata.name}"
+<Layout page="post" title="|${post.spec.title} - ${site.title}|">
+  <th:block slot="head">
+    <SeoHead
+      type="article"
+      titleExpr="post.spec.title"
+      descExpr="not #strings.isEmpty(post.status?.excerpt) ? post.status.excerpt : (post.spec.excerpt?.raw ?: '')"
+      abstractExpr="#strings.trim(#annotations.getOrDefault(post, 'mote/geo_summary', ''))"
+      imageExpr="post.spec.cover ?: ''"
+      pathExpr="post.status?.permalink ?: ''"
+      publishedTimeExpr="post.spec.publishTime != null ? post.spec.publishTime.toString() : ''"
+      modifiedTimeExpr="post.status?.lastModifyTime != null ? post.status.lastModifyTime.toString() : (post.spec.publishTime != null ? post.spec.publishTime.toString() : '')"
+      authorNameExpr="post.owner?.displayName ?: theme.config.basic?.title ?: site.title ?: ''"
+      authorUrlExpr="post.owner?.permalink ?: ''"
+      authorBioExpr="not #strings.isEmpty(post.owner?.bio) ? post.owner.bio : (theme.config.home?.now ?: site.subtitle ?: '')"
+      sectionExpr="not #lists.isEmpty(post.categories) ? post.categories[0].spec.displayName : ''"
+      keywordsExpr="(not #lists.isEmpty(post.tags) ? #strings.listJoin(post.tags.![spec.displayName], ', ') : '') + (not #strings.isEmpty(#annotations.getOrDefault(post, 'mote/geo_keywords', '')) ? ((not #lists.isEmpty(post.tags) ? ', ' : '') + #strings.trim(#annotations.getOrDefault(post, 'mote/geo_keywords', ''))) : '')"
+      sourceUrlExpr="#strings.trim(#annotations.getOrDefault(post, 'mote/source_url', ''))"
+      crumbParentNameExpr="not #lists.isEmpty(post.categories) ? post.categories[0].spec.displayName : '归档'"
+      crumbParentPathExpr="not #lists.isEmpty(post.categories) ? post.categories[0].status.permalink : '/archives'"
+      jsonLdKind="BlogPosting"
+    />
+    <th:block
+      th:if="${theme.config.seo?.enable_seo_meta != false and not #lists.isEmpty(post.tags)}"
+    >
+      <meta
+        property="article:tag"
+        th:each="tag : ${post.tags}"
+        th:content="${tag.spec.displayName}"
+      />
+    </th:block>
+  </th:block>
+  <article
+    class="article"
+    th:with={`avatar = \${${AVATAR}}, authorName = \${post.owner?.displayName ?: theme.config.basic?.title ?: theme.config.home?.title ?: site.title ?: 'Mote'}, authorPermalink = \${post.owner?.permalink ?: ''}, authorBio = \${not #strings.isEmpty(post.owner?.bio) ? post.owner.bio : (theme.config.home?.now ?: site.subtitle ?: '写代码、做设计，也在这里记录日常的思考与片段。')}, hideCover = \${#annotations.getOrDefault(post, 'mote/hide_cover', 'false') == 'true'}, hideToc = \${#annotations.getOrDefault(post, 'mote/hide_toc', 'false') == 'true'}, hideColophon = \${#annotations.getOrDefault(post, 'mote/hide_colophon', 'false') == 'true'}, outdatedMode = \${#annotations.getOrDefault(post, 'mote/outdated_notice', 'auto')}, customNotice = \${#strings.trim(#annotations.getOrDefault(post, 'mote/notice_text', ''))}, customCopyright = \${#strings.trim(#annotations.getOrDefault(post, 'mote/copyright', ''))}, geoSummary = \${#strings.trim(#annotations.getOrDefault(post, 'mote/geo_summary', ''))}, geoSourceUrl = \${#strings.trim(#annotations.getOrDefault(post, 'mote/source_url', ''))}, customAccent = \${#strings.trim(#annotations.getOrDefault(post, 'mote/accent_color', ''))}, pubDateStr = \${post.spec.publishTime != null ? #temporals.format(post.spec.publishTime, 'yyyy-MM-dd') : ''}, modDateStr = \${post.status?.lastModifyTime != null ? #temporals.format(post.status.lastModifyTime, 'yyyy-MM-dd') : ''}`}
+    th:attr="data-cover-palette-src=${not #strings.isEmpty(post.spec.cover) ? post.spec.cover : null},data-cover-palette-accent=${not #strings.isEmpty(customAccent) ? customAccent : null}"
   >
-  </halo:comment>
+    <header class="article-head wrap--text">
+      <div class="article-topbar">
+        <a class="article-back" href="/" th:href="@{/}">
+          <span class="back-arrow" aria-hidden="true">←</span>
+          <span>返回文章列表</span>
+        </a>
+
+        <div class="article-cats" th:if="${not #lists.isEmpty(post.categories)}">
+          <a
+            class="article-cat-pill"
+            th:each="category : ${post.categories}"
+            th:href="@{${category.status.permalink}}"
+            th:text="${category.spec.displayName}">分类</a
+          >
+        </div>
+      </div>
+
+      <h1 class="article-title" th:text="${post.spec.title}">标题</h1>
+
+      <p
+        class="article-lead"
+        th:if="${post.spec.excerpt?.autoGenerate == false and not #strings.isEmpty(post.spec.excerpt?.raw)}"
+        th:text="${post.spec.excerpt.raw}"
+      >
+        文章导语摘要
+      </p>
+
+      <div class="article-byline">
+        <div class="byline-left">
+          <img
+            class="byline-avatar"
+            th:if="${not #strings.isEmpty(avatar)}"
+            th:src="${avatar}"
+            width="22"
+            height="22"
+            alt=""
+          />
+          <a
+            class="byline-author"
+            th:if="${not #strings.isEmpty(authorPermalink)}"
+            th:href="@{${authorPermalink}}"
+            th:text="${authorName}">Handsome</a
+          >
+          <span
+            class="byline-author"
+            th:if="${#strings.isEmpty(authorPermalink)}"
+            th:text="${authorName}">Handsome</span
+          >
+          <span class="meta-sep" aria-hidden="true">·</span>
+          <time
+            class="num"
+            th:datetime="${post.spec.publishTime}"
+            th:text="${pubDateStr}"
+            >2026-11-12</time
+          >
+          <th:block
+            th:if="${not #strings.isEmpty(modDateStr) and modDateStr != pubDateStr}"
+          >
+            <span class="meta-sep" aria-hidden="true">·</span>
+            <time
+              class="byline-updated num"
+              th:datetime="${post.status.lastModifyTime}"
+              th:text="|更新于 ${modDateStr}|"
+              >更新于 2026-11-24</time
+            >
+          </th:block>
+          <span class="meta-sep" aria-hidden="true" data-readtime-sep hidden>·</span>
+          <span class="num" data-readtime hidden></span>
+          <th:block th:if="${theme.config.post?.show_visit != false}">
+            <span class="meta-sep" aria-hidden="true">·</span>
+            <span class="num" th:text="|${post.stats.visit} 次阅读|">0 次阅读</span>
+          </th:block>
+        </div>
+
+        <div class="reader-tools" role="toolbar" aria-label="阅读排版控制">
+          <button
+            type="button"
+            class="reader-tool-btn"
+            data-prose-font-toggle
+            aria-pressed="false"
+            data-tip="切换无衬线 / 书刊衬线体"
+          >
+            书刊体
+          </button>
+          <button
+            type="button"
+            class="reader-tool-btn"
+            data-prose-size-cycle
+            data-tip="切换正文字号（标准 / 大号 / 紧凑）"
+          >
+            <span data-prose-size-label>A</span>
+          </button>
+          <button
+            type="button"
+            class="reader-tool-btn"
+            data-copy-citation
+            th:attr="data-cite-title=${post.spec.title},data-cite-author=${authorName},data-cite-date=${pubDateStr}"
+            data-tip="复制引用信息"
+            aria-label="复制文章引用信息"
+          >
+            引用
+          </button>
+          <button
+            type="button"
+            class="reader-tool-btn"
+            data-copy-link
+            data-tip="复制文章链接"
+            aria-label="复制文章链接"
+          >
+            <Icon name="link" size={13} />
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div
+      class="article-cover-stage"
+      th:if="${not hideCover and theme.config.post?.show_cover != false and not #strings.isEmpty(post.spec.cover)}"
+    >
+      <ArticleCover item="post" />
+    </div>
+
+    <div class="article-shell wrap--text">
+      <div class="article-main">
+        <div class="article-notices">
+          <div
+            class="article-notice article-notice--custom"
+            role="note"
+            th:if="${not #strings.isEmpty(customNotice)}"
+          >
+            <svg
+              class="article-notice-icon"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M12 10v6"></path>
+              <circle cx="12" cy="7.2" r="0.6" fill="currentColor"></circle>
+            </svg>
+            <p th:text="${customNotice}">自定义提示</p>
+          </div>
+          <div
+            class="article-notice article-notice--outdated"
+            role="note"
+            data-outdated-notice
+            th:attr="data-publish-time=${post.spec.publishTime != null ? post.spec.publishTime.toString() : ''},data-outdated-mode=${outdatedMode},data-outdated-days=${theme.config.seo?.post_outdated_days ?: '180'}"
+            hidden
+          >
+            <p data-outdated-text></p>
+          </div>
+        </div>
+
+        <aside
+          class="article-tldr"
+          aria-label="核心要点"
+          data-article-tldr
+          th:if="${not #strings.isEmpty(geoSummary)}"
+        >
+          <p class="article-tldr-label">核心要点</p>
+          <p
+            class="article-tldr-text"
+            data-article-tldr-text
+            th:text="${geoSummary}"
+          >
+            核心结论
+          </p>
+        </aside>
+
+        <div
+          class="article-content prose"
+          th:utext="${post.content.content}"
+          data-article-body
+        >
+        </div>
+
+        <footer class="article-colophon" th:if="${not hideColophon}">
+          <div class="colophon-meta">
+            <ul
+              class="tag-list"
+              aria-label="标签"
+              th:if="${not #lists.isEmpty(post.tags)}"
+            >
+              <li th:each="tag : ${post.tags}">
+                <a
+                  class="colophon-tag"
+                  th:href="@{${tag.status.permalink}}"
+                  th:text="|#${tag.spec.displayName}|">#标签</a
+                >
+              </li>
+            </ul>
+            <span class="colophon-date num">
+              写于 <time
+                th:datetime="${post.spec.publishTime}"
+                th:text="${#temporals.format(post.spec.publishTime, 'yyyy年MM月dd日')}"
+                >2026年11月24日</time
+              >
+            </span>
+          </div>
+
+          <div class="colophon-card">
+            <div class="colophon-author">
+              <img
+                class="colophon-avatar"
+                th:if="${not #strings.isEmpty(avatar)}"
+                th:src="${avatar}"
+                width="42"
+                height="42"
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+              <div class="colophon-info">
+                <div class="colophon-name-row">
+                  <a
+                    class="colophon-author-link"
+                    th:if="${not #strings.isEmpty(authorPermalink)}"
+                    th:href="@{${authorPermalink}}"
+                  >
+                    <strong th:text="${authorName}">Handsome</strong>
+                  </a>
+                  <strong
+                    th:if="${#strings.isEmpty(authorPermalink)}"
+                    th:text="${authorName}">Handsome</strong
+                  >
+                </div>
+                <p class="colophon-bio" th:text="${authorBio}">
+                  写代码、做设计，也在这里记录日常的思考与片段。
+                </p>
+                <p
+                  class="colophon-copyright"
+                  th:if="${not #strings.isEmpty(customCopyright)}"
+                  th:text="${customCopyright}"
+                >
+                  版权声明
+                </p>
+                <p
+                  class="colophon-source"
+                  th:if="${not #strings.isEmpty(geoSourceUrl)}"
+                >
+                  <span>参考来源：</span>
+                  <a
+                    th:href="${geoSourceUrl}"
+                    th:text="${geoSourceUrl}"
+                    target="_blank"
+                    rel="noopener noreferrer">参考链接</a
+                  >
+                </p>
+              </div>
+            </div>
+
+            <div class="colophon-actions">
+              <div class="colophon-primary">
+                <button
+                  type="button"
+                  class="colophon-pill upvote-btn"
+                  data-upvote
+                  data-upvote-group="content.halo.run"
+                  data-upvote-plural="posts"
+                  th:attr="data-upvote-name=${post.metadata.name}"
+                  data-tip="喜欢这篇文章"
+                  aria-pressed="false"
+                >
+                  <Icon name="heart" size={14} class="upvote-heart" />
+                  <span>喜欢</span>
+                  <span
+                    class="upvote-count num"
+                    data-upvote-count
+                    th:text="${post.stats?.upvote ?: 0}">0</span
+                  >
+                </button>
+                <button
+                  type="button"
+                  class="colophon-pill sponsor-trigger-btn"
+                  th:if="${not #strings.isEmpty(theme.config.post?.sponsor_wechat) or not #strings.isEmpty(theme.config.post?.sponsor_alipay)}"
+                  data-sponsor-open
+                  data-tip="请作者喝杯咖啡"
+                >
+                  <Icon name="coffee" size={14} />
+                  <span>赞赏</span>
+                </button>
+              </div>
+
+              <div class="colophon-utils">
+                <button
+                  type="button"
+                  class="colophon-ghost"
+                  th:if="${theme.config.post?.enable_share_card != false}"
+                  data-share-card-open
+                  th:attr="data-share-title=${post.spec.title},data-share-excerpt=${not #strings.isEmpty(post.status?.excerpt) ? post.status.excerpt : (post.spec.excerpt?.raw ?: '')},data-share-author=${authorName},data-share-date=${pubDateStr},data-share-site=${theme.config.basic?.title ?: site.title ?: 'Mote'},data-share-category=${not #lists.isEmpty(post.categories) ? post.categories[0].spec.displayName : ''},data-share-cover=${post.spec.cover ?: ''}"
+                  data-tip="生成极简书签分享图"
+                >
+                  <Icon name="share" size={13} />
+                  <span>书签图</span>
+                </button>
+                <button
+                  type="button"
+                  class="colophon-ghost"
+                  data-copy-link
+                  data-tip="复制文章链接"
+                >
+                  <Icon name="link" size={13} />
+                  <span>复制链接</span>
+                </button>
+                <span class="colophon-sep" aria-hidden="true"></span>
+                <button
+                  type="button"
+                  class="colophon-icon-btn"
+                  data-random-trigger
+                  data-tip="随机读下一篇"
+                  aria-label="随机读下一篇"
+                >
+                  <Icon name="shuffle" size={14} />
+                </button>
+                <button
+                  type="button"
+                  class="colophon-icon-btn"
+                  data-scroll-top
+                  data-tip="回到顶部"
+                  aria-label="回到顶部"
+                >
+                  <Icon name="arrowUp" size={14} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </footer>
+
+        <th:block th:if="${theme.config.post?.show_prev_next != false}">
+          <PostNav />
+        </th:block>
+        <th:block th:if="${theme.config.post?.show_related_posts != false}">
+          <RelatedPosts />
+        </th:block>
+        <Comments kind="Post" item="post" />
+      </div>
+
+      <aside
+        class="article-aside"
+        th:if="${not hideToc and theme.config.post?.show_toc != false}"
+      >
+        <div class="aside-sticky">
+          <Toc />
+
+          <div class="aside-companion-head" aria-hidden="true">
+            <span class="toc-title">伴读</span>
+            <span class="toc-pct num" data-toc-pct>0%</span>
+          </div>
+
+          <div class="aside-tools">
+            <button
+              type="button"
+              class="aside-tool-btn aside-upvote-btn"
+              data-upvote
+              data-upvote-group="content.halo.run"
+              data-upvote-plural="posts"
+              th:attr="data-upvote-name=${post.metadata.name}"
+              data-tip="喜欢这篇文章"
+              aria-pressed="false"
+            >
+              <Icon name="heart" size={12} class="upvote-heart" />
+              <span>喜欢</span>
+              <span
+                class="upvote-count num"
+                data-upvote-count
+                th:text="${post.stats?.upvote ?: 0}">0</span
+              >
+            </button>
+            <button
+              type="button"
+              class="aside-tool-btn"
+              data-rain-toggle
+              data-tip="开启细雨白噪音"
+              aria-pressed="false"
+              th:if="${theme.config.home?.enable_rain != false}"
+            >
+              <span class="aside-tool-dot" aria-hidden="true"></span>
+              <span>细雨白噪音</span>
+            </button>
+            <button
+              type="button"
+              class="aside-tool-btn"
+              data-prose-font-toggle
+              data-tip="切换书刊衬线体"
+              aria-pressed="false"
+            >
+              <span>书刊衬线体</span>
+            </button>
+            <button
+              type="button"
+              class="aside-tool-btn"
+              data-scroll-top
+              data-tip="回到页面顶部"
+            >
+              <span>回到顶部 ↑</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Mobile / Tablet Floating Reading Companion Pill & Bottom-Sheet TOC (< 1180px) -->
+    <div
+      class="mobile-reading-bar"
+      data-mobile-reading-bar
+      role="region"
+      aria-label="阅读快捷栏"
+    >
+      <button
+        type="button"
+        class="mobile-bar-btn mobile-bar-toc"
+        data-mobile-toc-open
+        hidden
+      >
+        <Icon name="menu" size={14} />
+        <span>目录</span>
+      </button>
+      <span class="mobile-bar-sep" data-mobile-toc-sep hidden aria-hidden="true"></span>
+      <button
+        type="button"
+        class="mobile-bar-btn mobile-bar-upvote"
+        data-upvote
+        data-upvote-group="content.halo.run"
+        data-upvote-plural="posts"
+        th:attr="data-upvote-name=${post.metadata.name}"
+        aria-pressed="false"
+        aria-label="喜欢这篇文章"
+      >
+        <Icon name="heart" size={14} class="upvote-heart" />
+        <span
+          class="num"
+          data-upvote-count
+          th:text="${post.stats?.upvote ?: 0}">0</span
+        >
+      </button>
+      <span class="mobile-bar-sep" aria-hidden="true"></span>
+      <button
+        type="button"
+        class="mobile-dock-pct num"
+        data-scroll-top
+        data-scroll-pct-badge
+        aria-label="回到顶部"
+      >
+        0
+      </button>
+    </div>
+
+    <div
+      class="mobile-toc-modal"
+      data-mobile-toc-modal
+      role="dialog"
+      aria-modal="true"
+      aria-label="文章目录"
+      hidden
+    >
+      <div class="mobile-toc-backdrop" data-mobile-toc-close></div>
+      <div class="mobile-toc-sheet">
+        <div class="mobile-toc-head">
+          <div class="mobile-toc-title-row">
+            <strong>文章目录</strong>
+            <span class="num" data-toc-pct>0%</span>
+          </div>
+          <button
+            type="button"
+            class="icon-btn"
+            data-mobile-toc-close
+            aria-label="关闭目录"
+          >
+            <Icon name="close" size={16} />
+          </button>
+        </div>
+        <ol class="mobile-toc-list" data-mobile-toc-list></ol>
+      </div>
+    </div>
+
+    <th:block th:if="${theme.config.post?.enable_share_card != false}">
+      <ShareCardModal />
+    </th:block>
+    <SponsorModal />
+  </article>
 </Layout>

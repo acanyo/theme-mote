@@ -1,0 +1,78 @@
+---
+/**
+ * Minimal print-postcard bookmark share modal rendered on-demand via Canvas + QRCode.
+ */
+import Icon from "../common/Icon.astro";
+---
+
+<div
+  class="mote-dialog share-card-modal"
+  data-share-modal
+  aria-hidden="true"
+  hidden
+>
+  <div class="mote-dialog-backdrop" data-close></div>
+  <div
+    class="mote-dialog-sheet share-card-sheet"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="share-card-title"
+  >
+    <div class="mote-dialog-head">
+      <h2 class="mote-dialog-title" id="share-card-title">书签图</h2>
+      <button
+        type="button"
+        class="mote-dialog-close"
+        data-close
+        aria-label="关闭书签图预览"
+      >
+        <Icon name="close" size={15} />
+      </button>
+    </div>
+
+    <div class="share-card-stage">
+      <div class="share-card-loading" data-share-loading>绘制中…</div>
+      <canvas
+        class="share-card-canvas"
+        data-share-canvas
+        aria-label="文章书签分享图预览"
+      ></canvas>
+    </div>
+
+    <div class="share-card-footer">
+      <div class="share-theme-seg" role="radiogroup" aria-label="书签纸色">
+        <button
+          type="button"
+          class="share-theme-btn is-active"
+          data-share-theme="light"
+          aria-checked="true"
+        >
+          浅纸
+        </button>
+        <button
+          type="button"
+          class="share-theme-btn"
+          data-share-theme="dark"
+          aria-checked="false"
+        >
+          夜墨
+        </button>
+      </div>
+
+      <div class="share-card-actions">
+        <button type="button" class="share-action-btn" data-share-copy>
+          <Icon name="copy" size={13} />
+          <span>复制</span>
+        </button>
+        <button
+          type="button"
+          class="share-action-btn is-primary"
+          data-share-download
+        >
+          <Icon name="download" size={13} />
+          <span>保存图片</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

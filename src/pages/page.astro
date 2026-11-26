@@ -1,25 +1,153 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import ArticleCover from "../components/post/ArticleCover.astro";
+import Toc from "../components/post/Toc.astro";
+import Comments from "../components/post/Comments.astro";
+import Icon from "../components/common/Icon.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import "../styles/article.css";
 ---
 
-<Layout contentClass="prose">
-  <Fragment slot="head">
-    <title th:text="|${singlePage.spec.title} - ${site.title}|"></title>
-  </Fragment>
+<Layout page="single" title="|${singlePage.spec.title} - ${site.title}|">
+  <SeoHead
+    slot="head"
+    type="website"
+    titleExpr="singlePage.spec.title"
+    descExpr="not #strings.isEmpty(singlePage.status?.excerpt) ? singlePage.status.excerpt : (singlePage.spec.excerpt?.raw ?: '')"
+    imageExpr="singlePage.spec.cover ?: ''"
+    pathExpr="singlePage.status?.permalink ?: ''"
+    jsonLdKind="WebPage"
+  />
+  <article
+    class="article"
+    th:with="hideCover = ${#annotations.getOrDefault(singlePage, 'mote/hide_cover', 'false') == 'true'}, hideToc = ${#annotations.getOrDefault(singlePage, 'mote/hide_toc', 'false') == 'true'}, hideTopbar = ${#annotations.getOrDefault(singlePage, 'mote/hide_topbar', 'false') == 'true'}, customNotice = ${#strings.trim(#annotations.getOrDefault(singlePage, 'mote/notice_text', ''))}, customAccent = ${#strings.trim(#annotations.getOrDefault(singlePage, 'mote/accent_color', ''))}"
+    th:attr="data-cover-palette-src=${not #strings.isEmpty(singlePage.spec.cover) ? singlePage.spec.cover : null},data-cover-palette-accent=${not #strings.isEmpty(customAccent) ? customAccent : null}"
+  >
+    <header class="article-head wrap--text">
+      <div class="article-topbar" th:if="${not hideTopbar}">
+        <a class="article-back" href="/" th:href="@{/}">
+          <span class="back-arrow" aria-hidden="true">←</span>
+          <span>返回首页</span>
+        </a>
 
-  <div class="page-heading">
-    <h1 th:text="${singlePage.spec.title}"></h1>
-    <p class="page-meta">
-      <span
-        th:text="${#dates.format(singlePage.spec.publishTime, 'yyyy-MM-dd')}"
-      ></span>
-    </p>
-  </div>
+        <div class="reader-tools" role="toolbar" aria-label="阅读排版控制">
+          <button
+            type="button"
+            class="reader-tool-btn"
+            data-prose-font-toggle
+            aria-pressed="false"
+            title="切换无衬线 / 书刊衬线字体"
+          >
+            书刊体
+          </button>
+          <button
+            type="button"
+            class="reader-tool-btn"
+            data-prose-size-cycle
+            title="切换正文字号（标准 / 舒适 / 紧凑）"
+          >
+            <span data-prose-size-label>A</span>
+          </button>
+          <button
+            type="button"
+            class="reader-tool-btn"
+            data-copy-link
+            title="复制页面链接"
+            aria-label="复制页面链接"
+          >
+            <Icon name="link" size={13} />
+          </button>
+        </div>
+      </div>
 
-  <div th:utext="${singlePage.content.content}"></div>
+      <h1 class="article-title" th:text="${singlePage.spec.title}">页面</h1>
 
-  <halo:comment
-    group="content.halo.run"
-    kind="SinglePage"
-    th:attr="name=${singlePage.metadata.name}"></halo:comment>
+      <p
+        class="article-lead"
+        th:if="${singlePage.spec.excerpt?.autoGenerate == false and not #strings.isEmpty(singlePage.spec.excerpt?.raw)}"
+        th:text="${singlePage.spec.excerpt.raw}"
+      >
+        页面导语
+      </p>
+    </header>
+
+    <div
+      class="article-cover-stage"
+      th:if="${not hideCover and not #strings.isEmpty(singlePage.spec.cover)}"
+    >
+      <ArticleCover item="singlePage" />
+    </div>
+
+    <div class="article-shell wrap--text">
+      <div class="article-main">
+        <div
+          class="article-notices"
+          th:if="${not #strings.isEmpty(customNotice)}"
+        >
+          <div class="article-notice article-notice--custom" role="note">
+            <svg
+              class="article-notice-icon"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M12 10v6"></path>
+              <circle cx="12" cy="7.2" r="0.6" fill="currentColor"></circle>
+            </svg>
+            <p th:text="${customNotice}">自定义提示</p>
+          </div>
+        </div>
+
+        <div
+          class="article-content prose"
+          th:utext="${singlePage.content.content}"
+          data-article-body
+        >
+        </div>
+        <Comments kind="SinglePage" item="singlePage" />
+      </div>
+
+      <aside class="article-aside" th:if="${not hideToc}">
+        <div class="aside-sticky">
+          <Toc />
+
+          <div class="aside-companion-head" aria-hidden="true">
+            <span class="toc-title">伴读</span>
+            <span class="toc-pct num" data-toc-pct>0%</span>
+          </div>
+
+          <div class="aside-tools">
+            <button
+              type="button"
+              class="aside-tool-btn"
+              data-rain-toggle
+              aria-pressed="false"
+              th:if="${theme.config.home?.enable_rain != false}"
+            >
+              <span class="aside-tool-dot" aria-hidden="true"></span>
+              <span>细雨白噪音</span>
+            </button>
+            <button
+              type="button"
+              class="aside-tool-btn"
+              data-prose-font-toggle
+              aria-pressed="false"
+            >
+              <span>书刊衬线体</span>
+            </button>
+            <button type="button" class="aside-tool-btn" data-scroll-top>
+              <span>回到顶部 ↑</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </article>
 </Layout>

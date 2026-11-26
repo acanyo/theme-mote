@@ -1,0 +1,131 @@
+---
+import Icon from "../common/Icon.astro";
+import "../../styles/footer.css";
+---
+
+<footer
+  class="site-footer wrap"
+  th:with="brandTitle = ${theme.config.basic?.title ?: theme.config.home?.title ?: site.title ?: 'Mote'}, since = ${#strings.trim(theme.config.footer?.since ?: theme.config.sidebar?.since ?: '')}, socials = ${not #lists.isEmpty(theme.config.footer?.socials) ? theme.config.footer.socials : theme.config.home?.socials}, icp = ${#strings.trim(theme.config.footer?.icp ?: '')}, policeIcp = ${#strings.trim(theme.config.footer?.police_icp ?: '')}, note = ${#strings.trim(theme.config.footer?.note ?: '')}, showRandom = ${theme.config.footer?.show_random == true}, showPowered = ${theme.config.footer?.show_powered_by != false}, hasLegal = ${not #strings.isEmpty(icp) or not #strings.isEmpty(policeIcp)}, hasMetaRow = ${hasLegal or showPowered}"
+>
+  <div class="footer-main">
+    <div class="footer-identity">
+      <span class="footer-copyright">
+        © <span class="num" th:text="${#temporals.year(#temporals.createNow())}">2026</span>
+        <span class="footer-brand" th:text="${brandTitle}">Mote</span>
+      </span>
+      <span
+        class="footer-sep"
+        aria-hidden="true"
+        th:if="${not #strings.isEmpty(since)}">·</span
+      >
+      <span class="footer-since" th:if="${not #strings.isEmpty(since)}">
+        运行第 <span class="num" th:attr="data-since=${since}">—</span> 天
+      </span>
+    </div>
+
+    <nav class="footer-nav" aria-label="页脚链接">
+      <button
+        type="button"
+        class="footer-link"
+        data-random-trigger
+        th:if="${showRandom}"
+      >
+        <span class="footer-link-icon" aria-hidden="true">
+          <Icon name="shuffle" size={13} />
+        </span>
+        <span>随机读一篇</span>
+      </button>
+      <a
+        class="footer-link"
+        th:each="social : ${socials}"
+        th:href="${social.url}"
+        target="_blank"
+        rel="noopener me"
+      >
+        <span
+          class="footer-link-icon"
+          aria-hidden="true"
+          th:if="${not #strings.isEmpty(social.icon)}"
+          th:attr="data-iconify=${not #strings.startsWith(#strings.trim(social.icon), '<svg') ? #strings.trim(social.icon) : null}"
+          th:utext="${#strings.startsWith(#strings.trim(social.icon), '<svg') ? social.icon : ''}"
+        ></span>
+        <span th:text="${social.name}">社交</span>
+      </a>
+      <a
+        class="footer-link"
+        href="/feed.xml"
+        th:if="${pluginFinder.available('PluginFeed')}"
+      >
+        <span class="footer-link-icon" aria-hidden="true">
+          <Icon name="rss" size={13} />
+        </span>
+        <span>RSS</span>
+      </a>
+      <a
+        class="footer-link"
+        href="/sitemap.xml"
+        th:if="${pluginFinder.available('PluginSitemap')}"
+      >
+        <span class="footer-link-icon" aria-hidden="true">
+          <Icon name="sitemap" size={13} />
+        </span>
+        <span>Sitemap</span>
+      </a>
+      <button
+        type="button"
+        class="footer-top-btn"
+        data-scroll-top
+        data-tip="回到顶部"
+        aria-label="回到顶部"
+      >
+        <Icon name="arrowUp" size={13} />
+      </button>
+    </nav>
+  </div>
+
+  <div
+    class="footer-note"
+    th:if="${not #strings.isEmpty(note)}"
+    th:utext="${note}"
+  ></div>
+
+  <div class="footer-meta" th:if="${hasMetaRow}">
+    <div class="footer-legal" th:if="${hasLegal}">
+      <a
+        class="footer-legal-link"
+        href="https://beian.miit.gov.cn/"
+        target="_blank"
+        rel="noopener noreferrer"
+        th:if="${not #strings.isEmpty(icp)}"
+        th:text="${icp}"
+        >ICP 备案</a
+      >
+      <span
+        class="footer-sep"
+        aria-hidden="true"
+        th:if="${not #strings.isEmpty(icp) and not #strings.isEmpty(policeIcp)}"
+        >·</span
+      >
+      <a
+        class="footer-legal-link"
+        href="https://beian.mps.gov.cn/#/query/webSearch"
+        target="_blank"
+        rel="noopener noreferrer"
+        th:if="${not #strings.isEmpty(policeIcp)}"
+        th:text="${policeIcp}"
+        >公安备案</a
+      >
+    </div>
+
+    <div class="footer-credit" th:if="${showPowered}">
+      Powered by
+      <a href="https://www.halo.run" target="_blank" rel="noopener">Halo</a>
+      <span class="footer-sep" aria-hidden="true">·</span>
+      <a
+        href="https://github.com/acanyo/theme-mote"
+        target="_blank"
+        rel="noopener">Mote</a
+      >
+    </div>
+  </div>
+</footer>

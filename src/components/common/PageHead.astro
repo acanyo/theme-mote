@@ -1,0 +1,19 @@
+---
+/**
+ * Title block for list and index pages. The title is a Thymeleaf
+ * expression. The `lede` slot carries one line below it.
+ */
+import "../../styles/page.css";
+
+interface Props {
+  title: string;
+  /** Static fallback shown in the built template before Halo renders. */
+  fallback?: string;
+}
+const { title, fallback = "" } = Astro.props;
+---
+
+<header class="page-head wrap">
+  <h1 class="page-title" th:text={title}>{fallback}</h1>
+  <div class="page-lede"><slot /></div>
+</header>

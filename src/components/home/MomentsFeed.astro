@@ -1,0 +1,77 @@
+---
+import { momentText } from "../../lib/expressions";
+---
+
+<th:block
+  th:if="${theme.config.modules?.show_moments != false and pluginFinder.available('PluginMoments')}"
+>
+  <th:block
+    th:with="momentsLimit = ${theme.config.modules?.moments_limit ?: 3}, pluginMoments = ${momentFinder.list({page: 1, size: momentsLimit, sort: {'spec.releaseTime,desc'}})}"
+  >
+    <section
+      class="home-section home-moments"
+      id="moments"
+      aria-labelledby="home-moment-title"
+      th:if="${pluginMoments != null and not #lists.isEmpty(pluginMoments.items)}"
+    >
+      <header class="section-bar">
+        <h2 class="section-label" id="home-moment-title">最近瞬间</h2>
+        <a class="quiet-link" href="/moments" th:href="@{/moments}">
+          <span>全部瞬间</span>
+          <span class="quiet-arrow" aria-hidden="true">→</span>
+        </a>
+      </header>
+
+      <ol class="timeline-list">
+        <li
+          class="timeline-item"
+          th:each="moment : ${pluginMoments.items}"
+          th:with={`preview = ${momentText(180)}, media = \${moment.spec.content.medium}`}
+        >
+          <span class="timeline-node" aria-hidden="true"></span>
+          <a
+            class="timeline-time num"
+            th:href="@{|/moments/${moment.metadata.name}|}"
+            th:text="${#temporals.format(moment.spec.releaseTime, 'yyyy-MM-dd HH:mm')}"
+            >2026-11-24 09:40</a
+          >
+          <a
+            class="timeline-text-link"
+            th:if="${not #strings.isEmpty(preview)}"
+            th:href="@{|/moments/${moment.metadata.name}|}"
+          >
+            <p class="timeline-text" th:text="${preview}"></p>
+          </a>
+
+          <div
+            class="timeline-photos"
+            th:if="${not #lists.isEmpty(media)}"
+            th:classappend="${#lists.size(media) > 1} ? 'is-multi' : 'is-single'"
+            data-lightbox-gallery
+          >
+            <th:block th:each="m, mIter : ${media}">
+              <button
+                type="button"
+                class="timeline-photo-btn"
+                th:if="${m.type.name == 'PHOTO' and mIter.index < 2}"
+                th:attr="data-lightbox-trigger=${m.url}"
+                aria-label="放大查看图片"
+              >
+                <img th:src="${m.url}" alt="" loading="lazy" decoding="async" />
+              </button>
+            </th:block>
+          </div>
+
+          <div class="timeline-meta" th:if="${moment.stats.approvedComment > 0}">
+            <a
+              class="timeline-detail-link"
+              th:href="@{|/moments/${moment.metadata.name}|}"
+            >
+              <span class="num" th:text="${moment.stats.approvedComment}">0</span> 条评论
+            </a>
+          </div>
+        </li>
+      </ol>
+    </section>
+  </th:block>
+</th:block>

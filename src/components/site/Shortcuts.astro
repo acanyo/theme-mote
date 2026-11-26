@@ -1,0 +1,79 @@
+---
+/** Keyboard shortcut reference, opened with Shift + ? (scripts/shortcuts.ts). */
+import Icon from "../common/Icon.astro";
+import { SHORTCUTS } from "../../lib/shortcuts";
+---
+
+<div
+  class="cc shortcuts"
+  data-shortcuts
+  aria-hidden="true"
+  th:if="${theme.config.motion?.shortcuts != false}"
+>
+  <div class="cc-backdrop" data-cc-close></div>
+  <section
+    class="cc-sheet glass-lens"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="shortcuts-title"
+  >
+    <header class="cc-head">
+      <h2 id="shortcuts-title">键盘快捷键</h2>
+      <button class="icon-btn" type="button" data-cc-close aria-label="关闭">
+        <Icon name="close" size={18} />
+      </button>
+    </header>
+    <dl class="shortcut-list">
+      {
+        SHORTCUTS.map((item) => (
+          <div>
+            <dt>{item.label}</dt>
+            <dd>
+              {item.keys.map((key) => (
+                <kbd>{key}</kbd>
+              ))}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+</div>
+
+<style>
+  .shortcut-list {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 8px 20px 18px;
+  }
+
+  .shortcut-list div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 9px 4px;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+
+  .shortcut-list dd {
+    display: flex;
+    gap: 6px;
+    margin: 0;
+  }
+
+  kbd {
+    min-width: 28px;
+    padding: 3px 8px;
+    border-radius: 7px;
+    border: 1px solid var(--line-strong);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-align: center;
+    color: var(--ink);
+    background: var(--surface);
+  }
+</style>

@@ -1,0 +1,374 @@
+/* ==========================================================================
+   Mote Minimal Plus · Image Loading Skeleton & Error Fallback Placeholders
+   ========================================================================== */
+
+@keyframes moteImgShimmer {
+  0% {
+    background-position: 180% 0;
+  }
+  100% {
+    background-position: -180% 0;
+  }
+}
+
+@keyframes moteLightboxSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Smooth reveal for all managed images */
+img[data-img-state] {
+  transition: opacity 0.34s var(--ease-out);
+}
+
+/* Preserve existing hover zoom transitions on gallery/cover images */
+.filmstrip-frame img[data-img-state],
+.photo-card img[data-img-state],
+.timeline-photo-btn img[data-img-state],
+.moment-photo img[data-img-state],
+.article-cover img[data-img-state] {
+  transition:
+    opacity 0.34s var(--ease-out),
+    transform 0.5s var(--ease-out);
+}
+
+img[data-img-state="loading"] {
+  opacity: 0;
+}
+
+img[data-img-state="loaded"] {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   1. Framed Containers Loading State (.filmstrip-frame, .photo-card, etc.)
+   ========================================================================== */
+.filmstrip-frame,
+.photo-card,
+.photo-stage-frame,
+.article-cover,
+.moment-photo,
+.timeline-photo-btn {
+  position: relative;
+}
+
+.is-img-loading {
+  background-color: var(--surface);
+  background-image: linear-gradient(
+    105deg,
+    var(--surface) 28%,
+    color-mix(in srgb, var(--bg) 62%, var(--surface)) 48%,
+    var(--surface) 68%
+  );
+  background-size: 260% 100%;
+  animation: moteImgShimmer 1.65s ease-in-out infinite;
+}
+
+html.dark .is-img-loading {
+  background-image: linear-gradient(
+    105deg,
+    var(--surface) 28%,
+    color-mix(in srgb, var(--ink) 8%, var(--surface)) 48%,
+    var(--surface) 68%
+  );
+}
+
+/* Optional user-configured custom loading placeholder image */
+html[data-has-loading-placeholder="true"] .is-img-loading {
+  background-image: var(--img-loading-bg);
+  background-size: cover;
+  background-position: center;
+  animation: none;
+}
+
+html[data-has-loading-placeholder="true"] .is-img-loading::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.22) 50%,
+    transparent 70%
+  );
+  background-size: 240% 100%;
+  animation: moteImgShimmer 1.8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Guarantee visible stage height while exhibition photo / cover loads */
+.photo-stage-frame.is-img-loading,
+.photo-stage-frame.is-img-error {
+  min-height: 280px;
+}
+
+.moment-media.is-1 .moment-photo.is-img-loading,
+.moment-media.is-1 .moment-photo.is-img-error {
+  min-height: 200px;
+}
+
+/* ==========================================================================
+   2. Standalone Prose Images Loading State
+   ========================================================================== */
+.prose img[data-img-state="loading"] {
+  opacity: 1;
+  color: transparent;
+  min-height: 190px;
+  width: 100%;
+  background-color: var(--surface);
+  background-image: linear-gradient(
+    105deg,
+    var(--surface) 28%,
+    color-mix(in srgb, var(--bg) 62%, var(--surface)) 48%,
+    var(--surface) 68%
+  );
+  background-size: 260% 100%;
+  animation: moteImgShimmer 1.65s ease-in-out infinite;
+}
+
+html.dark .prose img[data-img-state="loading"] {
+  background-image: linear-gradient(
+    105deg,
+    var(--surface) 28%,
+    color-mix(in srgb, var(--ink) 8%, var(--surface)) 48%,
+    var(--surface) 68%
+  );
+}
+
+html[data-has-loading-placeholder="true"] .prose img[data-img-state="loading"] {
+  background-image: var(--img-loading-bg);
+  background-size: cover;
+  background-position: center;
+  animation: none;
+}
+
+/* ==========================================================================
+   3. Framed Containers Error State
+   ========================================================================== */
+.is-img-error {
+  background: var(--surface);
+}
+
+.is-img-error > img[data-img-state="error"],
+.is-img-error .photo-stage-trigger > img[data-img-state="error"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Suppress zoom-in / custom image cursor on broken frames */
+html[data-image-cursor] .is-img-error,
+html[data-image-cursor] .is-img-error [data-lightbox-trigger] {
+  cursor: default !important;
+}
+
+html[data-image-cursor] a.photo-card.is-img-error {
+  cursor: pointer !important;
+}
+
+.img-error-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px 10px;
+  text-align: center;
+  color: var(--ink-3);
+  background: var(--surface);
+}
+
+.img-error-overlay.has-custom {
+  padding: 0;
+}
+
+.img-error-custom {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.img-error-icon {
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+.img-error-label {
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--ink-3);
+  letter-spacing: 0.01em;
+}
+
+.img-retry-chip,
+.img-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  cursor: pointer;
+  transition:
+    color 0.16s ease,
+    border-color 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.img-retry-chip:hover,
+.img-retry-btn:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+  background: var(--hover-soft);
+}
+
+/* ==========================================================================
+   4. Standalone Prose Image Error Card
+   ========================================================================== */
+.prose img[data-img-state="error"] {
+  display: none;
+}
+
+.img-error-card {
+  margin: 1.9em auto;
+  min-height: 172px;
+  padding: 24px 20px;
+  border-radius: 10px;
+  border: 1px dashed var(--line-strong);
+  background: color-mix(in srgb, var(--surface) 76%, var(--bg));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  text-align: center;
+  color: var(--ink-3);
+}
+
+.img-error-card.has-custom {
+  padding: 0;
+  border-style: solid;
+  border-color: var(--line);
+  overflow: hidden;
+  min-height: 0;
+}
+
+.img-error-card.has-custom .img-error-custom {
+  max-height: 360px;
+  object-fit: contain;
+}
+
+.img-error-alt {
+  max-width: 420px;
+  font-size: 12px;
+  color: var(--ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   5. Avatars & Small Icons
+   ========================================================================== */
+.brand-avatar[data-img-state="loading"],
+.byline-avatar[data-img-state="loading"],
+.colophon-avatar[data-img-state="loading"],
+.moment-avatar[data-img-state="loading"],
+.friend-badge-img[data-img-state="loading"],
+.link-avatar[data-img-state="loading"] {
+  opacity: 1;
+  background: var(--surface);
+}
+
+img[data-img-fallback="avatar"] {
+  background: var(--surface);
+  opacity: 1;
+}
+
+/* ==========================================================================
+   6. Lightbox Loading & Error State
+   ========================================================================== */
+.lightbox-status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, visibility 0.18s ease;
+}
+
+.minimal-lightbox.is-loading .lightbox-status[data-lightbox-loading],
+.minimal-lightbox.is-error .lightbox-status[data-lightbox-error] {
+  opacity: 1;
+  visibility: visible;
+}
+
+.minimal-lightbox.is-error .lightbox-status[data-lightbox-error] {
+  pointer-events: auto;
+}
+
+.minimal-lightbox.is-loading img,
+.minimal-lightbox.is-error img {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+.lightbox-spinner {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: rgba(255, 255, 255, 0.88);
+  animation: moteLightboxSpin 0.72s linear infinite;
+}
+
+.lightbox-error-card {
+  padding: 20px 26px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+}
+
+.lightbox-error-card .img-retry-btn {
+  margin-top: 4px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.lightbox-error-card .img-retry-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-img-loading,
+  .prose img[data-img-state="loading"] {
+    animation: none;
+  }
+}

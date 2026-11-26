@@ -1,0 +1,390 @@
+/* ==========================================================================
+   Minimal Plus · Archives (Timeline + Instant Filter + Seamless Lazy Load)
+   ========================================================================== */
+
+.archive-head-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 18px;
+  flex-wrap: wrap;
+}
+
+.archive-summary {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.archive-summary-sep {
+  margin: 0 6px;
+  color: var(--ink-faint);
+}
+
+.archive-search-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: min(230px, 100%);
+}
+
+.archive-search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--ink-3);
+  pointer-events: none;
+}
+
+.archive-search-input {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px 0 30px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--bg);
+  font-size: 12.5px;
+  color: var(--ink);
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    width 0.2s var(--ease-out);
+}
+
+.archive-search-input::placeholder {
+  color: var(--ink-faint);
+}
+
+.archive-search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.archive-search-count {
+  position: absolute;
+  right: 10px;
+  font-size: 11px;
+  color: var(--accent);
+  pointer-events: none;
+}
+
+.archive-search-count[hidden] {
+  display: none;
+}
+
+.archive-search-wrap.has-count .archive-search-input {
+  padding-right: 54px;
+}
+
+/* Year Quick-Jump Pills */
+.archive-year-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 26px;
+}
+
+.archive-year-pill {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--ink-3);
+  background: color-mix(in srgb, var(--surface) 65%, var(--bg));
+  border: 1px solid var(--line);
+  transition:
+    color 0.16s ease,
+    border-color 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.archive-year-pill:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+  background: var(--hover);
+}
+
+/* Years & Months Timeline */
+.archive-years {
+  display: flex;
+  flex-direction: column;
+  gap: 42px;
+}
+
+.archive-year {
+  scroll-margin-top: 76px;
+}
+
+.archive-year[hidden],
+.archive-month[hidden],
+.archive-post-item[hidden] {
+  display: none;
+}
+
+.archive-year-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.archive-year-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 640;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.archive-year-line {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.archive-year-count {
+  font-size: 12px;
+  color: var(--ink-3);
+  flex-shrink: 0;
+}
+
+.archive-months {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.archive-month {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.archive-month-title {
+  position: sticky;
+  top: 76px;
+  margin: 0;
+  padding-top: 11px;
+  font-size: 12px;
+  font-weight: 480;
+  color: var(--ink-3);
+}
+
+.archive-posts {
+  position: relative;
+  margin: 0 -10px 0 0;
+  padding: 0 0 0 18px;
+  list-style: none;
+  border-left: 1px solid var(--line);
+}
+
+.archive-post-item {
+  position: relative;
+}
+
+.archive-post-item::after {
+  content: "";
+  position: absolute;
+  left: -21.5px;
+  top: 18px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--line-strong);
+  box-shadow: 0 0 0 2px var(--bg);
+  transition: background-color 0.18s ease, transform 0.18s ease;
+}
+
+.archive-post-item:hover::after {
+  background: var(--accent);
+  transform: scale(1.25);
+}
+
+.archive-post-item:not([hidden]) ~ .archive-post-item:not([hidden])::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10px;
+  right: 10px;
+  height: 1px;
+  background: var(--line);
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+
+.archive-post-item:hover::before,
+.archive-post-item:hover + .archive-post-item::before {
+  opacity: 0;
+}
+
+.archive-post {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 10px;
+  border-radius: 9px;
+  transition:
+    opacity 0.22s ease,
+    background-color 0.18s ease;
+}
+
+@media (hover: hover) {
+  .archive-posts:hover .archive-post {
+    opacity: 0.45;
+  }
+  .archive-posts:hover .archive-post:hover {
+    opacity: 1;
+    background: var(--hover-soft);
+  }
+}
+
+.archive-post-main {
+  min-width: 0;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.archive-post-title {
+  font-size: 15px;
+  font-weight: 480;
+  line-height: 1.5;
+  color: var(--ink);
+  transition: transform 0.22s var(--ease-out);
+}
+
+.archive-post:hover .archive-post-title {
+  transform: translateX(2px);
+}
+
+.archive-pin {
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  line-height: 1.45;
+}
+
+.archive-post-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.archive-post-cat {
+  font-size: 12px;
+  color: var(--ink-faint);
+  transition: color 0.18s ease;
+}
+
+.archive-post:hover .archive-post-cat {
+  color: var(--ink-3);
+}
+
+.archive-post time {
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+/* Seamless Lazy Load-More Bar */
+.archive-loader {
+  margin-top: 34px;
+  display: flex;
+  justify-content: center;
+}
+
+.archive-load-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--ink-2);
+  background: color-mix(in srgb, var(--surface) 60%, var(--bg));
+  border: 1px solid var(--line-strong);
+  transition:
+    color 0.16s ease,
+    border-color 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.archive-load-btn:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--hover);
+  border-color: var(--ink-3);
+}
+
+.archive-load-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.archive-load-meta {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.archive-end-note {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.archive-pagination-fallback[hidden] {
+  display: none;
+}
+
+@media (max-width: 560px) {
+  .archive-search-wrap {
+    width: 100%;
+  }
+  .archive-search-input {
+    height: 38px;
+    font-size: 16px;
+  }
+  .archive-year-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+    padding-bottom: 2px;
+  }
+  .archive-year-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .archive-year-pill {
+    flex-shrink: 0;
+    padding: 4px 12px;
+  }
+  .archive-month {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+  .archive-month-title {
+    position: static;
+    padding-top: 0;
+  }
+  .archive-posts {
+    margin-right: -8px;
+    padding-left: 14px;
+  }
+  .archive-post-item::after {
+    left: -17.5px;
+  }
+  .archive-post {
+    flex-direction: column;
+    gap: 4px;
+    padding: 11px 8px;
+  }
+}

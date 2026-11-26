@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="bg-d" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#221e33"/>
+      <stop offset="52%" stop-color="#614e75"/>
+      <stop offset="100%" stop-color="#db9e7c"/>
+    </linearGradient>
+    <radialGradient id="glass-d" cx="35%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.48"/>
+      <stop offset="55%" stop-color="#ffffff" stop-opacity="0.24"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.14"/>
+    </radialGradient>
+  </defs>
+  <rect width="120" height="120" fill="url(#bg-d)"/>
+  <circle cx="34" cy="34" r="22" fill="#ffffff" opacity="0.22"/>
+  <path d="M0 90 C34 62, 82 102, 120 64 L120 120 L0 120 Z" fill="#120e1e" opacity="0.32"/>
+  <circle cx="60" cy="60" r="28" fill="url(#glass-d)" stroke="rgba(255,255,255,0.72)" stroke-width="1.5"/>
+  <g fill="none" stroke="#ffffff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" transform="translate(48 48)">
+    <polyline points="15 3 21 3 21 9"/>
+    <polyline points="9 21 3 21 3 15"/>
+    <line x1="21" y1="3" x2="14" y2="10"/>
+    <line x1="3" y1="21" x2="10" y2="14"/>
+  </g>
+</svg>

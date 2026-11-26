@@ -1,18 +1,24 @@
 apiVersion: theme.halo.run/v1alpha1
 kind: Theme
 metadata:
-  name: astro-starter
+  name: theme-mote
 spec:
-  displayName: Astro Starter
+  displayName: Mote
   author:
-    name: Your Name
-    website: https://github.com/YourName
-  description: A starter theme for Halo.
-  logo: https://www.halo.run/logo
-  homepage: https://github.com/halo-sigs/theme-astro-starter
-  issues: https://github.com/halo-sigs/theme-astro-starter/issues
+    name: Handsome
+  description: 一款极简耐看的 Halo 单栏个人博客主题，专注中文阅读体验，融合封面取色、平滑切页与独立站生活记录。
+  settingName: theme-mote-setting
+  configMapName: theme-mote-configmap
   version: "1.0.0"
-  requires: ">=2.0.0"
+  requires: ">=2.22.1"
   license:
     - name: "GPL-3.0"
       url: "https://www.gnu.org/licenses/gpl-3.0.en.html"
+  customTemplates:
+    page:
+      - name: 朋友圈（友链订阅动态）
+        description: 独立朋友圈页面，适配链接管理插件（PluginLinks 2.5+）展示友链站点的最新 RSS 订阅动态。
+        file: page_friends.html
+      - name: 留言板（极简书信页）
+        description: 独立留言板页面，展示简短欢迎导语并直接衔接评论区，支持随封面图取色。
+        file: page_guestbook.html

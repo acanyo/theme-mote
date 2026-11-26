@@ -1,0 +1,189 @@
+---
+/**
+ * templates/page_friends.html: custom Halo SinglePage template for a standalone
+ * Friends Circle (朋友圈) route (e.g. /friends), powered by halo-sigs/plugin-links (v2.5+).
+ */
+import Layout from "../layouts/Layout.astro";
+import PageHead from "../components/common/PageHead.astro";
+import Comments from "../components/post/Comments.astro";
+import Icon from "../components/common/Icon.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import "../styles/friends.css";
+import "../styles/comments.css";
+---
+
+<Layout
+  page="friends"
+  title="|${singlePage.spec.title ?: '朋友圈'} - ${site.title}|"
+>
+  <SeoHead
+    slot="head"
+    type="website"
+    titleExpr="singlePage.spec.title ?: '朋友圈'"
+    descExpr="not #strings.isEmpty(singlePage.status?.excerpt) ? singlePage.status.excerpt : (singlePage.spec.excerpt?.raw ?: '来自友邻站点的最新文章与 RSS 订阅动态。')"
+    imageExpr="singlePage.spec.cover ?: ''"
+    pathExpr="singlePage.status?.permalink ?: ''"
+    jsonLdKind="WebPage"
+  />
+  <div
+    class="friends-page"
+    data-friends-page
+    th:attr="data-feeds-page-size=${theme.config.links?.feeds_page_size ?: '15'}"
+    th:with="hasLinksPlugin = ${pluginFinder.available('PluginLinks')}, hasCustomExcerpt = ${singlePage.spec.excerpt?.autoGenerate == false and not #strings.isEmpty(singlePage.spec.excerpt?.raw)}"
+  >
+    <PageHead title="${singlePage.spec.title ?: '朋友圈'}" fallback="朋友圈">
+      <div class="friends-head-bar">
+        <p
+          th:text="${hasCustomExcerpt ? singlePage.spec.excerpt.raw : '来自友邻站点的最新文章与 RSS 订阅动态。'}"
+        >
+          来自友邻站点的最新文章与 RSS 订阅动态。
+        </p>
+        <a
+          class="friends-dir-link"
+          href="/links"
+          th:href="@{/links}"
+          th:if="${hasLinksPlugin}"
+        >
+          <span>友链目录</span>
+          <span class="friends-dir-arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </PageHead>
+
+    <div
+      class="friends-intro wrap prose"
+      th:if="${singlePage.content != null and not #strings.isEmpty(#strings.trim(singlePage.content.content ?: ''))}"
+      th:utext="${singlePage.content.content}"
+    >
+    </div>
+
+    <th:block th:if="${hasLinksPlugin}">
+      <th:block th:with="allLinkGroups = ${linkFinder.groupBy()}">
+        <!-- Directory metadata bridge (enriches RSS items with site title & logo) -->
+        <div
+          class="friends-meta-bridge"
+          hidden
+          aria-hidden="true"
+          th:if="${allLinkGroups != null and not #lists.isEmpty(allLinkGroups)}"
+        >
+          <th:block th:each="grp : ${allLinkGroups}">
+            <th:block th:if="${grp.links != null}">
+              <span
+                th:each="link : ${grp.links}"
+                th:attr="data-link-name=${link.metadata.name},data-link-title=${link.spec.displayName},data-link-logo=${link.spec.logo},data-link-url=${link.spec.url}"
+              ></span>
+            </th:block>
+          </th:block>
+        </div>
+
+        <section class="friends-body wrap" aria-label="朋友圈订阅动态">
+          <div class="feed-toolbar">
+            <div
+              class="feed-group-tabs"
+              role="group"
+              aria-label="按友链分组筛选动态"
+            >
+              <button
+                type="button"
+                class="feed-group-tab is-active"
+                data-feed-group=""
+                aria-pressed="true"
+              >
+                全部动态
+              </button>
+              <th:block
+                th:if="${allLinkGroups != null and not #lists.isEmpty(allLinkGroups)}"
+              >
+                <th:block th:each="item : ${allLinkGroups}">
+                  <button
+                    type="button"
+                    class="feed-group-tab"
+                    th:if="${item.metadata != null and not #strings.isEmpty(item.metadata.name) and item.metadata.name != 'ungrouped'}"
+                    th:attr="data-feed-group=${item.metadata.name}"
+                    aria-pressed="false"
+                    th:text="${item.spec.displayName ?: '未分组'}">分组</button
+                  >
+                </th:block>
+              </th:block>
+            </div>
+
+            <label class="feed-search-wrap" aria-label="筛选朋友圈动态">
+              <Icon name="search" size={13} class="feed-search-icon" />
+              <input
+                type="search"
+                class="feed-search-input"
+                placeholder="筛选标题或作者..."
+                autocomplete="off"
+                data-feed-search
+              />
+            </label>
+          </div>
+
+          <div class="feed-active-filter" data-feed-active-filter hidden>
+            <span class="feed-filter-chip">
+              <span>仅看：</span>
+              <strong data-feed-filter-name></strong>
+              <button
+                type="button"
+                class="feed-filter-clear"
+                data-feed-filter-clear
+                aria-label="清除作者筛选"
+              >
+                <Icon name="close" size={12} />
+              </button>
+            </span>
+          </div>
+
+          <div class="feed-skeleton" data-feed-skeleton aria-hidden="true">
+            <div class="feed-skel-row">
+              <span class="feed-skel-meta"></span>
+              <span class="feed-skel-title"></span>
+              <span class="feed-skel-desc"></span>
+            </div>
+            <div class="feed-skel-row">
+              <span class="feed-skel-meta"></span>
+              <span class="feed-skel-title feed-skel-title--short"></span>
+              <span class="feed-skel-desc"></span>
+            </div>
+            <div class="feed-skel-row">
+              <span class="feed-skel-meta"></span>
+              <span class="feed-skel-title"></span>
+              <span class="feed-skel-desc feed-skel-desc--short"></span>
+            </div>
+            <div class="feed-skel-row">
+              <span class="feed-skel-meta"></span>
+              <span class="feed-skel-title feed-skel-title--short"></span>
+            </div>
+          </div>
+
+          <ol class="feed-stream" data-feed-stream></ol>
+
+          <p class="empty-note" data-feed-empty hidden></p>
+          <p class="empty-note" data-feed-search-empty hidden>
+            没有匹配当前关键词的朋友圈动态。
+          </p>
+
+          <div class="feed-loader" data-feed-loader hidden>
+            <button type="button" class="feed-load-btn" data-feed-load-btn>
+              <span data-feed-load-label>加载更早动态</span>
+            </button>
+          </div>
+
+          <p class="feed-end-note" data-feed-end-note hidden>
+            已加载全部订阅动态
+          </p>
+        </section>
+      </th:block>
+    </th:block>
+
+    <section class="friends-body wrap" th:if="${not hasLinksPlugin}">
+      <p class="empty-note">
+        请先在 Halo 后台安装并启用链接管理插件（PluginLinks 2.5+），并在「RSS 订阅」中开启「公开 RSS 订阅动态」。
+      </p>
+    </section>
+
+    <div class="wrap">
+      <Comments kind="SinglePage" item="singlePage" />
+    </div>
+  </div>
+</Layout>

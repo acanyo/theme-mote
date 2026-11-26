@@ -1,0 +1,454 @@
+---
+/**
+ * templates/links.html: route provided by halo-sigs/plugin-links.
+ * Clean grouped friends directory + frosted modal for friend-link application
+ * with theme-configurable site exchange info.
+ */
+import Layout from "../layouts/Layout.astro";
+import PageHead from "../components/common/PageHead.astro";
+import Icon from "../components/common/Icon.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import { AVATAR } from "../lib/expressions";
+import "../styles/links.css";
+import "../styles/comments.css";
+---
+
+<Layout page="links" title="|${linksTitle ?: '友链'} - ${site.title}|">
+  <SeoHead
+    slot="head"
+    type="website"
+    titleExpr="(linksTitle ?: '友链') + ' - ' + (site.title ?: 'Mote')"
+    descExpr="site.subtitle ?: ''"
+    pathExpr="'/links'"
+  />
+  <div
+    class="links-page"
+    th:with={`baseAvatar = \${${AVATAR}}, siteName = \${not #strings.isEmpty(theme.config.links?.site_name) ? theme.config.links.site_name : (not #strings.isEmpty(theme.config.basic?.title) ? theme.config.basic.title : (site.title ?: 'Mote'))}, siteUrl = \${not #strings.isEmpty(theme.config.links?.site_url) ? theme.config.links.site_url : site.url}, siteAvatar = \${not #strings.isEmpty(theme.config.links?.site_avatar) ? theme.config.links.site_avatar : baseAvatar}, siteDesc = \${not #strings.isEmpty(theme.config.links?.site_desc) ? theme.config.links.site_desc : (not #strings.isEmpty(site.subtitle) ? site.subtitle : (theme.config.home?.now ?: ''))}, siteFeed = \${not #strings.isEmpty(theme.config.links?.site_feed) ? theme.config.links.site_feed : (pluginFinder.available('PluginFeed') ? '/feed.xml' : '')}, applyNotice = \${theme.config.links?.apply_notice}, friendsUrl = \${#strings.trim(theme.config.links?.friends_url ?: '')}`}
+  >
+    <PageHead title="${linksTitle ?: '友链'}" fallback="友链">
+      <div class="links-head-bar">
+        <p>常逛的朋友与同路人，也欢迎交换链接。</p>
+        <div class="links-head-actions">
+          <a
+            class="links-friends-entry"
+            th:if="${not #strings.isEmpty(friendsUrl)}"
+            th:href="@{${friendsUrl}}"
+          >
+            <span>朋友圈</span>
+            <span class="links-friends-arrow" aria-hidden="true">→</span>
+          </a>
+          <button
+            type="button"
+            class="links-apply-trigger"
+            data-link-modal-open
+            th:if="${linkApplicationEnabled}"
+          >
+            <span aria-hidden="true">+</span>
+            <span>申请友链</span>
+          </button>
+        </div>
+      </div>
+    </PageHead>
+
+    <section class="links-body wrap" aria-label="友情链接">
+      <nav
+        class="link-tabs"
+        aria-label="友链分组"
+        th:if="${not #lists.isEmpty(simpleGroups) and #lists.size(simpleGroups) > 1}"
+      >
+        <a
+          class="link-tab"
+          href="/links"
+          th:href="@{/links}"
+          th:classappend="${group == null or #strings.isEmpty(group)} ? 'is-active'"
+        >
+          全部
+        </a>
+        <a
+          class="link-tab"
+          th:each="item : ${simpleGroups}"
+          th:href="@{/links(group=${item.metadata.name})}"
+          th:classappend="${group == item.metadata.name} ? 'is-active'"
+          th:text="${item.spec.displayName ?: '未分组'}">分组</a
+        >
+      </nav>
+
+      <div class="link-groups" th:if="${not #lists.isEmpty(groups)}">
+        <th:block th:each="item : ${groups}">
+          <section
+            class="link-group"
+            th:if="${not #lists.isEmpty(item.links)}"
+          >
+            <header class="link-group-head">
+              <h2
+                class="link-group-title"
+                th:text="${item.spec.displayName ?: '未分组'}"
+              >
+                友链分组
+              </h2>
+              <span
+                class="link-group-count num"
+                th:text="|${#lists.size(item.links)} 位|"
+                >0 位</span
+              >
+            </header>
+
+            <ul class="links-grid">
+              <li th:each="link : ${item.links}">
+                <a
+                  class="link-card"
+                  th:href="${link.spec.url}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    class="link-avatar"
+                    th:if="${not #strings.isEmpty(link.spec.logo)}"
+                    th:src="${link.spec.logo}"
+                    width="36"
+                    height="36"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span
+                    class="link-avatar-char"
+                    th:if="${#strings.isEmpty(link.spec.logo)}"
+                    th:text="${not #strings.isEmpty(link.spec.displayName) ? #strings.substring(link.spec.displayName, 0, 1) : '友'}"
+                    aria-hidden="true">友</span
+                  >
+                  <span class="link-info">
+                    <span class="link-name-row">
+                      <strong
+                        class="link-name"
+                        th:text="${link.spec.displayName}">站点名称</strong
+                      >
+                      <Icon name="external" size={12} class="link-ext" />
+                    </span>
+                    <span
+                      class="link-desc"
+                      th:if="${not #strings.isEmpty(link.spec.description)}"
+                      th:text="${link.spec.description}">站点简介</span
+                    >
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </section>
+        </th:block>
+      </div>
+
+      <p class="empty-note" th:if="${#lists.isEmpty(groups)}">
+        还没有添加友链。
+      </p>
+    </section>
+
+    <section
+      class="comments wrap"
+      aria-labelledby="comments-heading"
+      th:if="${haloCommentEnabled and not #strings.isEmpty(pluginName)}"
+    >
+      <h2 class="comments-heading" id="comments-heading">留言</h2>
+      <halo:comment
+        group="plugin.halo.run"
+        kind="Plugin"
+        th:attr="name=${pluginName}"
+      ></halo:comment>
+    </section>
+
+    <!-- Frosted Friend-Link Application Modal (halo-sigs/plugin-links) -->
+    <div
+      class="link-modal"
+      id="link-apply"
+      data-link-modal
+      hidden
+      th:if="${linkApplicationEnabled}"
+    >
+      <div class="link-modal-backdrop" data-link-modal-close></div>
+      <section
+        class="link-modal-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="link-apply-title"
+        data-link-modal-sheet
+      >
+        <header class="link-modal-head">
+          <div>
+            <h2 id="link-apply-title">申请交换友链</h2>
+            <p
+              class="link-modal-notice"
+              th:text="${not #strings.isEmpty(applyNotice) ? applyNotice : '提交后将进入待审核队列，审核通过即会自动展示在友链页。'}"
+            >
+              提交后将进入待审核队列，审核通过即会自动展示在友链页。
+            </p>
+          </div>
+          <button
+            class="icon-btn link-modal-close"
+            type="button"
+            data-link-modal-close
+            aria-label="关闭友链申请弹窗"
+          >
+            <Icon name="close" size={17} />
+          </button>
+        </header>
+
+        <!-- Theme-Configurable Site Exchange Info (per-field one-click copy) -->
+        <div class="site-snippet-card">
+          <div class="site-snippet-top">
+            <div class="site-snippet-identity">
+              <img
+                class="site-snippet-avatar"
+                th:if="${not #strings.isEmpty(siteAvatar)}"
+                th:src="${siteAvatar}"
+                width="34"
+                height="34"
+                alt=""
+              />
+              <div class="site-snippet-meta">
+                <strong class="site-snippet-name" th:text="${siteName}">Mote</strong>
+                <span
+                  class="site-snippet-url num"
+                  th:if="${not #strings.isEmpty(siteUrl)}"
+                  th:text="${siteUrl}">https://example.com</span
+                >
+              </div>
+            </div>
+            <button
+              type="button"
+              class="snippet-copy-chip snippet-copy-all"
+              data-copy-site-info
+              th:attr="data-site-name=${siteName},data-site-url=${siteUrl},data-site-avatar=${siteAvatar},data-site-desc=${siteDesc},data-site-feed=${siteFeed}"
+            >
+              <Icon name="copy" size={11} />
+              <span>一键复制</span>
+            </button>
+          </div>
+          <p
+            class="site-snippet-desc"
+            th:if="${not #strings.isEmpty(siteDesc)}"
+            th:text="${siteDesc}"
+          >
+            站点简介
+          </p>
+          <div class="site-copy-chips" role="group" aria-label="逐项复制本站信息">
+            <button
+              type="button"
+              class="snippet-copy-chip"
+              data-copy-field="名称"
+              th:attr="data-copy-value=${siteName}"
+            >
+              <Icon name="copy" size={11} />
+              <span>复制名称</span>
+            </button>
+            <button
+              type="button"
+              class="snippet-copy-chip"
+              th:if="${not #strings.isEmpty(siteUrl)}"
+              data-copy-field="网址"
+              th:attr="data-copy-value=${siteUrl}"
+            >
+              <Icon name="copy" size={11} />
+              <span>复制网址</span>
+            </button>
+            <button
+              type="button"
+              class="snippet-copy-chip"
+              th:if="${not #strings.isEmpty(siteAvatar)}"
+              data-copy-field="头像地址"
+              data-copy-resolve-url="true"
+              th:attr="data-copy-value=${siteAvatar}"
+            >
+              <Icon name="copy" size={11} />
+              <span>复制头像</span>
+            </button>
+            <button
+              type="button"
+              class="snippet-copy-chip"
+              th:if="${not #strings.isEmpty(siteDesc)}"
+              data-copy-field="简介"
+              th:attr="data-copy-value=${siteDesc}"
+            >
+              <Icon name="copy" size={11} />
+              <span>复制简介</span>
+            </button>
+            <button
+              type="button"
+              class="snippet-copy-chip"
+              th:if="${not #strings.isEmpty(siteFeed)}"
+              data-copy-field="订阅地址"
+              data-copy-resolve-url="true"
+              th:attr="data-copy-value=${siteFeed}"
+            >
+              <Icon name="rss" size={11} />
+              <span>复制订阅</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Application Form (Progressive: REST API + native POST fallback) -->
+        <form
+          class="apply-form"
+          method="post"
+          action="/links/apply/submit"
+          th:action="@{/links/apply/submit}"
+          data-link-apply-form
+          novalidate
+        >
+          <input
+            type="hidden"
+            name="_csrf"
+            th:if="${not #strings.isEmpty(csrfToken)}"
+            th:value="${csrfToken}"
+          />
+
+          <div class="apply-grid">
+            <label class="apply-field">
+              <span class="apply-label">
+                网站名称 <abbr title="必填">*</abbr>
+              </span>
+              <input
+                type="text"
+                name="displayName"
+                required
+                maxlength="80"
+                placeholder="例如：Handsome 的博客"
+                autocomplete="organization"
+              />
+            </label>
+
+            <label class="apply-field">
+              <span class="apply-label">
+                网站地址 <abbr title="必填">*</abbr>
+              </span>
+              <input
+                type="url"
+                name="url"
+                required
+                placeholder="https://example.com"
+                autocomplete="url"
+              />
+            </label>
+
+            <label class="apply-field">
+              <span class="apply-label">Logo / 头像地址</span>
+              <span class="apply-input-with-preview">
+                <input
+                  type="url"
+                  name="logo"
+                  placeholder="https://example.com/avatar.png"
+                  data-logo-input
+                />
+                <span class="apply-logo-preview" data-logo-preview hidden>
+                  <img src="" alt="" data-logo-preview-img />
+                </span>
+              </span>
+            </label>
+
+            <label class="apply-field">
+              <span class="apply-label">联系邮箱</span>
+              <input
+                type="email"
+                name="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+              />
+            </label>
+          </div>
+
+          <label class="apply-field">
+            <span class="apply-label">网站简介</span>
+            <textarea
+              name="description"
+              rows="2"
+              maxlength="240"
+              placeholder="一句话介绍你的站点内容或风格"
+            ></textarea>
+          </label>
+
+          <details class="apply-optional">
+            <summary class="apply-optional-summary">
+              <svg
+                class="apply-optional-chevron"
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4.5 2.5 8 6l-3.5 3.5"></path>
+              </svg>
+              <span>填写反链页面与 RSS 订阅地址</span>
+              <span class="apply-optional-tag">可选</span>
+            </summary>
+            <div class="apply-optional-body">
+              <label class="apply-field">
+                <span class="apply-label">反链页面地址</span>
+                <input
+                  type="url"
+                  name="backlink"
+                  placeholder="https://example.com/links"
+                />
+              </label>
+              <label class="apply-field">
+                <span class="apply-label">RSS / Atom 地址（每行一个）</span>
+                <textarea
+                  name="feedUrls"
+                  rows="2"
+                  placeholder="https://example.com/feed.xml"
+                ></textarea>
+              </label>
+            </div>
+          </details>
+
+          <div class="apply-foot">
+            <div class="apply-captcha-group">
+              <label class="apply-captcha-label" for="link-captcha-input">
+                验证码 <abbr title="必填">*</abbr>
+              </label>
+              <div class="apply-captcha-row">
+                <input
+                  id="link-captcha-input"
+                  type="text"
+                  name="captchaCode"
+                  class="apply-captcha-input num"
+                  required
+                  maxlength="8"
+                  autocomplete="off"
+                  spellcheck="false"
+                  placeholder="右侧字符"
+                />
+                <button
+                  type="button"
+                  class="apply-captcha-btn"
+                  data-captcha-refresh
+                  title="点击刷新验证码"
+                  aria-label="刷新图形验证码"
+                >
+                  <img src="" alt="图形验证码" data-captcha-img />
+                  <span class="apply-captcha-hint">换一张</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="apply-submit-btn" data-apply-submit>
+              <span data-apply-submit-label>提交申请</span>
+            </button>
+          </div>
+
+          <p
+            class="apply-feedback"
+            role="status"
+            aria-live="polite"
+            data-apply-feedback
+            hidden
+          >
+          </p>
+        </form>
+      </section>
+    </div>
+  </div>
+</Layout>

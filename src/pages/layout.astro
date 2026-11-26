@@ -1,0 +1,11 @@
+---
+/**
+ * templates/layout.html: Halo's page-layout contract (Halo 2.26+). Plugin
+ * front-end pages call layout :: html(head, content) to reuse this
+ * theme's header, footer and styles. Theme pages do not use it.
+ */
+import Layout from "../layouts/Layout.astro";
+import "../styles/plugin-page.css";
+---
+
+<Layout page="plugin" contract />

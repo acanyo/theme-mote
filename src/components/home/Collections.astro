@@ -1,0 +1,76 @@
+---
+import Icon from "../common/Icon.astro";
+---
+
+<th:block
+  th:if="${theme.config.sidebar?.show_categories != false}"
+  th:with="cats = ${categoryFinder.listAll()}"
+>
+  <section
+    class="home-section home-collections wrap"
+    id="collections"
+    aria-labelledby="collections-title"
+    th:if="${not #lists.isEmpty(cats)}"
+  >
+    <header class="section-head">
+      <div class="section-head-left">
+        <h2 class="section-title" id="collections-title">精选专题</h2>
+        <p class="section-sub">按主题收束成可以连贯读完的线索</p>
+      </div>
+      <a class="text-link" href="/categories" th:href="@{/categories}">
+        <span>全部分类</span>
+        <Icon name="arrowRight" size={14} />
+      </a>
+    </header>
+
+    <div class="collections-grid">
+      <a
+        class="collection-card glass-lens"
+        th:each="cat, iter : ${cats}"
+        th:if="${iter.index < 3}"
+        th:href="@{${cat.status.permalink}}"
+        th:classappend="${#strings.isEmpty(cat.spec.cover)} ? 'is-coverless' : 'has-cover'"
+      >
+        <div
+          class="collection-media"
+          th:if="${not #strings.isEmpty(cat.spec.cover)}"
+        >
+          <img
+            th:src="${cat.spec.cover}"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="mote-post-melt" aria-hidden="true"></span>
+          <span
+            class="glass-media-badge collection-count num"
+            th:text="|${cat.postCount} 篇|">0 篇</span
+          >
+        </div>
+
+        <div class="collection-body">
+          <div class="collection-head-row">
+            <h3 class="collection-title" th:text="${cat.spec.displayName}">
+              专题名称
+            </h3>
+            <span
+              class="collection-count-inline num"
+              th:if="${#strings.isEmpty(cat.spec.cover)}"
+              th:text="|${cat.postCount} 篇|">0 篇</span
+            >
+          </div>
+          <p
+            class="collection-desc"
+            th:text="${not #strings.isEmpty(cat.spec.description) ? cat.spec.description : '浏览该专题下的全部记录与思考。'}"
+          >
+            浏览该专题下的全部记录与思考。
+          </p>
+          <span class="collection-cta">
+            <span>进入专题</span>
+            <Icon name="arrowRight" size={14} />
+          </span>
+        </div>
+      </a>
+    </div>
+  </section>
+</th:block>

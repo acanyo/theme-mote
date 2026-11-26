@@ -1,0 +1,5 @@
+body[data-page="plugin"] .site-main {
+  width: min(var(--wrap-max), calc(100% - var(--gutter) * 2));
+  margin-inline: auto;
+  padding-top: 28px;
+}

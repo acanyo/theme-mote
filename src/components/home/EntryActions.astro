@@ -1,0 +1,23 @@
+---
+import Icon from "../common/Icon.astro";
+---
+
+<div class="entry-tools">
+  <button
+    class="icon-btn"
+    type="button"
+    data-peek
+    hidden
+    th:attr="aria-label=|${'预览文章：' + post.spec.title}|"
+    title="预览摘要"><Icon name="eye" size={17} /></button
+  >
+  <button
+    class="icon-btn"
+    type="button"
+    data-save-entry
+    hidden
+    aria-pressed="false"
+    aria-label="加入稍后读"
+    title="稍后读"><Icon name="bookmark" size={17} /></button
+  >
+</div>

@@ -1,0 +1,109 @@
+---
+/**
+ * templates/photo.html: single photo exhibition detail route provided by halo-sigs/plugin-photos.
+ * Uses guaranteed PhotoVo fields + GSAP fullscreen zoom + prev/next gallery navigation.
+ */
+import Layout from "../layouts/Layout.astro";
+import "../styles/photos.css";
+---
+
+<Layout
+  page="photos"
+  title="|${photo.spec.displayName ?: title ?: '图库'} - ${site.title}|"
+>
+  <article class="photo-detail">
+    <header class="photo-detail-head wrap">
+      <a class="photo-back" href="/photos" th:href="@{/photos}">
+        <span class="back-arrow" aria-hidden="true">←</span>
+        <span>返回图库</span>
+      </a>
+      <span
+        class="photo-counter num"
+        th:if="${position != null and total != null and total > 0}"
+        th:text="|${position} / ${total}|">1 / 1</span
+      >
+    </header>
+
+    <div class="photo-stage">
+      <figure class="photo-stage-frame">
+        <button
+          type="button"
+          class="photo-stage-trigger"
+          th:attr="data-lightbox-trigger=${photo.spec.url}"
+          aria-label="放大查看原图"
+        >
+          <img
+            th:src="${photo.spec.url}"
+            th:alt="${photo.spec.displayName ?: ''}"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </button>
+      </figure>
+    </div>
+
+    <div class="photo-meta-wrap wrap">
+      <div class="photo-meta-head">
+        <h1
+          class="photo-detail-title"
+          th:if="${not #strings.isEmpty(photo.spec.displayName)}"
+          th:text="${photo.spec.displayName}"
+        >
+          照片标题
+        </h1>
+        <time
+          class="photo-detail-date num"
+          th:if="${photo.metadata?.creationTimestamp != null}"
+          th:datetime="${photo.metadata.creationTimestamp}"
+          th:text="${#temporals.format(photo.metadata.creationTimestamp, 'yyyy-MM-dd')}"
+          >2026-11-24</time
+        >
+      </div>
+      <p
+        class="photo-detail-desc"
+        th:if="${not #strings.isEmpty(photo.spec.description)}"
+        th:text="${photo.spec.description}"
+      >
+        照片说明
+      </p>
+
+      <nav
+        class="photo-nav"
+        aria-label="相邻照片"
+        th:if="${prev != null or next != null}"
+      >
+        <a
+          class="photo-nav-link is-prev"
+          th:if="${prev != null}"
+          th:href="@{${photoUrl != null ? photoUrl.detail(prev) : '/photos'}}"
+        >
+          <span class="photo-nav-label">← 上一张</span>
+          <span
+            class="photo-nav-title"
+            th:text="${prev.spec.displayName ?: '上一张照片'}">上一张</span
+          >
+        </a>
+        <div class="photo-nav-link is-prev is-empty" th:if="${prev == null}">
+          <span class="photo-nav-label">第一张</span>
+          <span class="photo-nav-note">已经是画廊起点啦</span>
+        </div>
+
+        <a
+          class="photo-nav-link is-next"
+          th:if="${next != null}"
+          th:href="@{${photoUrl != null ? photoUrl.detail(next) : '/photos'}}"
+        >
+          <span class="photo-nav-label">下一张 →</span>
+          <span
+            class="photo-nav-title"
+            th:text="${next.spec.displayName ?: '下一张照片'}">下一张</span
+          >
+        </a>
+        <div class="photo-nav-link is-next is-empty" th:if="${next == null}">
+          <span class="photo-nav-label">最后一张</span>
+          <span class="photo-nav-note">已经翻到画廊末尾啦</span>
+        </div>
+      </nav>
+    </div>
+  </article>
+</Layout>

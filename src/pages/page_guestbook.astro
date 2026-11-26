@@ -1,0 +1,61 @@
+---
+/**
+ * templates/page_guestbook.html: minimal letter-style Guestbook custom page template.
+ * Create a SinglePage in Halo Console and select "留言板（极简书信页）".
+ */
+import Layout from "../layouts/Layout.astro";
+import ArticleCover from "../components/post/ArticleCover.astro";
+import Comments from "../components/post/Comments.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import "../styles/article.css";
+import "../styles/guestbook.css";
+---
+
+<Layout page="single" title="|${singlePage.spec.title ?: '留言板'} - ${site.title}|">
+  <SeoHead
+    slot="head"
+    type="website"
+    titleExpr="(singlePage.spec.title ?: '留言板') + ' - ' + (site.title ?: 'Mote')"
+    descExpr="not #strings.isEmpty(singlePage.status?.excerpt) ? singlePage.status.excerpt : (singlePage.spec.excerpt?.raw ?: '路过这里，欢迎留下一句近况、一条建议，或者打个招呼。')"
+    imageExpr="singlePage.spec.cover ?: ''"
+    pathExpr="singlePage.status?.permalink ?: '/guestbook'"
+    jsonLdKind="WebPage"
+  />
+
+  <article
+    class="guestbook wrap--text"
+    th:with="hideCover = ${#annotations.getOrDefault(singlePage, 'mote/hide_cover', 'false') == 'true'}, customAccent = ${#strings.trim(#annotations.getOrDefault(singlePage, 'mote/accent_color', ''))}"
+    th:attr="data-cover-palette-src=${not #strings.isEmpty(singlePage.spec.cover) ? singlePage.spec.cover : null},data-cover-palette-accent=${not #strings.isEmpty(customAccent) ? customAccent : null}"
+  >
+    <header class="guestbook-head">
+      <p class="guestbook-eyebrow">留言簿</p>
+      <h1 class="guestbook-title" th:text="${singlePage.spec.title ?: '留言板'}">
+        留言板
+      </h1>
+      <p
+        class="guestbook-lead"
+        th:text="${singlePage.spec.excerpt?.autoGenerate == false and not #strings.isEmpty(singlePage.spec.excerpt?.raw) ? singlePage.spec.excerpt.raw : '路过这里，欢迎留下一句近况、一条建议，或者只是打个招呼。'}"
+      >
+        路过这里，欢迎留下一句近况、一条建议，或者只是打个招呼。
+      </p>
+    </header>
+
+    <div
+      class="guestbook-cover"
+      th:if="${not hideCover and not #strings.isEmpty(singlePage.spec.cover)}"
+    >
+      <ArticleCover item="singlePage" />
+    </div>
+
+    <div
+      class="guestbook-note prose"
+      th:if="${not #strings.isEmpty(singlePage.content?.content)}"
+      th:utext="${singlePage.content.content}"
+    >
+    </div>
+
+    <div class="guestbook-comments">
+      <Comments kind="SinglePage" item="singlePage" />
+    </div>
+  </article>
+</Layout>

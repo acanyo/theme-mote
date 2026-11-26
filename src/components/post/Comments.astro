@@ -1,0 +1,23 @@
+---
+import "../../styles/comments.css";
+
+/** Halo comment widget; `kind` is Post, SinglePage or Moment (plugin-moments). */
+interface Props {
+  kind: "Post" | "SinglePage" | "Moment";
+  item: string;
+}
+const { kind, item } = Astro.props;
+const group = kind === "Moment" ? "moment.halo.run" : "content.halo.run";
+---
+
+<section
+  class="comments wrap--text"
+  aria-labelledby="comments-heading"
+  th:if="${haloCommentEnabled}"
+>
+  <h2 class="comments-heading" id="comments-heading">评论</h2>
+  <halo:comment
+    group={group}
+    kind={kind}
+    th:attr={`name=\${${item}.metadata.name}`}></halo:comment>
+</section>

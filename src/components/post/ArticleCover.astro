@@ -1,0 +1,23 @@
+---
+/**
+ * Optional cover for a post or single page. `item` names the
+ * Thymeleaf variable (post or singlePage).
+ */
+interface Props {
+  item: string;
+}
+const { item } = Astro.props;
+---
+
+<figure
+  class="article-cover"
+  th:if={`\${not #strings.isEmpty(${item}.spec.cover)}`}
+>
+  <img
+    th:src={`\${${item}.spec.cover}`}
+    th:alt={`\${${item}.spec.title}`}
+    fetchpriority="high"
+    decoding="async"
+    sizes="(min-width: 1200px) 1050px, 90vw"
+  />
+</figure>

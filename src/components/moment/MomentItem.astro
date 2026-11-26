@@ -1,0 +1,201 @@
+---
+/**
+ * One moment (`moment` bound, MomentVo).
+ * Unboxed editorial micro-journal entry: quiet top meta bar with inline tags,
+ * clean full-width prose, tight Apple-Photos-style media mosaic, and whisper footer actions.
+ */
+import Icon from "../common/Icon.astro";
+import { AVATAR } from "../../lib/expressions";
+
+interface Props {
+  detail?: boolean;
+}
+const { detail = false } = Astro.props;
+---
+
+<article
+  class:list={["moment", detail && "moment--detail"]}
+  th:with={`content = \${moment.spec.content}, fallbackAvatar = \${${AVATAR}}, avatarSrc = \${not #strings.isEmpty(moment.owner?.avatar) ? moment.owner.avatar : fallbackAvatar}, authorName = \${moment.owner?.displayName ?: theme.config.basic?.title ?: site.title ?: '博主'}`}
+>
+  <header class="moment-head">
+    <div class="moment-who">
+      <img
+        class="moment-avatar"
+        th:if="${not #strings.isEmpty(avatarSrc)}"
+        th:src="${avatarSrc}"
+        alt=""
+        width="24"
+        height="24"
+        loading="lazy"
+        decoding="async"
+      />
+      <span
+        class="moment-avatar-char"
+        th:if="${#strings.isEmpty(avatarSrc)}"
+        th:text="${#strings.substring(authorName, 0, 1)}"
+        aria-hidden="true">博</span
+      >
+      <span class="moment-name" th:text="${authorName}">作者</span>
+      <span class="moment-sep" aria-hidden="true">·</span>
+      {
+        detail ? (
+          <time
+            class="num moment-time"
+            th:datetime="${moment.spec.releaseTime}"
+            th:text="${#temporals.format(moment.spec.releaseTime, 'yyyy-MM-dd HH:mm')}"
+          >
+            2026-11-12 20:00
+          </time>
+        ) : (
+          <a
+            class="num moment-time"
+            th:href="@{|/moments/${moment.metadata.name}|}"
+            th:text="${#temporals.format(moment.spec.releaseTime, 'yyyy-MM-dd HH:mm')}"
+          >
+            2026-11-12 20:00
+          </a>
+        )
+      }
+    </div>
+
+    <span class="moment-tags" th:if="${not #lists.isEmpty(moment.spec.tags)}">
+      <a
+        class="moment-inline-tag"
+        th:each="tag : ${moment.spec.tags}"
+        th:href="@{/moments(tag=${tag})}"
+        th:text="|#${tag}|">#标签</a
+      >
+    </span>
+  </header>
+
+  <div
+    class="moment-body prose"
+    th:if="${not #strings.isEmpty(content.html)}"
+    th:utext="${content.html}"
+    th:attr={!detail ? "data-moment-clickable='true'" : undefined}
+  >
+  </div>
+
+  <div
+    class="moment-media"
+    th:if="${not #lists.isEmpty(content.medium)}"
+    th:classappend="|is-${#lists.size(content.medium) > 4 ? 'many' : #lists.size(content.medium)}|"
+    data-lightbox-gallery
+  >
+    <th:block th:each="media : ${content.medium}">
+      <button
+        type="button"
+        class="moment-photo"
+        th:if="${media.type.name == 'PHOTO'}"
+        th:attr="data-lightbox-trigger=${media.url}"
+        aria-label="放大查看图片"
+      >
+        <img th:src="${media.url}" alt="" loading="lazy" decoding="async" />
+      </button>
+      <video
+        class="moment-video"
+        th:if="${media.type.name == 'VIDEO'}"
+        th:src="${media.url}"
+        controls
+        preload="metadata"
+        playsinline></video>
+      <audio
+        class="moment-audio"
+        th:if="${media.type.name == 'AUDIO'}"
+        th:src="${media.url}"
+        controls
+        preload="none"></audio>
+    </th:block>
+  </div>
+
+  <footer class="moment-foot">
+    <div class="moment-actions">
+      <button
+        type="button"
+        class="moment-action-btn moment-upvote-btn"
+        data-upvote
+        data-upvote-group="moment.halo.run"
+        data-upvote-plural="moments"
+        th:attr="data-upvote-name=${moment.metadata.name}"
+        data-tip="喜欢这条瞬间"
+        aria-pressed="false"
+        aria-label="喜欢这条瞬间"
+      >
+        <Icon name="heart" size={14} class="upvote-heart" />
+        <span
+          class="num"
+          data-upvote-count
+          th:text="${moment.stats?.upvote ?: 0}">0</span
+        >
+      </button>
+      {
+        !detail && (
+          <>
+            <button
+              type="button"
+              class="moment-action-btn moment-comments moment-comment-toggle"
+              th:if="${haloCommentEnabled}"
+              data-moment-comment-toggle
+              th:attr="data-moment-name=${moment.metadata.name}"
+              aria-expanded="false"
+              th:title="|${moment.stats.approvedComment} 条评论|"
+            >
+              <Icon name="chat" size={14} />
+              <span
+                class="num"
+                data-moment-comment-count
+                th:text="${moment.stats.approvedComment > 0 ? moment.stats.approvedComment : '评论'}"
+              >
+                评论
+              </span>
+            </button>
+            <a
+              class="moment-action-btn moment-comments"
+              th:if="${not haloCommentEnabled}"
+              th:href="@{|/moments/${moment.metadata.name}|}"
+              th:title="|${moment.stats.approvedComment} 条评论|"
+            >
+              <Icon name="chat" size={14} />
+              <span
+                class="num"
+                th:text="${moment.stats.approvedComment > 0 ? moment.stats.approvedComment : '评论'}"
+              >
+                评论
+              </span>
+            </a>
+          </>
+        )
+      }
+    </div>
+
+    {
+      !detail && (
+        <a
+          class="moment-detail-link"
+          th:href="@{|/moments/${moment.metadata.name}|}"
+        >
+          <span>详情</span>
+          <span aria-hidden="true">→</span>
+        </a>
+      )
+    }
+  </footer>
+
+  {
+    !detail && (
+      <th:block th:if="${haloCommentEnabled}">
+        <div
+          class="moment-comment-drawer"
+          data-moment-comment-drawer
+          hidden
+        ></div>
+        <template data-moment-comment-tpl>
+          <halo:comment
+            group="moment.halo.run"
+            kind="Moment"
+            th:attr="name=${moment.metadata.name}"></halo:comment>
+        </template>
+      </th:block>
+    )
+  }
+</article>

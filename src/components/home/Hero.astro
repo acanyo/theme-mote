@@ -1,0 +1,94 @@
+---
+import Icon from "../common/Icon.astro";
+import { AVATAR } from "../../lib/expressions";
+---
+
+<section
+  class="hero"
+  aria-label="站点首屏"
+  th:with={`cover = \${theme.config.home?.hero_cover}, hasCover = \${not #strings.isEmpty(cover)}, author = \${theme.config.home?.title ?: site.title ?: 'Mote'}, role = \${theme.config.home?.role}, avatar = \${${AVATAR}}, headline = \${theme.config.home?.tagline ?: site.title ?: 'Mote'}, headline2 = \${theme.config.home?.focus}, lede = \${theme.config.home?.lede ?: site.subtitle}`}
+  th:classappend="${hasCover} ? 'has-cover' : 'is-ambient'"
+>
+  <div class="hero-backdrop" aria-hidden="true">
+    <img
+      class="hero-bg-img"
+      th:if="${hasCover}"
+      th:src="${cover}"
+      alt=""
+      decoding="async"
+      fetchpriority="high"
+      data-hero-parallax
+    />
+    <div class="hero-ambient-mesh" th:unless="${hasCover}"></div>
+    <div class="hero-scrim"></div>
+  </div>
+
+  <div class="hero-inner wrap">
+    <div class="hero-copy">
+      <div class="hero-identity">
+        <img
+          class="hero-avatar"
+          th:if="${not #strings.isEmpty(avatar)}"
+          th:src="${avatar}"
+          width="30"
+          height="30"
+          alt=""
+        />
+        <span class="hero-author" th:text="${author}">Mote</span>
+        <span
+          class="hero-dot"
+          aria-hidden="true"
+          th:if="${not #strings.isEmpty(role)}">·</span
+        >
+        <span
+          class="hero-role"
+          th:if="${not #strings.isEmpty(role)}"
+          th:text="${role}">独立开发者</span
+        >
+      </div>
+
+      <h1 class="hero-title">
+        <span th:text="${headline}">Mote</span>
+        <br th:if="${not #strings.isEmpty(headline2)}" />
+        <span
+          th:if="${not #strings.isEmpty(headline2)}"
+          th:text="${headline2}"></span>
+      </h1>
+
+      <p
+        class="hero-lede"
+        th:if="${not #strings.isEmpty(lede)}"
+        th:text="${lede}"
+      >
+      </p>
+
+      <div class="hero-actions">
+        <a class="glass-pill hero-cta" href="#writing">
+          <span>浏览文章</span>
+          <Icon name="arrowDown" size={14} />
+        </a>
+        <button
+          class="hero-ghost-link"
+          type="button"
+          data-random-trigger
+        >
+          随机读一篇
+        </button>
+        <span
+          class="hero-socials"
+          th:if="${not #lists.isEmpty(theme.config.home?.socials)}"
+        >
+          <span class="hero-divider" aria-hidden="true"></span>
+          <a
+            class="hero-social-link"
+            th:each="social : ${theme.config.home.socials}"
+            th:href="${social.url}"
+            target="_blank"
+            rel="noopener me"
+            th:text="${social.name}">社交</a
+          >
+        </span>
+      </div>
+    </div>
+  </div>
+</section>

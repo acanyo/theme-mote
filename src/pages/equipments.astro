@@ -1,0 +1,156 @@
+---
+/**
+ * templates/equipments.html: studio-grade horizontal hardware/uses catalog
+ * for chengzhongxue/plugin-equipment (/equipments).
+ */
+import Layout from "../layouts/Layout.astro";
+import PageHead from "../components/common/PageHead.astro";
+import Icon from "../components/common/Icon.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import "../styles/equipments.css";
+---
+
+<Layout page="equipments" title="|${title ?: '我的装备'} - ${site.title}|">
+  <SeoHead
+    slot="head"
+    type="website"
+    titleExpr="(title ?: '我的装备') + ' - ' + (site.title ?: 'Mote')"
+    descExpr="site.subtitle ?: '日常陪伴写作、设计与开发的工具和器物。'"
+    pathExpr="'/equipments'"
+    jsonLdKind="CollectionPage"
+  />
+  <PageHead title="${title ?: '我的装备'}" fallback="我的装备">
+    <p>日常陪伴写作、设计与开发的工具和器物。</p>
+  </PageHead>
+
+  <section
+    class="equipments wrap"
+    aria-label="装备清单"
+    th:with="eqGroups = ${not #lists.isEmpty(groups) ? groups : (pluginFinder.available('equipment') ? equipmentFinder.groupBy() : null)}"
+  >
+    <th:block th:if="${eqGroups != null and not #lists.isEmpty(eqGroups)}">
+      <nav
+        class="eq-tabs"
+        role="tablist"
+        aria-label="装备分组"
+        th:if="${#lists.size(eqGroups) > 1}"
+      >
+        <button
+          type="button"
+          class="eq-tab is-active"
+          data-eq-filter="all"
+          aria-pressed="true"
+        >
+          全部
+        </button>
+        <button
+          type="button"
+          class="eq-tab"
+          th:each="group : ${eqGroups}"
+          th:if="${not #lists.isEmpty(group.equipments)}"
+          th:attr="data-eq-filter=${group.metadata.name}"
+          aria-pressed="false"
+        >
+          <span th:text="${group.spec.displayName}">分组</span>
+          <span
+            class="eq-tab-count num"
+            th:text="${#lists.size(group.equipments)}">0</span
+          >
+        </button>
+      </nav>
+
+      <div class="eq-groups">
+        <section
+          class="eq-group"
+          th:each="group, gStat : ${eqGroups}"
+          th:if="${not #lists.isEmpty(group.equipments)}"
+          th:attr="data-eq-group=${group.metadata.name}"
+        >
+          <header class="eq-group-head">
+            <div class="eq-group-heading">
+              <span
+                class="eq-group-index num"
+                th:text="${gStat.count < 10 ? '0' + gStat.count : gStat.count}"
+                >01</span
+              >
+              <h2 class="eq-group-title" th:text="${group.spec.displayName}">
+                桌面主机
+              </h2>
+              <span
+                class="eq-group-count num"
+                th:text="|${#lists.size(group.equipments)} 件|"
+                >0 件</span
+              >
+            </div>
+            <p
+              class="eq-group-desc"
+              th:if="${not #strings.isEmpty(group.spec.description)}"
+              th:text="${group.spec.description}"
+            >
+            </p>
+          </header>
+
+          <div class="eq-list" data-lightbox-gallery>
+            <article class="eq-card" th:each="item : ${group.equipments}">
+              <button
+                type="button"
+                class="eq-thumb"
+                th:if="${not #strings.isEmpty(item.spec.cover)}"
+                th:attr="data-lightbox-trigger=${item.spec.cover}"
+                th:aria-label="|查看设备大图：${item.spec.displayName}|"
+              >
+                <img
+                  th:src="${item.spec.cover}"
+                  th:alt="${item.spec.displayName}"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </button>
+
+              <div class="eq-body">
+                <div class="eq-top">
+                  <h3 class="eq-name" th:text="${item.spec.displayName}">
+                    设备名称
+                  </h3>
+                  <a
+                    class="eq-link"
+                    th:if="${not #strings.isEmpty(item.spec.url)}"
+                    th:href="${item.spec.url}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-tip="查看产品详情"
+                  >
+                    <span>官网 / 详情</span>
+                    <Icon name="external" size={11} />
+                  </a>
+                </div>
+
+                <div
+                  class="eq-spec-row"
+                  th:if="${not #strings.isEmpty(item.spec.specification)}"
+                >
+                  <span
+                    class="eq-spec-badge"
+                    th:text="${item.spec.specification}">规格参数</span
+                  >
+                </div>
+
+                <p
+                  class="eq-desc"
+                  th:if="${not #strings.isEmpty(item.spec.description)}"
+                  th:text="${item.spec.description}"
+                >
+                  使用感受
+                </p>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </th:block>
+
+    <p class="empty-note" th:if="${eqGroups == null or #lists.isEmpty(eqGroups)}">
+      还没有记录装备清单。
+    </p>
+  </section>
+</Layout>

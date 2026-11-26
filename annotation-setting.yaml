@@ -1,0 +1,111 @@
+apiVersion: v1alpha1
+kind: AnnotationSetting
+metadata:
+  name: theme-mote-post-annotation-setting
+spec:
+  targetRef:
+    group: content.halo.run
+    kind: Post
+  formSchema:
+    - $formkit: switch
+      name: mote/hide_cover
+      label: 正文顶部隐藏封面图
+      value: "false"
+      onValue: "true"
+      offValue: "false"
+      help: 仅隐藏正文上方大图，列表预览与社交分享封面不受影响。
+    - $formkit: switch
+      name: mote/hide_toc
+      label: 隐藏文章目录与伴读侧栏
+      value: "false"
+      onValue: "true"
+      offValue: "false"
+      help: 适合短随笔、图片日记或无二级标题的文章。
+    - $formkit: switch
+      name: mote/hide_colophon
+      label: 隐藏文末作者卡片
+      value: "false"
+      onValue: "true"
+      offValue: "false"
+    - $formkit: select
+      name: mote/outdated_notice
+      label: 文章时效提示
+      value: "auto"
+      options:
+        - label: 跟随主题全局设置（默认）
+          value: "auto"
+        - label: 强制显示时效提示
+          value: "show"
+        - label: 本篇隐藏时效提示
+          value: "hide"
+    - $formkit: textarea
+      name: mote/notice_text
+      label: 文首自定义提示（可选）
+      value: ""
+      help: 显示在正文开头的一条克制提示条，可用于版本勘误、更新说明或阅读前提。
+    - $formkit: text
+      name: mote/copyright
+      label: 自定义版权 / 来源声明（可选）
+      value: ""
+      help: 显示在文末作者卡片底部，例如原创许可协议或转载来源说明。
+    - $formkit: textarea
+      name: mote/geo_summary
+      label: 核心要点 / AI 摘要（GEO，可选）
+      value: ""
+      help: 展示在正文开头的「核心要点」速览卡片中，同时写入 BlogPosting.abstract 与 Speakable，便于读者速览和 AI 搜索引擎精准引用（支持多行，每行自动生成一条要点）。
+    - $formkit: text
+      name: mote/geo_keywords
+      label: 补充主题关键词（GEO，可选）
+      value: ""
+      help: 英文逗号分隔（如 Halo, Astro, 中文排版），自动与文章标签合并写入结构化数据 keywords。
+    - $formkit: text
+      name: mote/source_url
+      label: 参考来源 / 原始出处链接（GEO，可选）
+      value: ""
+      help: 译文或基于官方文档/开源项目撰写的文章可填写完整链接，写入 BlogPosting.isBasedOn 增强溯源可信度。
+    - $formkit: text
+      name: mote/accent_color
+      label: 本篇专属强调色（HEX，可选）
+      value: ""
+      placeholder: "#2a6b5c"
+      help: 填写十六进制颜色（如 #2a6b5c）可手动覆盖封面自动取色；留空时自动从封面图提取配色。
+---
+apiVersion: v1alpha1
+kind: AnnotationSetting
+metadata:
+  name: theme-mote-single-page-annotation-setting
+spec:
+  targetRef:
+    group: content.halo.run
+    kind: SinglePage
+  formSchema:
+    - $formkit: switch
+      name: mote/hide_cover
+      label: 顶部隐藏封面图
+      value: "false"
+      onValue: "true"
+      offValue: "false"
+    - $formkit: switch
+      name: mote/hide_toc
+      label: 隐藏目录与伴读侧栏
+      value: "false"
+      onValue: "true"
+      offValue: "false"
+    - $formkit: switch
+      name: mote/hide_topbar
+      label: 隐藏顶部「返回首页」与排版工具条
+      value: "false"
+      onValue: "true"
+      offValue: "false"
+      help: 适合「关于」「留言板」等极简独立页面。
+    - $formkit: textarea
+      name: mote/notice_text
+      label: 页首自定义提示（可选）
+      value: ""
+      help: 显示在页面正文开头的一条克制提示条。
+    - $formkit: text
+      name: mote/accent_color
+      label: 本页专属强调色（HEX，可选）
+      value: ""
+      placeholder: "#2a6b5c"
+      help: 填写十六进制颜色（如 #2a6b5c）可手动覆盖封面自动取色；留空时自动从封面图提取配色。

@@ -1,0 +1,30 @@
+/* ==========================================================================
+   Minimal Plus · Comments Section Container
+   (Global Halo widget CSS variables live in src/styles/widgets.css)
+   ========================================================================== */
+
+.comments {
+  margin-top: 52px;
+  padding-top: 30px;
+  border-top: 1px solid var(--line);
+}
+
+.comments-heading {
+  margin: 0 0 20px;
+  font-size: 13.5px;
+  font-weight: 560;
+  letter-spacing: 0.01em;
+  color: var(--ink-2);
+}
+
+.comments halo-comment-widget,
+.comments comment-widget {
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .comments {
+    margin-top: 40px;
+    padding-top: 24px;
+  }
+}

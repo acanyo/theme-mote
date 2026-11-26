@@ -1,0 +1,663 @@
+/* ==========================================================================
+   Minimal Plus · Refined Long-Form Chinese Prose Typography
+   ========================================================================== */
+
+.prose {
+  font-size: var(--prose-size, 16px);
+  line-height: 1.9;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  word-break: break-word;
+  transition: font-size 0.18s ease;
+}
+
+html[data-prose-font="serif"] .prose {
+  font-family: "Noto Serif SC", "Songti SC", "STSong", Georgia, serif;
+  line-height: 1.96;
+}
+
+html[data-prose-size="sm"] .prose {
+  --prose-size: 15px;
+}
+
+html[data-prose-size="lg"] .prose {
+  --prose-size: 17.5px;
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose p {
+  margin: 0 0 1.48em;
+}
+
+.prose strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.prose h2,
+.prose h3,
+.prose h4 {
+  position: relative;
+  font-weight: 620;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  scroll-margin-top: 76px;
+}
+
+.prose h2 {
+  margin: 2.35em 0 0.85em;
+  font-size: 1.32rem;
+  line-height: 1.4;
+}
+
+.prose h3 {
+  margin: 1.85em 0 0.65em;
+  font-size: 1.12rem;
+  line-height: 1.45;
+}
+
+.prose h4 {
+  margin: 1.5em 0 0.55em;
+  font-size: 1rem;
+}
+
+/* Subtle Hover # Section Anchor Copy Button */
+.heading-anchor {
+  margin-left: 7px;
+  font-size: 0.85em;
+  font-weight: 450;
+  color: var(--ink-faint);
+  opacity: 0;
+  vertical-align: baseline;
+  transition:
+    opacity 0.16s ease,
+    color 0.16s ease;
+}
+
+.prose h2:hover .heading-anchor,
+.prose h3:hover .heading-anchor,
+.heading-anchor:focus-visible {
+  opacity: 1;
+}
+
+.heading-anchor:hover {
+  color: var(--accent);
+}
+
+.prose a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 36%, var(--line-strong));
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.25px;
+  transition:
+    text-decoration-color 0.16s ease,
+    color 0.16s ease;
+}
+
+.prose a:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
+.prose ul,
+.prose ol {
+  margin: 0 0 1.45em;
+  padding-left: 1.45em;
+}
+
+.prose li {
+  margin-bottom: 0.45em;
+}
+
+.prose li::marker {
+  color: var(--ink-3);
+}
+
+.prose ul ul,
+.prose ol ol,
+.prose ul ol,
+.prose ol ul {
+  margin: 0.42em 0 0.2em;
+}
+
+/* Task Lists (Halo TipTap Editor + GitHub-Flavored Markdown) */
+.prose ul[data-type="taskList"],
+.prose ul.contains-task-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.prose li[data-type="taskItem"],
+.prose li.task-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  list-style: none;
+}
+
+.prose li[data-type="taskItem"] > label,
+.prose li.task-list-item > input[type="checkbox"] {
+  flex-shrink: 0;
+  margin-top: 0.34em;
+  display: inline-flex;
+  align-items: center;
+}
+
+.prose li[data-type="taskItem"] input[type="checkbox"],
+.prose li.task-list-item input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--accent);
+  border-radius: 4px;
+  cursor: default;
+}
+
+.prose li[data-type="taskItem"] > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.prose li[data-type="taskItem"] > div > p {
+  margin: 0;
+}
+
+.prose li[data-type="taskItem"][data-checked="true"] > div {
+  color: var(--ink-3);
+  text-decoration: line-through;
+  text-decoration-color: var(--ink-faint);
+}
+
+/* Definition Lists */
+.prose dl {
+  margin: 1.5em 0;
+}
+
+.prose dt {
+  margin-top: 1em;
+  font-weight: 580;
+  color: var(--ink);
+}
+
+.prose dd {
+  margin: 0.3em 0 0 1.25em;
+  color: var(--ink-2);
+}
+
+/* Inline Publication Micro-Typography */
+.prose mark {
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: inherit;
+  background: color-mix(in srgb, var(--accent-secondary) 34%, transparent);
+}
+
+html.dark .prose mark {
+  background: color-mix(in srgb, var(--accent-secondary) 22%, transparent);
+}
+
+.prose kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  margin: 0 1px;
+  border-radius: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.79em;
+  line-height: 1.5;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  box-shadow: inset 0 -1px 0 var(--line-strong);
+  vertical-align: 0.06em;
+}
+
+.prose del,
+.prose s {
+  color: var(--ink-3);
+  text-decoration-color: var(--ink-faint);
+}
+
+.prose abbr[title] {
+  text-decoration: underline dotted var(--ink-faint);
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
+.prose sup,
+.prose sub {
+  font-size: 0.74em;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+.prose sup {
+  top: -0.45em;
+}
+
+.prose sub {
+  bottom: -0.22em;
+}
+
+/* Editorial Collapsible Blocks (Halo Editor <details> & Markdown) */
+.prose details {
+  margin: 1.65em 0;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 52%, var(--bg));
+  overflow: hidden;
+  transition: border-color 0.16s ease;
+}
+
+.prose details[open] {
+  border-color: var(--line-strong);
+}
+
+.prose summary {
+  position: relative;
+  list-style: none;
+  padding: 11px 16px 11px 36px;
+  font-size: 14.5px;
+  font-weight: 540;
+  color: var(--ink);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.16s ease;
+}
+
+.prose summary::-webkit-details-marker {
+  display: none;
+}
+
+.prose summary::before {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-right: 1.6px solid var(--ink-3);
+  border-bottom: 1.6px solid var(--ink-3);
+  transform: translateY(-50%) rotate(-45deg);
+  transition:
+    transform 0.2s var(--ease-out),
+    border-color 0.16s ease;
+}
+
+.prose summary:hover {
+  background: var(--hover-soft);
+}
+
+.prose details[open] > summary {
+  border-bottom: 1px solid var(--line);
+}
+
+.prose details[open] > summary::before {
+  border-color: var(--accent);
+  transform: translateY(-65%) rotate(45deg);
+}
+
+.prose details > :not(summary) {
+  margin-inline: 16px;
+}
+
+.prose details > :nth-child(2) {
+  margin-top: 14px;
+}
+
+.prose details > :last-child {
+  margin-bottom: 14px;
+}
+
+/* Restrained Editorial Callouts / Alerts (Halo Editor + Markdown Alerts) */
+.prose :is(.callout, [data-callout], .markdown-alert, .custom-block) {
+  --callout-color: var(--accent);
+  margin: 1.7em 0;
+  padding: 13px 17px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  border-left: 2.5px solid var(--callout-color);
+  background: color-mix(in srgb, var(--callout-color) 5%, var(--surface));
+  font-size: 14.5px;
+  line-height: 1.8;
+  color: var(--ink-2);
+}
+
+.prose :is(.callout, [data-callout], .markdown-alert, .custom-block) > :first-child {
+  margin-top: 0;
+}
+
+.prose :is(.callout, [data-callout], .markdown-alert, .custom-block) > :last-child {
+  margin-bottom: 0;
+}
+
+.prose :is(.markdown-alert-title, .callout-title, .custom-block-title) {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--callout-color);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prose :is(.markdown-alert-tip, .callout.tip, .callout[data-callout="tip"], .custom-block.tip) {
+  --callout-color: #16a34a;
+}
+
+.prose :is(.markdown-alert-warning, .markdown-alert-caution, .callout.warning, .callout[data-callout="warning"], .custom-block.warning) {
+  --callout-color: #d97706;
+}
+
+.prose :is(.markdown-alert-important, .callout.important, .callout[data-callout="important"]) {
+  --callout-color: #7c3aed;
+}
+
+.prose :is(.markdown-alert-danger, .callout.danger, .callout[data-callout="danger"], .custom-block.danger) {
+  --callout-color: #dc2626;
+}
+
+html.dark .prose :is(.markdown-alert-tip, .callout.tip, .callout[data-callout="tip"], .custom-block.tip) {
+  --callout-color: #4ade80;
+}
+
+html.dark .prose :is(.markdown-alert-warning, .markdown-alert-caution, .callout.warning, .callout[data-callout="warning"], .custom-block.warning) {
+  --callout-color: #fbbf24;
+}
+
+html.dark .prose :is(.markdown-alert-important, .callout.important, .callout[data-callout="important"]) {
+  --callout-color: #a78bfa;
+}
+
+html.dark .prose :is(.markdown-alert-danger, .callout.danger, .callout[data-callout="danger"], .custom-block.danger) {
+  --callout-color: #f87171;
+}
+
+/* Editorial Accent-Rail Blockquote */
+.prose blockquote {
+  margin: 1.7em 0;
+  padding: 13px 18px;
+  border-left: 2.5px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 9px 9px 0;
+  color: var(--ink-2);
+  font-size: 15px;
+  line-height: 1.82;
+}
+
+.prose blockquote > :first-child {
+  margin-top: 0;
+}
+
+.prose blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.prose hr {
+  border: 0;
+  height: 1px;
+  margin: 2.6em 0;
+  background: var(--line);
+}
+
+.prose img {
+  margin: 1.9em auto;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 30px -16px rgba(15, 23, 42, 0.14);
+  cursor: zoom-in;
+}
+
+html.dark .prose img {
+  box-shadow: 0 14px 36px -14px rgba(0, 0, 0, 0.45);
+}
+
+.prose figure {
+  margin: 1.9em 0;
+}
+
+.prose figure img {
+  margin-bottom: 0;
+}
+
+.prose figcaption {
+  margin-top: 9px;
+  text-align: center;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+
+/* Halo Editor Multi-Column / Gallery Image Groups */
+.prose :is(.gallery-group, [data-type="columns"], .columns) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 1.85em 0;
+}
+
+.prose :is(.gallery-group, [data-type="columns"], .columns) img {
+  margin: 0;
+  width: 100%;
+  height: auto;
+}
+
+/* Responsive Embedded Media (Video, Audio, Iframes) */
+.prose video {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 1.85em auto;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #000;
+}
+
+.prose audio {
+  display: block;
+  width: 100%;
+  margin: 1.6em 0;
+  border-radius: 10px;
+}
+
+.prose iframe {
+  display: block;
+  max-width: 100%;
+  margin: 1.85em auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.prose iframe[src*="youtube"],
+.prose iframe[src*="youtu.be"],
+.prose iframe[src*="bilibili"],
+.prose iframe[src*="vimeo"] {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+/* Footnotes */
+.prose .footnotes {
+  margin-top: 3em;
+  padding-top: 1.4em;
+  border-top: 1px solid var(--line);
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+
+.prose .footnotes ol {
+  margin: 0;
+  padding-left: 1.35em;
+}
+
+.prose .footnotes li {
+  margin-bottom: 0.55em;
+  scroll-margin-top: 84px;
+}
+
+.prose .footnotes p {
+  margin-bottom: 0.45em;
+}
+
+.prose a.footnote-ref,
+.prose a.footnote-backref {
+  text-decoration: none;
+  color: var(--accent);
+  padding: 0 2px;
+}
+
+.prose a.footnote-ref:hover,
+.prose a.footnote-backref:hover {
+  text-decoration: underline;
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--code-bg);
+  color: var(--ink);
+}
+
+/* Refined Code Blocks with Subtle Language Tag & Copy Feedback */
+.prose pre {
+  position: relative;
+  margin: 1.75em 0;
+  padding: 18px 20px;
+  overflow-x: auto;
+  border-radius: 10px;
+  background: var(--pre-bg);
+  color: var(--pre-ink);
+  border: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 1.72;
+  letter-spacing: 0;
+}
+
+.prose pre[data-lang] {
+  padding-top: 34px;
+}
+
+.prose pre[data-lang]::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 10px;
+  left: 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+
+.prose pre code {
+  padding: 0;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}
+
+.code-copy-btn {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  z-index: 2;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  opacity: 0;
+  transition:
+    opacity 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease;
+}
+
+.prose pre:hover .code-copy-btn,
+.code-copy-btn:focus-visible,
+.code-copy-btn.is-copied {
+  opacity: 1;
+}
+
+.code-copy-btn:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.code-copy-btn.is-copied {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+}
+
+.prose table {
+  width: 100%;
+  margin: 1.75em 0;
+  border-collapse: collapse;
+  font-size: 14px;
+  border-radius: 9px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.prose th,
+.prose td {
+  padding: 10px 13px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+.prose th {
+  font-weight: 550;
+  color: var(--ink-2);
+  background: var(--surface);
+}
+
+.prose tbody tr:hover td {
+  background: var(--hover-soft);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .code-copy-btn {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .prose {
+    font-size: var(--prose-size, 15.5px);
+    line-height: 1.86;
+  }
+  .prose h2 {
+    margin: 2em 0 0.75em;
+    font-size: 1.24rem;
+  }
+  .prose h3 {
+    margin: 1.6em 0 0.55em;
+    font-size: 1.08rem;
+  }
+  .prose pre {
+    padding: 14px 15px;
+    font-size: 12.5px;
+    border-radius: 9px;
+  }
+  .prose pre[data-lang] {
+    padding-top: 36px;
+  }
+  .prose table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

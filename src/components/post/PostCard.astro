@@ -1,0 +1,76 @@
+---
+/** One listed post inside a Thymeleaf loop that binds `post`. */
+import Icon from "../common/Icon.astro";
+---
+
+<article
+  class="index-post"
+  th:classappend="${#strings.isEmpty(post.spec.cover)} ? 'is-coverless'"
+>
+  <a
+    class="index-post-cover-link"
+    th:if="${not #strings.isEmpty(post.spec.cover)}"
+    th:href="@{${post.status.permalink}}"
+    tabindex="-1"
+    aria-hidden="true"
+  >
+    <img
+      class="index-post-cover"
+      th:src="${post.spec.cover}"
+      alt=""
+      loading="lazy"
+      decoding="async"
+    />
+  </a>
+  <div class="index-post-copy">
+    <p class="index-post-meta">
+      <time
+        class="num"
+        th:datetime="${post.spec.publishTime}"
+        th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}"
+        >2026-11-12</time
+      >
+      <a
+        class="index-post-cat"
+        th:if="${not #lists.isEmpty(post.categories)}"
+        th:href="@{${post.categories[0].status.permalink}}"
+        th:text="${post.categories[0].spec.displayName}">分类</a
+      >
+      <span class="stamp-label" th:if="${post.spec.pinned}">置顶</span>
+    </p>
+    <h2>
+      <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}"
+        >文章标题</a
+      >
+    </h2>
+    <p
+      class="index-post-excerpt"
+      th:if="${not #strings.isEmpty(post.status.excerpt)}"
+      th:text="${post.status.excerpt}"
+    >
+    </p>
+    <footer class="index-post-foot">
+      <span class="index-post-stat" th:title="|${post.stats.visit} 次阅读|">
+        <Icon name="eye" size={14} /><span
+          class="num"
+          th:text="${post.stats.visit}">0</span
+        >
+      </span>
+      <span
+        class="index-post-stat"
+        th:if="${post.stats.comment > 0}"
+        th:title="|${post.stats.comment} 条评论|"
+      >
+        <Icon name="chat" size={14} /><span
+          class="num"
+          th:text="${post.stats.comment}">0</span
+        >
+      </span>
+      <a
+        th:each="tag : ${post.tags}"
+        th:href="@{${tag.status.permalink}}"
+        th:text="|# ${tag.spec.displayName}|"># 标签</a
+      >
+    </footer>
+  </div>
+</article>

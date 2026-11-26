@@ -1,0 +1,95 @@
+---
+import Icon from "../common/Icon.astro";
+---
+
+<th:block th:if="${theme.config.modules?.show_closing != false}">
+  <th:block
+    th:with="brandTitle = ${theme.config.basic?.title ?: theme.config.home?.title ?: site.title ?: 'Mote'}, closingTitle = ${not #strings.isEmpty(theme.config.modules?.closing_title) ? theme.config.modules.closing_title : '谢谢你看到这里'}, closingText = ${not #strings.isEmpty(theme.config.modules?.closing_text) ? theme.config.modules.closing_text : '如果这里的某段文字刚好引起共鸣，欢迎写信聊聊，或者订阅更新。'}, closingEmail = ${#strings.trim(theme.config.modules?.closing_email ?: '')}, guestbookUrl = ${#strings.trim(theme.config.modules?.closing_link ?: '')}, guestbookLabel = ${not #strings.isEmpty(theme.config.modules?.closing_link_label) ? theme.config.modules.closing_link_label : '去留言'}, hasFeed = ${pluginFinder.available('PluginFeed')}, hasEmail = ${not #strings.isEmpty(closingEmail)}, hasGuestbook = ${not #strings.isEmpty(guestbookUrl)}, hasPrimary = ${hasEmail or hasGuestbook}"
+  >
+    <section
+      class="home-section home-closing"
+      aria-labelledby="home-closing-title"
+    >
+      <div class="closing-letter">
+        <div class="closing-copy">
+          <div class="closing-head">
+            <h2 class="closing-title" id="home-closing-title">
+              <span class="closing-mark" aria-hidden="true">
+                <Icon name="feather" size={14} />
+              </span>
+              <span th:text="${closingTitle}">谢谢你看到这里</span>
+            </h2>
+            <span class="closing-sign" aria-hidden="true">
+              <span class="closing-sign-dash">—</span>
+              <span th:text="${brandTitle}">Mote</span>
+            </span>
+          </div>
+          <p class="closing-text" th:text="${closingText}">
+            如果这里的某段文字刚好引起共鸣，欢迎写信聊聊，或者订阅更新。
+          </p>
+        </div>
+
+        <div class="closing-actions">
+          <div class="closing-primary" th:if="${hasPrimary}">
+            <button
+              type="button"
+              class="closing-pill is-primary"
+              th:if="${hasEmail}"
+              th:attr="data-copy-email=${closingEmail}"
+              data-tip="点击复制邮箱"
+            >
+              <Icon name="mail" size={13} />
+              <span class="closing-email-text num" th:text="${closingEmail}">
+                hello@example.com
+              </span>
+              <Icon name="copy" size={11} class="closing-copy-icon" />
+            </button>
+
+            <a
+              th:class="${hasEmail ? 'closing-pill' : 'closing-pill is-primary'}"
+              class="closing-pill"
+              th:if="${hasGuestbook}"
+              th:href="${guestbookUrl}"
+            >
+              <Icon name="chat" size={13} />
+              <span th:text="${guestbookLabel}">去留言</span>
+            </a>
+          </div>
+
+          <div class="closing-primary" th:if="${not hasPrimary and hasFeed}">
+            <a
+              class="closing-pill is-primary"
+              href="/feed.xml"
+              data-tip="通过 RSS 阅读器订阅更新"
+            >
+              <Icon name="rss" size={13} />
+              <span>RSS 订阅</span>
+            </a>
+          </div>
+
+          <div class="closing-utils">
+            <a
+              class="closing-ghost"
+              href="/feed.xml"
+              data-tip="通过 RSS 阅读器订阅更新"
+              th:if="${hasPrimary and hasFeed}"
+            >
+              <Icon name="rss" size={13} />
+              <span>RSS 订阅</span>
+            </a>
+
+            <button
+              type="button"
+              class="closing-ghost"
+              data-random-trigger
+              data-tip="随机挑一篇站内文章"
+            >
+              <Icon name="shuffle" size={13} />
+              <span>随机读一篇</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </th:block>
+</th:block>

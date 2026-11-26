@@ -1,0 +1,81 @@
+---
+/** Stroke icons drawn on a 24px grid. */
+interface Props {
+  name: keyof typeof paths;
+  size?: number;
+  class?: string;
+}
+
+const paths = {
+  sparkles:
+    "m12 3 2.3 6.7L21 12l-6.7 2.3L12 21l-2.3-6.7L3 12l6.7-2.3L12 3ZM20 3v4m-2-2h4",
+  wave: "M3 9c3.5-4 6.5-4 10-2s5.5 2 8-1M3 14c3.5-4 6.5-4 10-2s5.5 2 8-1M3 19c3.5-4 6.5-4 10-2s5.5 2 8-1M19 3h.01",
+  code: "m8 6-6 6 6 6m8-12 6 6-6 6M14 3l-4 18",
+  book: "M12 6C8 3 4 4 2 5v15c4-2 7-2 10 0m0-14c4-3 8-2 10-1v15c-4-2-7-2-10 0V6Z",
+  cube: "m12 2 9 5v10l-9 5-9-5V7l9-5Zm0 10L3 7m9 5 9-5m-9 5v10M7.5 4.5l9 5",
+  leaf: "M20 3C8 2 3 7 4 14c1 5 9 6 13 1 3-4 3-8 3-12ZM4 21c2-8 5-11 11-14",
+  tag: "M3 3h8l10 10-8 8L3 11V3ZM7 7h.01",
+  broadcast:
+    "M8 5a10 10 0 0 0 0 14M16 5a10 10 0 0 1 0 14M10 8a5 5 0 0 0 0 8m4-8a5 5 0 0 1 0 8M12 11v2",
+  rss: "M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16M4 19h.01",
+  user: "M20 21v-2a6 6 0 0 0-6-6h-4a6 6 0 0 0-6 6v2M16 6a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z",
+  search: "m20 20-4.2-4.2M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z",
+  sun: "M12 3v1.5m0 15V21M3 12h1.5m15 0H21M5.6 5.6l1 1m10.8 10.8 1 1M5.6 18.4l1-1M17.4 6.6l1-1M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z",
+  moon: "M20 14.2A8 8 0 0 1 9.8 4 8 8 0 1 0 20 14.2Z",
+  menu: "M4 9h16M4 15h10",
+  close: "M6 6l12 12M18 6 6 18",
+  arrowLeft: "M19 12H5m6-6-6 6 6 6",
+  arrowRight: "M5 12h14m-6-6 6 6-6 6",
+  arrowUp: "M12 19V5m-6 6 6-6 6 6",
+  arrowDown: "M12 5v14m-6-6 6 6 6-6",
+  chevronDown: "m7 10 5 5 5-5",
+  pause: "M9 6v12m6-12v12",
+  play: "M8 5.5v13l10-6.5-10-6.5Z",
+  sliders: "M4 7h10m4 0h2M4 17h4m4 0h8M16 5v4M10 15v4",
+  copy: "M9 9h10v10H9zM5 15V5h10",
+  link: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
+  external:
+    "M14 5h5v5m0-5-8 8M18 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4",
+  refresh: "M19 12a7 7 0 1 1-2.05-4.95M19 5v4h-4",
+  shuffle:
+    "M4 7h3c4 0 6 10 10 10h3m-3-3 3 3-3 3M4 17h3c1.5 0 2.6-1.4 3.6-3.2M14 8.6C15 7.6 16 7 17 7h3m-3-3 3 3-3 3",
+  home: "M4 11 12 4l8 7M6 9.5V20h12V9.5",
+  image: "M4 5h16v14H4zM4 16l5-5 4 4 2-2 5 5M15.5 9.5h.01",
+  keyboard: "M3 7h18v10H3zM7 11h.01M11 11h.01M15 11h.01M8 14h8",
+  feather: "M20 4C12 4 7 9 7 16l-2 4m2-4c7 0 12-5 13-12M9 14l5-5",
+  archive: "M4 5h16v4H4zM6 9v10h12V9M10 13h4",
+  folder: "M4 6h6l2 2h8v10H4z",
+  hash: "M5 9h14M5 15h14M10 4 8 20M16 4l-2 16",
+  chat: "M5 5h14v10H9l-4 4z",
+  heart:
+    "M12 20.4s-7-4.4-9.2-8.4C1.2 9.1 2.7 5.5 6.4 5.2c2-.2 3.7.9 4.6 2.3.9-1.4 2.6-2.5 4.6-2.3 3.7.3 5.2 3.9 3.6 6.8-2.2 4-7.2 8.4-7.2 8.4Z",
+  mail: "M4 6h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Zm0 1 8 6 8-6",
+  eye: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z",
+  calendar: "M4 6h16v14H4zM4 10h16M8 3v4M16 3v4",
+  monitor: "M3 5h18v11H3zM8 20h8M12 16v4",
+  bookmark: "M7 4h10v17l-5-4-5 4V4Z",
+  timeline: "M6 4v16M5 6h2M5 12h2M5 18h2M11 6h9M11 12h7M11 18h9",
+  star: "m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9L12 3Z",
+  coffee: "M17 8h1a4 4 0 1 1 0 8h-1M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8Zm3-5v2m4-2v2m4-2v2",
+  share: "M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4m4-4v13",
+  download: "M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2",
+  check: "m5 13 4 4L19 7",
+  sitemap: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm-8.5 9h17M12 3a13.5 13.5 0 0 1 0 18 13.5 13.5 0 0 1 0-18Z",
+} as const;
+
+const { name, size = 20, class: className } = Astro.props;
+---
+
+<svg
+  class={className}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.7"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"><path d={paths[name]}></path></svg
+>

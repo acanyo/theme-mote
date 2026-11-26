@@ -1,0 +1,195 @@
+---
+/**
+ * templates/portfolio-detail.html: project detail route provided by halo-plugin-portfolio (/portfolio/{slug}).
+ */
+import Layout from "../layouts/Layout.astro";
+import Toc from "../components/post/Toc.astro";
+import Icon from "../components/common/Icon.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import "../styles/article.css";
+import "../styles/portfolio.css";
+---
+
+<Layout page="post" title="|${title ?: project.title} - ${site.title}|">
+  <SeoHead
+    slot="head"
+    type="website"
+    titleExpr="(project != null ? project.title : (title ?: '项目详情')) + ' - ' + (site.title ?: 'Mote')"
+    descExpr="not #strings.isEmpty(description) ? description : (project?.summary ?: '')"
+    imageExpr="project?.cover ?: ''"
+    pathExpr="project != null ? ('/portfolio/' + project.slug) : '/portfolio'"
+    jsonLdKind="WebPage"
+  />
+
+  <article
+    class="article portfolio-detail"
+    th:attr="data-cover-palette-src=${not #strings.isEmpty(project?.cover) ? project.cover : null}"
+  >
+    <header class="article-head wrap--text">
+      <div class="article-topbar">
+        <a class="article-back" href="/portfolio" th:href="@{/portfolio}">
+          <span class="back-arrow" aria-hidden="true">←</span>
+          <span>返回项目集</span>
+        </a>
+
+        <div class="article-cats">
+          <a
+            class="article-cat-pill"
+            th:if="${not #strings.isEmpty(project?.type)}"
+            th:href="@{/portfolio(type=${project.type})}"
+            th:text="${typeLabels != null and typeLabels[project.type] != null ? typeLabels[project.type] : project.type}"
+            >项目</a
+          >
+          <a
+            class="article-cat-pill"
+            th:if="${not #strings.isEmpty(project?.platform)}"
+            th:href="@{/portfolio(platform=${project.platform})}"
+            th:text="${platformLabels != null and platformLabels[project.platform] != null ? platformLabels[project.platform] : project.platform}"
+            >平台</a
+          >
+        </div>
+      </div>
+
+      <h1 class="article-title" th:text="${project?.title ?: '项目详情'}">
+        项目标题
+      </h1>
+
+      <p
+        class="article-lead"
+        th:if="${not #strings.isEmpty(project?.summary)}"
+        th:text="${project.summary}"
+      >
+        项目简介
+      </p>
+
+      <div class="portfolio-detail-bar">
+        <div class="portfolio-detail-stats">
+          <span
+            class="portfolio-stat-item num"
+            th:if="${project?.repository != null and project.repository.stars > 0}"
+          >
+            <Icon name="star" size={12} />
+            <span th:text="|${project.repository.stars} Stars|">0 Stars</span>
+          </span>
+          <span
+            class="portfolio-stat-item num"
+            th:if="${project?.repository != null and project.repository.forks > 0}"
+            th:text="|${project.repository.forks} Forks|"
+          ></span>
+          <span
+            class="portfolio-stat-item"
+            th:if="${project?.repository != null and not #strings.isEmpty(project.repository.language)}"
+            th:text="${project.repository.language}"
+          ></span>
+          <span
+            class="portfolio-stat-item"
+            th:if="${project?.repository != null and not #strings.isEmpty(project.repository.license)}"
+            th:text="${project.repository.license}"
+          ></span>
+          <span
+            class="portfolio-stat-item num"
+            th:if="${not #strings.isEmpty(project?.updateTime)}"
+            th:text="|更新于 ${#strings.length(project.updateTime) >= 10 ? #strings.substring(project.updateTime, 0, 10) : project.updateTime}|"
+          ></span>
+        </div>
+
+        <div class="portfolio-detail-actions">
+          <a
+            class="portfolio-action-btn is-primary"
+            th:if="${not #strings.isEmpty(project?.demoUrl)}"
+            th:href="${project.demoUrl}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span>在线预览</span>
+            <Icon name="external" size={12} />
+          </a>
+          <a
+            class="portfolio-action-btn"
+            th:if="${not #strings.isEmpty(project?.repoUrl)}"
+            th:href="${project.repoUrl}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Icon name="code" size={12} />
+            <span>源码仓库</span>
+          </a>
+          <a
+            class="portfolio-action-btn"
+            th:if="${not #strings.isEmpty(project?.docsUrl)}"
+            th:href="${project.docsUrl}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Icon name="book" size={12} />
+            <span>文档</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div
+      class="article-cover-stage"
+      th:if="${not #strings.isEmpty(project?.cover)}"
+    >
+      <figure class="article-cover">
+        <img
+          th:src="${project.cover}"
+          th:alt="${project.title}"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </figure>
+    </div>
+
+    <div class="article-shell wrap--text">
+      <div class="article-main">
+        <div
+          class="article-content prose"
+          th:utext="${projectContentHtml}"
+          data-article-body
+        >
+        </div>
+
+        <footer
+          class="portfolio-detail-foot"
+          th:if="${not #lists.isEmpty(project?.techStacks) or not #lists.isEmpty(project?.tags)}"
+        >
+          <div class="portfolio-foot-tags">
+            <a
+              class="tag-chip chip"
+              th:each="stack : ${project.techStacks}"
+              th:href="@{/portfolio(tag=${stack})}"
+              th:text="${stack}">Stack</a
+            >
+            <a
+              class="tag-chip chip"
+              th:each="tag : ${project.tags}"
+              th:href="@{/portfolio(tag=${tag})}"
+              th:text="|#${tag}|">#Tag</a
+            >
+          </div>
+        </footer>
+      </div>
+
+      <aside class="article-aside">
+        <div class="aside-sticky">
+          <Toc />
+          <div class="aside-tools">
+            <button
+              type="button"
+              class="aside-tool-btn"
+              data-prose-font-toggle
+              aria-pressed="false"
+            >
+              <span>书刊衬线体</span>
+            </button>
+            <button type="button" class="aside-tool-btn" data-scroll-top>
+              <span>回到顶部 ↑</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </article>
+</Layout>

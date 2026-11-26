@@ -1,52 +1,296 @@
 ---
-import "../styles/global.css";
-import Footer from "../components/Footer.astro";
-import Header from "../components/Header.astro";
+import "../styles/tokens.css";
+import "../styles/widgets.css";
+import "../styles/base.css";
+import "../styles/image-cursor.css";
+import "../styles/image-placeholder.css";
+import "../styles/feedback.css";
+import "../styles/transitions.css";
+import "../styles/print.css";
+import Header from "../components/site/Header.astro";
+import Footer from "../components/site/Footer.astro";
+import ControlCenter from "../components/site/ControlCenter.astro";
+import Shortcuts from "../components/site/Shortcuts.astro";
 
 interface Props {
-  pageTitle?: string;
-  contentClass?: string;
+  title?: string;
+  page: string;
+  contract?: boolean;
 }
 
-const { pageTitle, contentClass } = Astro.props;
-
-const hasHeading = Boolean(pageTitle);
+const { title = "${site.title}", page, contract = false } = Astro.props;
+const htmlAttrs = contract ? { "th:fragment": "html (head, content)" } : {};
 ---
 
 <!doctype html>
-<html lang="en">
+<html
+  lang="zh-CN"
+  data-color-scheme="light"
+  data-palette="custom"
+  data-palette-default="custom"
+  data-scheme-default="light"
+  data-excerpt-default="false"
+  data-ambient-bg="home"
+  data-image-cursor="viewfinder"
+  data-cover-palette="true"
+  data-lightbox-enabled="true"
+  data-code-copy="true"
+  th:lang="${site.language ?: 'zh-CN'}"
+  th:with="primaryColor = ${theme.config.basic?.primary_color ?: theme.config.style?.primary_color}, secondaryColor = ${theme.config.basic?.secondary_color ?: theme.config.style?.secondary_color}, schemeDefault = ${theme.config.basic?.color_scheme ?: theme.config.style?.color_scheme ?: 'light'}, ambientBg = ${theme.config.basic?.ambient_bg ?: theme.config.style?.ambient_bg ?: 'home'}, imageCursor = ${theme.config.basic?.image_cursor ?: 'viewfinder'}, imgLoadingSrc = ${theme.config.basic?.image_loading_placeholder ?: ''}, imgErrorSrc = ${theme.config.basic?.image_error_placeholder ?: ''}, pageTrans = ${theme.config.basic?.page_transition != null ? theme.config.basic.page_transition : (theme.config.motion?.page_transition != false)}"
+  th:style="|${not #strings.isEmpty(primaryColor) ? '--theme-primary:' + primaryColor + ';' : ''}${not #strings.isEmpty(secondaryColor) ? '--theme-secondary:' + secondaryColor + ';' : ''}${not #strings.isEmpty(imgLoadingSrc) ? '--img-loading-bg:url(' + imgLoadingSrc + ');' : ''}|"
+  th:attr="data-palette='custom',data-palette-default='custom',data-scheme-default=${schemeDefault},data-ambient-bg=${ambientBg},data-image-cursor=${imageCursor},data-cover-palette=${theme.config.basic?.cover_palette != false},data-cover-palette-api=${theme.config.basic?.cover_palette_api ?: ''},data-has-loading-placeholder=${not #strings.isEmpty(imgLoadingSrc)},data-img-error-src=${imgErrorSrc},data-lightbox-enabled=${theme.config.post?.enable_lightbox != false},data-code-copy=${theme.config.post?.enable_code_copy != false},data-excerpt-default=${theme.config.home?.show_excerpt_default == true},data-motion-site=${theme.config.motion?.enabled != false},data-page-transition=${pageTrans}"
+  {...htmlAttrs}
+>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
     <script is:inline>
-      (function () {
-        var stored = localStorage.getItem("theme");
-        var prefersDark = window.matchMedia(
-          "(prefers-color-scheme: dark)",
-        ).matches;
-        if (stored === "dark" || (!stored && prefersDark)) {
-          document.documentElement.classList.add("dark");
+      (() => {
+        const root = document.documentElement;
+        let storedScheme;
+        try {
+          storedScheme = localStorage.getItem("mote-scheme");
+          if (localStorage.getItem("mote-motion") === "off")
+            root.dataset.motion = "off";
+          const palette = localStorage.getItem("mote-palette");
+          if (/^(custom|sky|clear|ink|lagoon|dusk)$/.test(palette || ""))
+            root.dataset.palette = palette;
+          const excerpt = localStorage.getItem("mote-show-excerpt");
+          if (excerpt === "true" || excerpt === "false")
+            root.dataset.showExcerpt = excerpt;
+          const proseFont = localStorage.getItem("mote-prose-font");
+          if (proseFont === "serif" || proseFont === "sans")
+            root.dataset.proseFont = proseFont;
+          const proseSize = localStorage.getItem("mote-prose-size");
+          if (proseSize === "sm" || proseSize === "md" || proseSize === "lg")
+            root.dataset.proseSize = proseSize;
+        } catch {}
+
+        const scheme = storedScheme || root.dataset.schemeDefault || "light";
+        const dark =
+          scheme === "dark" ||
+          (scheme === "auto" &&
+            matchMedia("(prefers-color-scheme: dark)").matches);
+        root.classList.toggle("dark", dark);
+        root.classList.toggle("color-scheme-dark", dark);
+        root.classList.toggle("color-scheme-light", !dark);
+        root.dataset.colorScheme = dark ? "dark" : "light";
+        const themeMeta = document.querySelector('meta[name="theme-color"]');
+        if (themeMeta)
+          themeMeta.setAttribute("content", dark ? "#141414" : "#ffffff");
+
+        if (!root.dataset.showExcerpt) {
+          root.dataset.showExcerpt =
+            root.dataset.excerptDefault === "true" ? "true" : "false";
         }
+
+        if (matchMedia("(max-width: 720px)").matches) {
+          root.setAttribute("data-compact", "");
+        }
+
+        window.addEventListener("pagereveal", (event) => {
+          if (
+            root.dataset.motion === "off" ||
+            root.dataset.motionSite === "false" ||
+            root.dataset.pageTransition === "false" ||
+            matchMedia("(prefers-reduced-motion: reduce)").matches
+          )
+            event.viewTransition?.skipTransition();
+        });
       })();
     </script>
+    {
+      contract ? (
+        <>
+          <title th:if="${head == null}" th:text="${site.title}" />
+          <th:block th:if="${head != null}">
+            <th:block th:replace="${head}" />
+          </th:block>
+        </>
+      ) : (
+        <title th:text={title}>Mote</title>
+      )
+    }
+    <link
+      rel="icon"
+      type="image/png"
+      href="/themes/theme-mote/assets/favicon.png"
+      th:if="${#strings.isEmpty(site.favicon)}"
+    />
     <slot name="head" />
   </head>
-  <body>
-    <Header />
-    <main class="layout-main">
-      <article class="page-shell">
-        {
-          hasHeading && (
-            <header class="page-heading">
-              {pageTitle && <h1>{pageTitle}</h1>}
-            </header>
-          )
-        }
-        <div class:list={["page-content", contentClass]}>
-          <slot />
+  <body data-page={page}>
+    <a class="skip-link" href="#main">跳到正文</a>
+    <div
+      class="read-progress"
+      aria-hidden="true"
+      th:if="${theme.config.post?.show_read_progress != false}"
+    >
+      <div class="read-progress-bar" data-progress-bar></div>
+    </div>
+    <div class="ambient-bg" aria-hidden="true">
+      <div class="ambient-dots"></div>
+      <div class="ambient-wash ambient-wash--right"></div>
+      <div class="ambient-wash ambient-wash--left"></div>
+      <div class="ambient-wash ambient-wash--beam"></div>
+    </div>
+    <div class="site-shell">
+      <Header />
+      <main id="main" class="site-main transition-main" tabindex="-1">
+        {contract ? <th:block th:replace="${content}" /> : <slot />}
+      </main>
+      <Footer />
+    </div>
+    <ControlCenter />
+    <Shortcuts />
+    <!-- Thyuu-Inspired Smart Mobile Bottom Utility Pill (non-post pages on <1180px) -->
+    <div
+      class="mobile-float-dock"
+      data-mobile-float-dock
+      role="region"
+      aria-label="页面快捷操作"
+    >
+      <button
+        type="button"
+        class="mobile-dock-btn"
+        data-random-trigger
+        aria-label="随机读一篇"
+        th:if="${theme.config.basic?.show_random != false}"
+      >
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M16 3h5v5"></path>
+          <path d="M4 20 21 3"></path>
+          <path d="M21 16v5h-5"></path>
+          <path d="M15 15l6 6"></path>
+          <path d="M4 4l5 5"></path>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="mobile-dock-pct num"
+        data-scroll-top
+        data-scroll-pct-badge
+        aria-label="回到顶部"
+      >
+        0
+      </button>
+    </div>
+    <div
+      class="minimal-lightbox"
+      data-lightbox
+      role="dialog"
+      aria-modal="true"
+      aria-label="查看原图"
+      aria-hidden="true"
+    >
+      <button
+        type="button"
+        class="lightbox-btn lightbox-close"
+        data-lightbox-close
+        data-tip="关闭大图"
+        data-tip-kbd="Esc"
+        aria-label="关闭大图"
+      >
+        <svg
+          width="17"
+          height="17"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        >
+          <path d="M6 6l12 12M18 6 6 18"></path>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="lightbox-btn lightbox-prev"
+        data-lightbox-prev
+        data-tip="上一张"
+        data-tip-kbd="←"
+        aria-label="上一张"
+        hidden
+      >
+        <svg
+          width="17"
+          height="17"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M15 18l-6-6 6-6"></path>
+        </svg>
+      </button>
+      <div class="lightbox-status" data-lightbox-loading aria-hidden="true">
+        <span class="lightbox-spinner"></span>
+      </div>
+      <div class="lightbox-status" data-lightbox-error aria-hidden="true">
+        <div class="lightbox-error-card">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="3" y="4" width="18" height="16" rx="2.5"></rect>
+            <circle cx="9" cy="10" r="1.4"></circle>
+            <path d="m21 16-4.2-4.2a1.5 1.5 0 0 0-2.1 0L9 17.5"></path>
+            <path d="m3 3 18 18"></path>
+          </svg>
+          <span>图片加载失败</span>
+          <button type="button" class="img-retry-btn" data-lightbox-retry>
+            重新加载
+          </button>
         </div>
-      </article>
-    </main>
-    <Footer />
+      </div>
+      <img src="" alt="" data-lightbox-img />
+      <button
+        type="button"
+        class="lightbox-btn lightbox-next"
+        data-lightbox-next
+        data-tip="下一张"
+        data-tip-kbd="→"
+        aria-label="下一张"
+        hidden
+      >
+        <svg
+          width="17"
+          height="17"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M9 18l6-6-6-6"></path>
+        </svg>
+      </button>
+    </div>
+    <halo:footer></halo:footer>
+    <script>
+      import { initSite } from "../scripts/main";
+      initSite();
+    </script>
   </body>
 </html>

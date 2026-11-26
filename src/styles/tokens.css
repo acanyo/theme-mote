@@ -1,0 +1,225 @@
+/* ==========================================================================
+   Mote Minimal Plus · Pure Single-Column Tokens
+   Backend-driven Primary & Secondary Colors (--theme-primary / --theme-secondary)
+   ========================================================================== */
+
+:root {
+  --font-sans:
+    "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas,
+    monospace;
+
+  --wrap-max: 700px;
+  --wrap-text: 700px;
+  --gutter: 24px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --dur-quick: 130ms;
+  --dur-enter: 240ms;
+  --dur-exit: 155ms;
+
+  /* Light Theme (Pure White Minimalist Default) */
+  --bg: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.84);
+  --surface: #f7f7f7;
+  --hover: #f5f5f5;
+  --hover-soft: rgba(0, 0, 0, 0.03);
+
+  --ink: #1a1a1a;
+  --ink-2: #555555;
+  --ink-3: #8c8c8c;
+  --ink-faint: #b4b4b4;
+
+  --line: #efefef;
+  --line-strong: #e2e2e2;
+  --dot-green: #22c55e;
+
+  /* Site Primary & Secondary Colors (overridden inline via Halo settings.yaml) */
+  --theme-primary: #2563eb;
+  --theme-secondary: #f0b890;
+
+  --accent: var(--theme-primary);
+  --accent-soft: color-mix(in srgb, var(--theme-primary) 9%, transparent);
+  --accent-secondary: var(--theme-secondary);
+
+  /* Mote Original Dual-Tone Ambient Window Light & Corner Dots */
+  --ambient-a: color-mix(in srgb, var(--theme-primary) 30%, transparent);
+  --ambient-b: color-mix(in srgb, var(--theme-secondary) 36%, transparent);
+  --ambient-c: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--theme-primary) 55%, var(--theme-secondary)) 22%,
+    transparent
+  );
+  --ambient-dot: rgba(15, 23, 42, 0.14);
+
+  --code-bg: #f5f5f5;
+  --pre-bg: #f7f7f7;
+  --pre-ink: #1f2328;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --gutter: 18px;
+  }
+}
+
+/* Soft Charcoal Dark Mode (auto-lifts primary/secondary for dark legibility) */
+html.dark {
+  --bg: #141414;
+  --bg-glass: rgba(20, 20, 20, 0.84);
+  --surface: #1c1c1c;
+  --hover: #1e1e1e;
+  --hover-soft: rgba(255, 255, 255, 0.04);
+
+  --ink: #eaeaea;
+  --ink-2: #a0a0a0;
+  --ink-3: #6e6e6e;
+  --ink-faint: #4b4b4b;
+
+  --line: #242424;
+  --line-strong: #323232;
+  --dot-green: #34d399;
+
+  --accent: color-mix(in srgb, var(--theme-primary) 72%, #ffffff);
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+  --accent-secondary: color-mix(in srgb, var(--theme-secondary) 78%, #ffffff);
+
+  --ambient-a: color-mix(in srgb, var(--theme-primary) 20%, transparent);
+  --ambient-b: color-mix(in srgb, var(--theme-secondary) 15%, transparent);
+  --ambient-c: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--theme-primary) 55%, var(--theme-secondary)) 12%,
+    transparent
+  );
+  --ambient-dot: rgba(255, 255, 255, 0.12);
+
+  --code-bg: #202020;
+  --pre-bg: #1a1a1a;
+  --pre-ink: #e4e4e7;
+}
+
+/* Visitor Quick-Switch Presets in Control Center */
+html[data-palette="clear"] {
+  --accent: #1a1a1a;
+  --accent-soft: rgba(0, 0, 0, 0.05);
+  --accent-secondary: #8c8c8c;
+  --ambient-a: rgba(116, 166, 238, 0.34);
+  --ambient-b: rgba(240, 184, 144, 0.28);
+  --ambient-c: rgba(164, 196, 242, 0.22);
+}
+html.dark[data-palette="clear"] {
+  --accent: #eaeaea;
+  --accent-soft: rgba(255, 255, 255, 0.07);
+  --accent-secondary: #a0a0a0;
+  --ambient-a: rgba(96, 165, 250, 0.17);
+  --ambient-b: rgba(245, 178, 118, 0.12);
+  --ambient-c: rgba(129, 140, 248, 0.1);
+}
+
+html[data-palette="sky"] {
+  --accent: #2563eb;
+  --accent-soft: rgba(37, 99, 235, 0.08);
+  --accent-secondary: #38bdf8;
+  --ambient-a: rgba(59, 130, 246, 0.3);
+  --ambient-b: rgba(103, 210, 235, 0.26);
+  --ambient-c: rgba(147, 197, 253, 0.22);
+}
+html.dark[data-palette="sky"] {
+  --accent: #60a5fa;
+  --accent-soft: rgba(96, 165, 250, 0.12);
+  --accent-secondary: #7dd3fc;
+  --ambient-a: rgba(59, 130, 246, 0.18);
+  --ambient-b: rgba(56, 189, 248, 0.12);
+  --ambient-c: rgba(96, 165, 250, 0.1);
+}
+
+html[data-palette="lagoon"] {
+  --accent: #2a6b5c;
+  --accent-soft: rgba(42, 107, 92, 0.08);
+  --accent-secondary: #d4b483;
+  --ambient-a: rgba(52, 160, 134, 0.28);
+  --ambient-b: rgba(226, 200, 148, 0.26);
+  --ambient-c: rgba(134, 215, 196, 0.2);
+}
+html.dark[data-palette="lagoon"] {
+  --accent: #6ab5a3;
+  --accent-soft: rgba(106, 181, 163, 0.12);
+  --accent-secondary: #e2c894;
+  --ambient-a: rgba(45, 212, 191, 0.15);
+  --ambient-b: rgba(217, 180, 114, 0.11);
+  --ambient-c: rgba(52, 211, 153, 0.1);
+}
+
+html[data-palette="dusk"] {
+  --accent: #b45309;
+  --accent-soft: rgba(180, 83, 9, 0.08);
+  --accent-secondary: #e89ca6;
+  --ambient-a: rgba(235, 154, 82, 0.3);
+  --ambient-b: rgba(232, 156, 166, 0.26);
+  --ambient-c: rgba(250, 206, 148, 0.22);
+}
+html.dark[data-palette="dusk"] {
+  --accent: #f59e0b;
+  --accent-soft: rgba(245, 158, 11, 0.12);
+  --accent-secondary: #f47288;
+  --ambient-a: rgba(245, 158, 11, 0.16);
+  --ambient-b: rgba(244, 114, 136, 0.11);
+  --ambient-c: rgba(251, 191, 36, 0.09);
+}
+
+html[data-palette="ink"] {
+  --accent: #4f46e5;
+  --accent-soft: rgba(79, 70, 229, 0.08);
+  --accent-secondary: #92baf5;
+  --ambient-a: rgba(108, 110, 238, 0.28);
+  --ambient-b: rgba(146, 186, 245, 0.26);
+  --ambient-c: rgba(186, 164, 246, 0.2);
+}
+html.dark[data-palette="ink"] {
+  --accent: #818cf8;
+  --accent-soft: rgba(129, 140, 248, 0.12);
+  --accent-secondary: #93c5fd;
+  --ambient-a: rgba(129, 140, 248, 0.18);
+  --ambient-b: rgba(96, 165, 250, 0.12);
+  --ambient-c: rgba(167, 139, 250, 0.1);
+}
+
+/* Cover-Driven Adaptive Page Palette (Post & SinglePage; wins until visitor overrides on-page) */
+html[data-cover-palette-active="true"]:not([data-cover-palette-override="true"]) {
+  --accent: var(--page-primary, var(--theme-primary));
+  --accent-soft: color-mix(in srgb, var(--accent) 10%, transparent);
+  --accent-secondary: var(--page-secondary, var(--theme-secondary));
+  --ambient-a: color-mix(in srgb, var(--accent) 34%, transparent);
+  --ambient-b: color-mix(in srgb, var(--accent-secondary) 38%, transparent);
+  --ambient-c: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--accent) 55%, var(--accent-secondary)) 24%,
+    transparent
+  );
+}
+
+html.dark[data-cover-palette-active="true"]:not([data-cover-palette-override="true"]) {
+  --accent: var(
+    --page-primary-dark,
+    color-mix(in srgb, var(--page-primary, var(--theme-primary)) 72%, #ffffff)
+  );
+  --accent-soft: color-mix(in srgb, var(--accent) 15%, transparent);
+  --accent-secondary: var(
+    --page-secondary-dark,
+    color-mix(
+      in srgb,
+      var(--page-secondary, var(--theme-secondary)) 78%,
+      #ffffff
+    )
+  );
+  --ambient-a: color-mix(in srgb, var(--accent) 22%, transparent);
+  --ambient-b: color-mix(in srgb, var(--accent-secondary) 16%, transparent);
+  --ambient-c: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--accent) 55%, var(--accent-secondary)) 12%,
+    transparent
+  );
+}

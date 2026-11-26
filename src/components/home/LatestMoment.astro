@@ -1,0 +1,44 @@
+---
+import Icon from "../common/Icon.astro";
+import { momentText } from "../../lib/expressions";
+---
+
+<th:block
+  th:if="${theme.config.sidebar?.show_moments != false and pluginFinder.available('PluginMoments')}"
+>
+  <th:block
+    th:with="moments = ${momentFinder.list({page: 1, size: 1, sort: {'spec.releaseTime,desc'}})}"
+  >
+    <section
+      class="home-moments"
+      aria-labelledby="home-moment-title"
+      th:if="${not #lists.isEmpty(moments.items)}"
+      th:with="moment = ${moments.items[0]}"
+    >
+      <header class="home-section-head">
+        <h2 class="section-title" id="home-moment-title">瞬间</h2>
+        <a class="ink-link moment-all" href="/moments" th:href="@{/moments}">
+          全部瞬间 <Icon name="arrowRight" size={15} />
+        </a>
+      </header>
+      <a
+        class="moment-note"
+        th:href="@{|/moments/${moment.metadata.name}|}"
+        th:with={`preview = ${momentText(110)}`}
+      >
+        <time class="num" th:datetime="${moment.spec.releaseTime}">
+          <span
+            th:text="${#temporals.format(moment.spec.releaseTime, 'yyyy.MM.dd')}"
+            >2026.11.18</span
+          >
+        </time>
+        <p
+          class="moment-excerpt"
+          th:text="${not #strings.isEmpty(preview) ? preview : (#lists.isEmpty(moment.spec.content.medium) ? '查看这条瞬间' : '查看瞬间附件')}"
+        >
+          查看这条瞬间
+        </p>
+      </a>
+    </section>
+  </th:block>
+</th:block>

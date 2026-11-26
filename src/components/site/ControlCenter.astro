@@ -1,0 +1,273 @@
+---
+import Icon from "../common/Icon.astro";
+import "../../styles/control-center.css";
+---
+
+<div class="cc" id="control-center" data-cc aria-hidden="true">
+  <div class="cc-backdrop" data-cc-close></div>
+  <section
+    class="cc-sheet"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cc-title"
+    tabindex="-1"
+  >
+    <!-- Hidden post permalink pool used by openRandomPost() across the site -->
+    <template data-random-posts>
+      <a
+        th:each="post : ${postFinder.list({page: 1, size: 50}).items}"
+        th:href="@{${post.status.permalink}}"></a>
+    </template>
+
+    <header class="cc-head">
+      <h2 id="cc-title">阅读偏好</h2>
+      <div class="cc-head-actions">
+        <button
+          class="cc-reset-btn"
+          type="button"
+          data-cc-reset
+          data-tip="恢复所有阅读偏好为默认"
+        >
+          恢复默认
+        </button>
+        <button
+          class="cc-close-btn"
+          type="button"
+          data-cc-close
+          aria-label="关闭阅读偏好"
+        >
+          <Icon name="close" size={15} />
+        </button>
+      </div>
+    </header>
+
+    <div class="cc-body">
+      <!-- 1. Appearance Mode & Accent Palette -->
+      <div class="cc-section">
+        <div class="cc-row">
+          <span class="cc-row-label">外观</span>
+          <div class="cc-seg" role="radiogroup" aria-label="明暗外观">
+            <button
+              type="button"
+              class="cc-seg-btn"
+              role="radio"
+              aria-checked="false"
+              data-scheme-pick="light"
+            >
+              浅色
+            </button>
+            <button
+              type="button"
+              class="cc-seg-btn"
+              role="radio"
+              aria-checked="false"
+              data-scheme-pick="dark"
+            >
+              深色
+            </button>
+            <button
+              type="button"
+              class="cc-seg-btn"
+              role="radio"
+              aria-checked="false"
+              data-scheme-pick="auto"
+            >
+              自动
+            </button>
+          </div>
+        </div>
+
+        <div class="cc-row cc-row--stack">
+          <div class="cc-row-head">
+            <span class="cc-row-label">强调色</span>
+            <span class="cc-row-val" data-palette-label>站点默认</span>
+          </div>
+          <div class="cc-palettes" role="radiogroup" aria-label="强调色">
+            <button
+              class="cc-swatch"
+              type="button"
+              role="radio"
+              aria-checked="false"
+              data-palette-pick="custom"
+              data-palette-name="站点默认"
+              data-tip="站点默认配色"
+              aria-label="站点默认配色"
+              ><span class="swatch swatch--custom"></span></button
+            >
+            <button
+              class="cc-swatch"
+              type="button"
+              role="radio"
+              aria-checked="false"
+              data-palette-pick="clear"
+              data-palette-name="纯墨"
+              data-tip="纯墨"
+              aria-label="纯墨"><span class="swatch swatch--clear"></span></button
+            >
+            <button
+              class="cc-swatch"
+              type="button"
+              role="radio"
+              aria-checked="false"
+              data-palette-pick="sky"
+              data-palette-name="静蓝"
+              data-tip="静蓝"
+              aria-label="静蓝"><span class="swatch swatch--sky"></span></button
+            >
+            <button
+              class="cc-swatch"
+              type="button"
+              role="radio"
+              aria-checked="false"
+              data-palette-pick="lagoon"
+              data-palette-name="松绿"
+              data-tip="松绿"
+              aria-label="松绿"><span class="swatch swatch--lagoon"></span></button
+            >
+            <button
+              class="cc-swatch"
+              type="button"
+              role="radio"
+              aria-checked="false"
+              data-palette-pick="dusk"
+              data-palette-name="暖琥珀"
+              data-tip="暖琥珀"
+              aria-label="暖琥珀"><span class="swatch swatch--dusk"></span></button
+            >
+            <button
+              class="cc-swatch"
+              type="button"
+              role="radio"
+              aria-checked="false"
+              data-palette-pick="ink"
+              data-palette-name="靛墨"
+              data-tip="靛墨"
+              aria-label="靛墨"><span class="swatch swatch--ink"></span></button
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Reading Typography (Font & Size) -->
+      <div class="cc-section">
+        <div class="cc-row">
+          <span class="cc-row-label">正文字体</span>
+          <div class="cc-seg" role="radiogroup" aria-label="正文字体">
+            <button
+              type="button"
+              class="cc-seg-btn"
+              role="radio"
+              aria-checked="true"
+              data-prose-font-pick="sans"
+            >
+              无衬线
+            </button>
+            <button
+              type="button"
+              class="cc-seg-btn cc-seg-btn--serif"
+              role="radio"
+              aria-checked="false"
+              data-prose-font-pick="serif"
+            >
+              书刊体
+            </button>
+          </div>
+        </div>
+
+        <div class="cc-row">
+          <span class="cc-row-label">正文字号</span>
+          <div class="cc-seg" role="radiogroup" aria-label="正文字号">
+            <button
+              type="button"
+              class="cc-seg-btn"
+              role="radio"
+              aria-checked="false"
+              data-prose-size-pick="sm"
+            >
+              紧凑
+            </button>
+            <button
+              type="button"
+              class="cc-seg-btn"
+              role="radio"
+              aria-checked="true"
+              data-prose-size-pick="md"
+            >
+              标准
+            </button>
+            <button
+              type="button"
+              class="cc-seg-btn"
+              role="radio"
+              aria-checked="false"
+              data-prose-size-pick="lg"
+            >
+              大号
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Atmosphere & Accessibility Toggles -->
+      <div class="cc-section">
+        <button
+          type="button"
+          class="cc-switch-row"
+          data-rain-toggle
+          aria-pressed="false"
+          th:if="${theme.config.home?.enable_rain != false}"
+        >
+          <span class="cc-switch-info">
+            <span class="cc-row-label">细雨白噪音</span>
+            <span class="cc-row-desc">切页时持续轻柔播放</span>
+          </span>
+          <span class="cc-switch" aria-hidden="true">
+            <span class="cc-switch-thumb"></span>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="cc-switch-row"
+          data-motion-toggle
+          aria-pressed="false"
+        >
+          <span class="cc-switch-info">
+            <span class="cc-row-label">减弱动效</span>
+            <span class="cc-row-desc" data-motion-desc>减少过渡与入场动画</span>
+          </span>
+          <span class="cc-switch" aria-hidden="true">
+            <span class="cc-switch-thumb"></span>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <footer class="cc-foot">
+      <button
+        class="cc-foot-btn"
+        type="button"
+        data-action="search"
+        th:if="${pluginFinder.available('PluginSearchWidget')}"
+      >
+        <Icon name="search" size={13} />
+        <span>搜索</span>
+        <kbd>⌘K</kbd>
+      </button>
+      <button class="cc-foot-btn" type="button" data-action="random">
+        <Icon name="shuffle" size={13} />
+        <span>随机漫步</span>
+      </button>
+      <button
+        class="cc-foot-btn"
+        type="button"
+        data-action="shortcuts"
+        th:if="${theme.config.motion?.shortcuts != false}"
+      >
+        <Icon name="keyboard" size={13} />
+        <span>快捷键</span>
+        <kbd>?</kbd>
+      </button>
+    </footer>
+  </section>
+</div>

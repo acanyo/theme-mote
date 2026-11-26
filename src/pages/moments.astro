@@ -1,0 +1,86 @@
+---
+/** templates/moments.html: list route provided by plugin-moments. */
+import Layout from "../layouts/Layout.astro";
+import PageHead from "../components/common/PageHead.astro";
+import Pagination from "../components/common/Pagination.astro";
+import MomentItem from "../components/moment/MomentItem.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import "../styles/moments.css";
+---
+
+<Layout page="moments" title="|瞬间 - ${site.title}|">
+  <SeoHead
+    slot="head"
+    type="website"
+    titleExpr="'瞬间 - ' + (site.title ?: 'Mote')"
+    descExpr="site.subtitle ?: ''"
+    pathExpr="'/moments'"
+  />
+  <PageHead title="'瞬间'" fallback="瞬间">
+    <p>
+      记录日常里的零散念头与片段，共
+      <span class="num" th:text="${moments?.total ?: 0}">0</span> 条。
+    </p>
+  </PageHead>
+
+  <section
+    class="moments wrap"
+    aria-label="瞬间列表"
+    data-list-root
+  >
+    <nav
+      class="moment-filter"
+      aria-label="按标签筛选"
+      th:if="${not #lists.isEmpty(tags)}"
+    >
+      <a
+        class="moment-tag-pill"
+        href="/moments"
+        th:href="@{/moments}"
+        th:classappend="${param.tag == null or #lists.isEmpty(param.tag) or #strings.isEmpty(param.tag[0])} ? 'is-active'">全部</a
+      >
+      <a
+        class="moment-tag-pill"
+        th:each="tag : ${tags}"
+        th:href="@{/moments(tag=${tag.name})}"
+        th:classappend="${param.tag != null and #lists.contains(param.tag, tag.name)} ? 'is-active'"
+      >
+        <span th:text="|#${tag.name}|">#标签</span>
+        <span class="num" th:text="${tag.momentCount}">0</span>
+      </a>
+    </nav>
+
+    <ol
+      class="moment-list"
+      data-list-items
+      th:if="${not #lists.isEmpty(moments.items)}"
+    >
+      <li class="moment-list-item" th:each="moment : ${moments.items}">
+        <MomentItem />
+      </li>
+    </ol>
+    <p class="empty-note" th:if="${#lists.isEmpty(moments.items)}">
+      还没有瞬间。
+    </p>
+
+    <div
+      class="list-loader"
+      data-list-loader
+      th:if="${moments.hasNext()}"
+      th:attr="data-next-url=@{${moments.nextUrl}},data-page=${moments.page},data-total-pages=${moments.totalPages}"
+    >
+      <button type="button" class="list-load-btn" data-list-load-btn>
+        <span data-list-load-label>加载更早瞬间</span>
+        <span
+          class="list-load-meta num"
+          data-list-load-meta
+          th:text="|${moments.page} / ${moments.totalPages}|">1 / 2</span
+        >
+      </button>
+    </div>
+
+    <div class="list-pagination-fallback" data-list-pagination>
+      <Pagination list="moments" />
+    </div>
+  </section>
+</Layout>

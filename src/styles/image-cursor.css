@@ -1,0 +1,147 @@
+/* ==========================================================================
+   Mote Minimal Plus · Configurable Image Hover Cursors (A–F + System)
+   ========================================================================== */
+
+@media (hover: hover) and (pointer: fine) {
+  /* A · Camera Viewfinder (Default) */
+  html[data-image-cursor="viewfinder"] {
+    --mote-image-cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 11V7a2 2 0 0 1 2-2h4M21 5h4a2 2 0 0 1 2 2v4M27 21v4a2 2 0 0 1-2 2h-4M11 27H7a2 2 0 0 1-2-2v-4M16 12v8M12 16h8' stroke='rgba(0,0,0,0.58)' stroke-width='3.2'/%3E%3Cpath d='M5 11V7a2 2 0 0 1 2-2h4M21 5h4a2 2 0 0 1 2 2v4M27 21v4a2 2 0 0 1-2 2h-4M11 27H7a2 2 0 0 1-2-2v-4M16 12v8M12 16h8' stroke='%23ffffff' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E")
+      16 16, zoom-in;
+  }
+
+  /* B · Editorial Loupe */
+  html[data-image-cursor="loupe"] {
+    --mote-image-cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Ccircle cx='14' cy='14' r='8.5' fill='rgba(15,23,42,0.38)' stroke='rgba(0,0,0,0.45)' stroke-width='3'/%3E%3Cpath d='M20.5 20.5L27 27M14 10.5v7M10.5 14h7' stroke='rgba(0,0,0,0.45)' stroke-width='3'/%3E%3Ccircle cx='14' cy='14' r='8.5' stroke='%23ffffff' stroke-width='1.5'/%3E%3Cpath d='M20.5 20.5L27 27M14 10.5v7M10.5 14h7' stroke='%23ffffff' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E")
+      14 14, zoom-in;
+  }
+
+  /* C · Expand Circle */
+  html[data-image-cursor="expand"] {
+    --mote-image-cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='16' cy='16' r='12' fill='rgba(15,23,42,0.52)' stroke='rgba(255,255,255,0.92)' stroke-width='1.4'/%3E%3Cpath d='M18 10h4v4M14 22h-4v-4M22 10l-4.5 4.5M10 22l4.5-4.5' stroke='%23ffffff' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E")
+      16 16, zoom-in;
+  }
+
+  /* System fallback (also pre-hydration fallback for D/E/F before JS mounts) */
+  html[data-image-cursor="system"],
+  html[data-image-cursor="frosted"],
+  html[data-image-cursor="aperture"],
+  html[data-image-cursor="pill"] {
+    --mote-image-cursor: zoom-in;
+  }
+
+  /* Only hide native pointer once the JS floating cursor is mounted */
+  html.has-float-image-cursor[data-image-cursor="frosted"],
+  html.has-float-image-cursor[data-image-cursor="aperture"],
+  html.has-float-image-cursor[data-image-cursor="pill"] {
+    --mote-image-cursor: none;
+  }
+
+  /* Apply consistently to all viewable images across the site */
+  html[data-image-cursor] [data-lightbox-trigger],
+  html[data-image-cursor] .photo-card,
+  html[data-image-cursor] .photo-card.is-zoom,
+  html[data-image-cursor] .article-cover img,
+  html[data-image-cursor] .prose img {
+    cursor: var(--mote-image-cursor, zoom-in);
+  }
+
+  /* Keep linked images inside prose as standard navigation pointer */
+  html[data-image-cursor] .prose a img {
+    cursor: pointer;
+  }
+
+  /* Lightbox backdrop zoom-out polish */
+  .minimal-lightbox.is-open {
+    cursor: zoom-out;
+  }
+
+  .minimal-lightbox.is-open img {
+    cursor: default;
+  }
+
+  .minimal-lightbox.is-open .lightbox-btn {
+    cursor: pointer;
+  }
+}
+
+/* ==========================================================================
+   Floating Damped Cursors (D · Frosted / E · Aperture / F · Pill)
+   ========================================================================== */
+.mote-image-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 290;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  will-change: transform, opacity;
+  user-select: none;
+}
+
+.mote-image-cursor-inner {
+  transform: translate(-50%, -50%) scale(0.76);
+  transition: transform 0.2s var(--ease-out);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mote-image-cursor.is-visible .mote-image-cursor-inner {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.mote-image-cursor.is-visible.is-pressed .mote-image-cursor-inner {
+  transform: translate(-50%, -50%) scale(0.88);
+}
+
+/* D · Frosted Glass Disc */
+.mote-image-cursor[data-style="frosted"] .mote-image-cursor-inner {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(12px) saturate(155%);
+  -webkit-backdrop-filter: blur(12px) saturate(155%);
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  box-shadow:
+    0 10px 26px -4px rgba(15, 23, 42, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+}
+
+/* E · Difference Aperture Ring */
+.mote-image-cursor[data-style="aperture"] {
+  mix-blend-mode: difference;
+}
+
+.mote-image-cursor[data-style="aperture"] .mote-image-cursor-inner {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1.5px solid #ffffff;
+  color: #ffffff;
+}
+
+/* F · Compact Pill */
+.mote-image-cursor[data-style="pill"] .mote-image-cursor-inner {
+  padding: 5px 12px;
+  border-radius: 999px;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: #ffffff;
+  background: rgba(15, 23, 42, 0.74);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.3);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .mote-image-cursor {
+    display: none !important;
+  }
+}

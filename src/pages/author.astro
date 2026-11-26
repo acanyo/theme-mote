@@ -1,0 +1,68 @@
+---
+/**
+ * templates/author.html: Halo standard author archive template (/authors/:name).
+ */
+import Layout from "../layouts/Layout.astro";
+import PostList from "../components/post/PostList.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import "../styles/author.css";
+---
+
+<Layout
+  page="author"
+  title="|${author.spec.displayName ?: '作者'} - ${site.title}|"
+>
+  <SeoHead
+    slot="head"
+    type="profile"
+    titleExpr="author.spec.displayName ?: '作者'"
+    descExpr="author.spec.bio ?: ''"
+    imageExpr="author.spec.avatar ?: ''"
+    pathExpr="author.status?.permalink ?: ''"
+    authorNameExpr="author.spec.displayName ?: ''"
+    jsonLdKind="ProfilePage"
+  />
+
+  <div class="author-detail-top wrap">
+    <a class="author-back" href="/archives" th:href="@{/archives}">
+      <span class="back-arrow" aria-hidden="true">←</span>
+      <span>全部文章归档</span>
+    </a>
+  </div>
+
+  <header class="author-head wrap">
+    <div class="author-identity">
+      <img
+        class="author-avatar"
+        th:if="${not #strings.isEmpty(author.spec.avatar)}"
+        th:src="${author.spec.avatar}"
+        width="56"
+        height="56"
+        th:alt="${author.spec.displayName}"
+      />
+      <span
+        class="author-avatar-char"
+        th:if="${#strings.isEmpty(author.spec.avatar)}"
+        th:text="${not #strings.isEmpty(author.spec.displayName) ? #strings.substring(author.spec.displayName, 0, 1) : '作'}"
+        aria-hidden="true">作</span
+      >
+      <div class="author-meta">
+        <div class="author-title-row">
+          <h1 class="author-name" th:text="${author.spec.displayName}">作者</h1>
+          <span class="author-count num" th:text="|共 ${posts.total} 篇|"
+            >共 0 篇</span
+          >
+        </div>
+        <p
+          class="author-bio"
+          th:if="${not #strings.isEmpty(author.spec.bio)}"
+          th:text="${author.spec.bio}"
+        >
+          作者简介
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <PostList empty="这位作者还没有发布文章。" />
+</Layout>

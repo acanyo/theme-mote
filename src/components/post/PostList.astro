@@ -1,0 +1,50 @@
+---
+import PostCard from "./PostCard.astro";
+import Pagination from "../common/Pagination.astro";
+import "../../styles/posts.css";
+
+interface Props {
+  /** Shown when the list has no posts. */
+  empty: string;
+  /** Constrain to the page width. Off when a parent layout sets the width. */
+  wrap?: boolean;
+}
+const { empty, wrap = true } = Astro.props;
+---
+
+<section
+  class:list={["post-list", { wrap }]}
+  aria-label="文章列表"
+  data-list-root
+>
+  <div
+    class="index-posts"
+    data-list-items
+    th:if="${not #lists.isEmpty(posts.items)}"
+  >
+    <th:block th:each="post : ${posts.items}">
+      <PostCard />
+    </th:block>
+  </div>
+  <p class="empty-note" th:if="${#lists.isEmpty(posts.items)}">{empty}</p>
+
+  <div
+    class="list-loader"
+    data-list-loader
+    th:if="${posts.hasNext()}"
+    th:attr="data-next-url=@{${posts.nextUrl}},data-page=${posts.page},data-total-pages=${posts.totalPages}"
+  >
+    <button type="button" class="list-load-btn" data-list-load-btn>
+      <span data-list-load-label>加载更多文章</span>
+      <span
+        class="list-load-meta num"
+        data-list-load-meta
+        th:text="|${posts.page} / ${posts.totalPages}|">1 / 2</span
+      >
+    </button>
+  </div>
+
+  <div class="list-pagination-fallback" data-list-pagination>
+    <Pagination list="posts" />
+  </div>
+</section>

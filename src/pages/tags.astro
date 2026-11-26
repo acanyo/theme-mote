@@ -1,21 +1,76 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import PageHead from "../components/common/PageHead.astro";
+import Icon from "../components/common/Icon.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import "../styles/taxonomy.css";
 ---
 
-<Layout pageTitle="标签">
-  <Fragment slot="head">
-    <title th:text="|标签 - ${site.title}|"></title>
-  </Fragment>
+<Layout page="tags" title="|标签 - ${site.title}|">
+  <SeoHead
+    slot="head"
+    type="website"
+    titleExpr="'标签 - ' + (site.title ?: 'Mote')"
+    descExpr="site.subtitle ?: ''"
+    pathExpr="'/tags'"
+  />
+  <div
+    class="taxonomy-page"
+    th:with="totalTags = ${tags != null ? #lists.size(tags) : 0}"
+  >
+    <PageHead title="'标签'" fallback="标签">
+      <div class="taxonomy-head-bar">
+        <p class="taxonomy-summary">
+          按关键词查找文章，共 <span class="num" th:text="${totalTags}">0</span> 个标签。
+        </p>
 
-  <div class="tag-cloud" role="list" aria-label="Tag list">
-    <a
-      th:each="tag : ${tags}"
-      class="tag-pill"
-      role="listitem"
-      th:href="@{${tag.status.permalink}}"
-    >
-      <span th:text="${tag.spec.displayName}"></span>
-      <span class="tag-pill__count" th:text="${tag.postCount}"></span>
-    </a>
+        <div class="taxonomy-search-wrap" th:if="${totalTags > 4}">
+          <Icon name="search" size={13} class="taxonomy-search-icon" />
+          <input
+            type="search"
+            class="taxonomy-search-input"
+            placeholder="快速筛选标签…"
+            aria-label="快速筛选标签"
+            data-quick-filter="tags"
+          />
+          <span
+            class="taxonomy-search-count num"
+            data-quick-filter-count="tags"
+            hidden></span>
+        </div>
+      </div>
+    </PageHead>
+
+    <section class="taxonomy wrap" aria-label="全部标签">
+      <ul
+        class="taxonomy-index taxonomy-index--tags"
+        data-quick-list="tags"
+        th:if="${not #lists.isEmpty(tags)}"
+      >
+        <li
+          th:each="tag : ${tags}"
+          th:attr="data-filter-text=${tag.spec.displayName}"
+        >
+          <a
+            class="taxonomy-tag-link"
+            th:classappend="${tag.postCount == null or tag.postCount == 0} ? 'is-empty'"
+            th:href="@{${tag.status.permalink}}"
+          >
+            <span class="taxonomy-hash" aria-hidden="true">#</span>
+            <span class="taxonomy-name" th:text="${tag.spec.displayName}"
+              >标签</span
+            >
+            <span class="taxonomy-count num" th:text="${tag.postCount ?: 0}"
+              >0</span
+            >
+          </a>
+        </li>
+      </ul>
+
+      <p class="empty-note" data-quick-filter-empty="tags" hidden>
+        没有找到匹配的标签。
+      </p>
+      <p class="empty-note" th:if="${#lists.isEmpty(tags)}">还没有标签。</p>
+    </section>
   </div>
 </Layout>

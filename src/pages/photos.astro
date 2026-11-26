@@ -1,0 +1,208 @@
+---
+/**
+ * templates/photos.html: gallery route provided by halo-sigs/plugin-photos.
+ * Supports both plugin-photos v2 (`photos.items` + `groups` + `photoUrl`)
+ * and v1 / fallback (`photoFinder.groupBy()`).
+ */
+import Layout from "../layouts/Layout.astro";
+import PageHead from "../components/common/PageHead.astro";
+import Pagination from "../components/common/Pagination.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import "../styles/photos.css";
+---
+
+<Layout page="photos" title="|${title ?: '图库'} - ${site.title}|">
+  <SeoHead
+    slot="head"
+    type="website"
+    titleExpr="(title ?: '图库') + ' - ' + (site.title ?: 'Mote')"
+    descExpr="site.subtitle ?: ''"
+    pathExpr="'/photos'"
+  />
+  <PageHead title="${title ?: '图库'}" fallback="图库">
+    <p>记录日常里的光影与片段。</p>
+  </PageHead>
+
+  <th:block
+    th:with="hasPagedPhotos = ${photos != null and not #lists.isEmpty(photos.items)}, navGroups = ${not #lists.isEmpty(groups) ? groups : (pluginFinder.available('PluginPhotos') ? photoFinder.groupBy() : null)}, hasGroupData = ${navGroups != null and not #lists.isEmpty(navGroups)}"
+  >
+    <section class="photos wrap" aria-label="图库">
+      <!-- Mode A: plugin-photos v2 paginated `photos.items` + server-side group filter -->
+      <th:block th:if="${hasPagedPhotos}">
+        <nav
+          class="photo-tabs"
+          aria-label="相册分组"
+          th:if="${hasGroupData and #lists.size(navGroups) > 1}"
+        >
+          <a
+            class="photo-tab"
+            href="/photos"
+            th:href="@{${photoUrl != null ? photoUrl.list('') : '/photos'}}"
+            th:classappend="${param.group == null or #strings.isEmpty(param.group[0])} ? 'is-active'"
+          >
+            全部
+          </a>
+          <a
+            class="photo-tab"
+            th:each="g : ${navGroups}"
+            th:href="@{${photoUrl != null ? photoUrl.list(g.metadata.name) : ('/photos?group=' + g.metadata.name)}}"
+            th:classappend="${param.group != null and #lists.contains(param.group, g.metadata.name)} ? 'is-active'"
+            th:text="${g.spec.displayName}">分组</a
+          >
+        </nav>
+
+        <div class="photo-grid" data-lightbox-gallery>
+          <th:block th:each="photo : ${photos.items}">
+            <a
+              class="photo-card"
+              th:if="${photoUrl != null}"
+              th:href="@{${photoUrl.detail(photo)}}"
+              th:aria-label="|查看详情：${photo.spec.displayName ?: '照片'}|"
+            >
+              <img
+                th:src="${not #strings.isEmpty(photo.spec.cover) ? photo.spec.cover : photo.spec.url}"
+                th:alt="${photo.spec.displayName ?: ''}"
+                loading="lazy"
+                decoding="async"
+              />
+              <span
+                class="photo-card-cap"
+                th:if="${not #strings.isEmpty(photo.spec.displayName) or not #strings.isEmpty(photo.spec.description)}"
+              >
+                <strong
+                  th:if="${not #strings.isEmpty(photo.spec.displayName)}"
+                  th:text="${photo.spec.displayName}">标题</strong
+                >
+                <span
+                  th:if="${not #strings.isEmpty(photo.spec.description)}"
+                  th:text="${photo.spec.description}">说明</span
+                >
+              </span>
+            </a>
+
+            <button
+              type="button"
+              class="photo-card is-zoom"
+              th:if="${photoUrl == null}"
+              th:attr="data-lightbox-trigger=${photo.spec.url}"
+              th:aria-label="|查看原图：${photo.spec.displayName ?: '照片'}|"
+            >
+              <img
+                th:src="${not #strings.isEmpty(photo.spec.cover) ? photo.spec.cover : photo.spec.url}"
+                th:alt="${photo.spec.displayName ?: ''}"
+                loading="lazy"
+                decoding="async"
+              />
+              <span
+                class="photo-card-cap"
+                th:if="${not #strings.isEmpty(photo.spec.displayName) or not #strings.isEmpty(photo.spec.description)}"
+              >
+                <strong
+                  th:if="${not #strings.isEmpty(photo.spec.displayName)}"
+                  th:text="${photo.spec.displayName}">标题</strong
+                >
+                <span
+                  th:if="${not #strings.isEmpty(photo.spec.description)}"
+                  th:text="${photo.spec.description}">说明</span
+                >
+              </span>
+            </button>
+          </th:block>
+        </div>
+
+        <Pagination list="photos" />
+      </th:block>
+
+      <!-- Mode B: Fallback grouped view (`photoFinder.groupBy()`) when `photos` pagination isn't provided -->
+      <th:block th:if="${not hasPagedPhotos and hasGroupData}">
+        <nav
+          class="photo-tabs"
+          role="tablist"
+          aria-label="相册分组"
+          th:if="${#lists.size(navGroups) > 1}"
+        >
+          <button
+            type="button"
+            class="photo-tab is-active"
+            data-photo-filter="all"
+            aria-pressed="true"
+          >
+            全部
+          </button>
+          <button
+            type="button"
+            class="photo-tab"
+            th:each="group : ${navGroups}"
+            th:attr="data-photo-filter=${group.metadata.name}"
+            aria-pressed="false"
+            th:text="${group.spec.displayName}">分组</button
+          >
+        </nav>
+
+        <div class="photo-groups">
+          <th:block th:each="group : ${navGroups}">
+            <section
+              class="photo-group"
+              th:if="${not #lists.isEmpty(group.photos)}"
+              th:attr="data-photo-group=${group.metadata.name}"
+            >
+              <div
+                class="photo-group-head"
+                th:if="${#lists.size(navGroups) > 1}"
+              >
+                <h2
+                  class="photo-group-title"
+                  th:text="${group.spec.displayName}"
+                >
+                  默认分组
+                </h2>
+                <span
+                  class="photo-group-count num"
+                  th:text="|${#lists.size(group.photos)} 张|"
+                  >0 张</span
+                >
+              </div>
+
+              <div class="photo-grid" data-lightbox-gallery>
+                <button
+                  type="button"
+                  class="photo-card is-zoom"
+                  th:each="photo : ${group.photos}"
+                  th:attr="data-lightbox-trigger=${photo.spec.url}"
+                  th:aria-label="|查看原图：${photo.spec.displayName ?: '照片'}|"
+                >
+                  <img
+                    th:src="${not #strings.isEmpty(photo.spec.cover) ? photo.spec.cover : photo.spec.url}"
+                    th:alt="${photo.spec.displayName ?: ''}"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span
+                    class="photo-card-cap"
+                    th:if="${not #strings.isEmpty(photo.spec.displayName) or not #strings.isEmpty(photo.spec.description)}"
+                  >
+                    <strong
+                      th:if="${not #strings.isEmpty(photo.spec.displayName)}"
+                      th:text="${photo.spec.displayName}">标题</strong
+                    >
+                    <span
+                      th:if="${not #strings.isEmpty(photo.spec.description)}"
+                      th:text="${photo.spec.description}">说明</span
+                    >
+                  </span>
+                </button>
+              </div>
+            </section>
+          </th:block>
+        </div>
+      </th:block>
+
+      <p
+        class="empty-note"
+        th:if="${not hasPagedPhotos and not hasGroupData}"
+      >
+        图库里还没有照片。
+      </p>
+    </section>
+  </th:block>
+</Layout>

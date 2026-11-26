@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon --config nodemon.json --exec 'astro build'",
     "build": "astro build",
-    "astro": "astro",
+    "check": "astro check",
+    "pack": "pnpm run check && pnpm run build && node -e \"const fs=require('fs'),cp=require('child_process');const v=fs.readFileSync('theme.yaml','utf8').match(/^  version:\\s*\\\"([^\\\"]+)\\\"/m)?.[1]||'release';const out='dist/theme-mote-'+v+'.zip';fs.mkdirSync('dist',{recursive:true});fs.rmSync(out,{force:true});cp.execFileSync('zip',['-rq',out,'theme.yaml','settings.yaml','annotation-setting.yaml','README.md','templates'],{stdio:'inherit'});console.log('Packed:',out,(fs.statSync(out).size/1024).toFixed(1)+'KB');\"",
     "format": "prettier --write ."
   },
   "prettier": {
@@ -23,20 +24,21 @@
     ]
   },
   "dependencies": {
-    "@astrojs/mdx": "^5.0.3",
-    "@astrojs/rss": "^4.0.18",
-    "@astrojs/vue": "^6.0.1",
-    "@halo-dev/api-client": "^2.23.0",
+    "@swup/head-plugin": "^2.3.1",
+    "@swup/preload-plugin": "^3.2.12",
+    "@swup/scroll-plugin": "^4.0.0",
     "astro": "^6.1.4",
-    "ky": "^2.0.0",
+    "gsap": "^3.15.1",
+    "qrcode": "^1.5.4",
     "sharp": "^0.34.5",
-    "vue": "^3.5.32"
+    "swup": "^4.10.0"
   },
   "devDependencies": {
-    "@iconify-json/mingcute": "^1.2.7",
+    "@astrojs/check": "^0.9.12",
+    "@types/qrcode": "^1.5.6",
     "nodemon": "^3.1.14",
     "prettier": "3.8.1",
     "prettier-plugin-astro": "0.14.1",
-    "unplugin-icons": "^23.0.1"
+    "typescript": "^5.9.3"
   }
 }

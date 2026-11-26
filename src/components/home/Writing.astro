@@ -1,0 +1,143 @@
+---
+---
+
+<section
+  class="home-section home-writing"
+  id="writing"
+  aria-labelledby="writing-title"
+  th:with="showCatsBar = ${theme.config.home?.show_categories_bar != false}, showPostCat = ${theme.config.home?.show_post_category != false}, showExcerptBtn = ${theme.config.home?.show_excerpt_toggle != false}, enableHoverCover = ${theme.config.home?.enable_hover_cover != false}"
+>
+  <header class="section-bar">
+    <h2 class="section-label" id="writing-title">最近文章</h2>
+    <div class="writing-controls" th:if="${showCatsBar or showExcerptBtn}">
+      <div class="cat-tabs" role="group" aria-label="文章分类筛选" th:if="${showCatsBar}">
+        <button
+          type="button"
+          class="cat-tab is-active"
+          data-cat-filter="all"
+          aria-pressed="true"
+        >
+          全部
+        </button>
+        <th:block
+          th:with="allCategories = ${categoryFinder.listAll()}, visibleCategories = ${allCategories != null ? allCategories.?[postCount != null and postCount > 0] : null}"
+        >
+          <th:block th:if="${visibleCategories != null}">
+            <button
+              type="button"
+              class="cat-tab"
+              th:each="cat, iter : ${visibleCategories}"
+              th:if="${iter.index < 5}"
+              th:attr="data-cat-filter=${cat.metadata.name},data-cat-name=${cat.spec.displayName},data-cat-href=@{${cat.status.permalink}}"
+              aria-pressed="false"
+              th:text="${cat.spec.displayName}">分类</button
+            >
+          </th:block>
+        </th:block>
+      </div>
+      <span
+        class="control-sep"
+        aria-hidden="true"
+        th:if="${showCatsBar and showExcerptBtn}">|</span
+      >
+      <button
+        type="button"
+        class="excerpt-toggle"
+        data-excerpt-toggle
+        data-tip="展开文章摘录"
+        aria-pressed="false"
+        th:if="${showExcerptBtn}"
+      >
+        <span class="excerpt-dot" aria-hidden="true"></span>
+        <span>显示摘录</span>
+      </button>
+    </div>
+  </header>
+
+  <ul class="post-rows" data-post-rows th:if="${not #lists.isEmpty(posts.items)}">
+    <li
+      class="post-row-item"
+      th:each="post : ${posts.items}"
+      th:attr="data-post-cats=${not #lists.isEmpty(post.categories) ? #strings.listJoin(post.categories.![metadata.name], ',') : ''}"
+    >
+      <a
+        class="post-row"
+        th:href="@{${post.status.permalink}}"
+        th:attr="data-hover-cover=${enableHoverCover and not #strings.isEmpty(post.spec.cover) ? post.spec.cover : null}"
+      >
+        <div class="post-row-main">
+          <div class="post-row-head">
+            <span class="post-row-title" th:text="${post.spec.title}">文章标题</span>
+            <span class="post-pin" th:if="${post.spec.pinned}">置顶</span>
+          </div>
+          <p
+            class="post-row-excerpt"
+            th:if="${not #strings.isEmpty(post.status.excerpt)}"
+            th:text="${post.status.excerpt}"
+          >
+          </p>
+        </div>
+        <span class="post-row-meta">
+          <span
+            class="post-row-cat"
+            th:if="${showPostCat and not #lists.isEmpty(post.categories)}"
+            th:text="${post.categories[0].spec.displayName}">分类</span
+          >
+          <time
+            class="post-row-date num"
+            th:datetime="${post.spec.publishTime}"
+            th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}"
+            >2026-11-18</time
+          >
+        </span>
+      </a>
+    </li>
+  </ul>
+
+  <p class="empty-note" data-filter-empty hidden>
+    当前页暂无该分类文章，可点击下方查看该分类全部内容。
+  </p>
+
+  <p class="empty-note" th:if="${#lists.isEmpty(posts.items)}">
+    还没有发布文章。
+  </p>
+
+  <div class="writing-more" th:if="${not #lists.isEmpty(posts.items)}">
+    <a
+      class="quiet-link"
+      href="/archives"
+      th:href="@{/archives}"
+      data-writing-more
+      th:attr="data-default-href=@{/archives}"
+    >
+      <span data-writing-more-label>查看全部归档</span>
+      <span class="quiet-arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+
+  <div
+    class="hover-cover-preview"
+    data-hover-preview
+    aria-hidden="true"
+    th:if="${enableHoverCover}"
+  >
+    <div class="hover-cover-stage" data-hover-preview-stage>
+      <img
+        class="hover-cover-layer"
+        src=""
+        alt=""
+        data-hover-preview-layer="0"
+        data-img-placeholder-ignore
+        decoding="async"
+      />
+      <img
+        class="hover-cover-layer"
+        src=""
+        alt=""
+        data-hover-preview-layer="1"
+        data-img-placeholder-ignore
+        decoding="async"
+      />
+    </div>
+  </div>
+</section>

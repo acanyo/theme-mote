@@ -1,0 +1,99 @@
+---
+---
+
+<th:block
+  th:with="introMode = ${theme.config.home?.intro_mode ?: 'default'}, lede = ${theme.config.home?.lede ?: site.subtitle}, now = ${theme.config.home?.now ?: theme.config.sidebar?.bio}, location = ${theme.config.home?.location}, reading = ${theme.config.home?.reading}, enableRain = ${theme.config.home?.enable_rain != false}, customHtml = ${theme.config.home?.intro_custom_html}, customCss = ${theme.config.home?.intro_custom_css}, customJs = ${theme.config.home?.intro_custom_js}, showCustomNow = ${theme.config.home?.intro_custom_show_now == true}, isCustom = ${introMode == 'custom'}, isHidden = ${introMode == 'hidden'}, hasCopy = ${not #strings.isEmpty(lede) or not #strings.isEmpty(now)}, hasCustom = ${not #strings.isEmpty(customHtml) or not #strings.isEmpty(customCss) or not #strings.isEmpty(customJs)}, hasDefaultBar = ${not #strings.isEmpty(location) or not #strings.isEmpty(reading) or (enableRain and hasCopy)}, hasCustomBar = ${showCustomNow and (not #strings.isEmpty(location) or not #strings.isEmpty(reading) or enableRain)}, showBar = ${isCustom ? hasCustomBar : hasDefaultBar}, shouldRender = ${not isHidden and (isCustom ? (hasCustom or hasCustomBar) : (hasCopy or hasDefaultBar))}"
+>
+  <section
+    class="home-intro"
+    aria-label="个人简介与近况"
+    th:if="${shouldRender}"
+    th:classappend="${isCustom} ? 'is-custom'"
+  >
+    <th:block th:if="${isCustom}">
+      <th:block th:if="${not #strings.isEmpty(customCss)}">
+        <style is:inline th:utext="${customCss}"></style>
+      </th:block>
+      <div
+        class="intro-custom"
+        th:if="${not #strings.isEmpty(customHtml)}"
+        th:utext="${customHtml}"
+      >
+      </div>
+    </th:block>
+
+    <th:block th:if="${not isCustom}">
+      <div
+        class="intro-lead"
+        th:if="${not #strings.isEmpty(lede)}"
+        th:utext="${lede}"
+      >
+      </div>
+      <div
+        class="intro-now"
+        th:if="${not #strings.isEmpty(now)}"
+        th:utext="${now}"
+      >
+      </div>
+    </th:block>
+
+    <div class="now-pill" th:if="${showBar}">
+      <span class="now-item" th:if="${not #strings.isEmpty(location)}">
+        <span class="now-dot" aria-hidden="true"></span>
+        <span th:text="${location}">正在写作</span>
+      </span>
+
+      <span
+        class="now-sep"
+        aria-hidden="true"
+        th:if="${not #strings.isEmpty(location) and not #strings.isEmpty(reading)}"
+        >·</span
+      >
+
+      <span class="now-item" th:if="${not #strings.isEmpty(reading)}">
+        <span class="now-prefix">在读</span>
+        <span class="now-book" th:text="${reading}">一本书</span>
+      </span>
+
+      <span
+        class="now-sep"
+        aria-hidden="true"
+        th:if="${enableRain and (not #strings.isEmpty(location) or not #strings.isEmpty(reading))}"
+        >·</span
+      >
+
+      <button
+        type="button"
+        class="rain-btn"
+        data-rain-toggle
+        data-tip="开启细雨白噪音"
+        aria-pressed="false"
+        th:if="${enableRain}"
+      >
+        <svg
+          class="rain-icon"
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+        <span class="rain-bars" aria-hidden="true">
+          <i></i><i></i><i></i>
+        </span>
+        <span>雨声</span>
+      </button>
+    </div>
+
+    <th:block th:if="${isCustom and not #strings.isEmpty(customJs)}">
+      <script is:inline th:utext="${customJs}"></script>
+    </th:block>
+  </section>
+</th:block>

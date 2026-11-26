@@ -1,0 +1,76 @@
+---
+import Icon from "../common/Icon.astro";
+import { AVATAR } from "../../lib/expressions";
+---
+
+<th:block
+  th:with={`now = \${theme.config.home?.now ?: theme.config.sidebar?.bio ?: theme.config.home?.status}, author = \${theme.config.home?.title}, avatar = \${${AVATAR}}, reading = \${theme.config.home?.reading}, motto = \${theme.config.home?.motto}, showStats = \${theme.config.home?.show_stats != false}, hasNotes = \${not #strings.isEmpty(now) or not #strings.isEmpty(reading) or not #strings.isEmpty(motto)}, hasProfile = \${not #strings.isEmpty(author) or not #strings.isEmpty(avatar)}`}
+>
+  <section
+    class="home-notes"
+    aria-labelledby="notes-title"
+    th:if="${hasNotes or hasProfile or showStats}"
+  >
+    <header class="home-section-head">
+      <h2
+        class="section-title"
+        id="notes-title"
+        th:text="${hasNotes ? '近况' : '站点信息'}"
+      >
+        近况
+      </h2>
+    </header>
+    <div class="notes-body">
+      <div class="notes-copy" th:if="${hasNotes or hasProfile}">
+        <div class="note-writer" th:if="${hasProfile}">
+          <img
+            th:if="${not #strings.isEmpty(avatar)}"
+            th:src="${avatar}"
+            width="28"
+            height="28"
+            alt=""
+            loading="lazy"
+          />
+          <strong th:if="${not #strings.isEmpty(author)}" th:text="${author}"
+            >作者</strong
+          >
+        </div>
+        <p
+          class="note-now"
+          th:if="${not #strings.isEmpty(now)}"
+          th:text="${now}"
+        >
+        </p>
+        <p class="note-reading" th:if="${not #strings.isEmpty(reading)}">
+          <Icon name="book" size={16} /><span
+            >最近在读 <strong th:text="${reading}">一本书</strong></span
+          >
+        </p>
+        <blockquote
+          class="note-motto"
+          th:if="${not #strings.isEmpty(motto)}"
+          th:text="${motto}"
+        >
+        </blockquote>
+      </div>
+      <dl
+        class="note-stats"
+        th:if="${showStats}"
+        th:with="stats = ${siteStatsFinder.getStats()}"
+      >
+        <div><dt>文章</dt><dd class="num" th:text="${stats.post}">0</dd></div>
+        <div>
+          <dt>分类</dt><dd class="num" th:text="${stats.category}">0</dd>
+        </div>
+        <div th:if="${not #strings.isEmpty(theme.config.sidebar?.since)}">
+          <dt>建站天数</dt><dd
+            class="num"
+            th:attr="data-since=${theme.config.sidebar.since}"
+          >
+            —
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+</th:block>

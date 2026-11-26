@@ -1,0 +1,89 @@
+---
+import Icon from "../common/Icon.astro";
+---
+
+<th:block
+  th:if="${theme.config.modules?.show_links != false and pluginFinder.available('PluginLinks')}"
+>
+  <th:block
+    th:with="targetGroup = ${#strings.trim(theme.config.modules?.links_group ?: '')}, hasTarget = ${not #strings.isEmpty(targetGroup)}, rawGroups = ${hasTarget ? null : linkFinder.groupBy()}, nonEmptyGroups = ${rawGroups != null ? rawGroups.?[links != null and not #lists.isEmpty(links)] : null}, displayLinks = ${hasTarget ? linkFinder.listBy(targetGroup) : ((nonEmptyGroups != null and not #lists.isEmpty(nonEmptyGroups)) ? nonEmptyGroups[0].links : null)}"
+  >
+    <section
+      class="home-section home-friends"
+      id="friends"
+      aria-labelledby="friends-title"
+      th:if="${displayLinks != null and not #lists.isEmpty(displayLinks)}"
+    >
+      <header
+        class="section-bar"
+        th:with="friendsUrl = ${#strings.trim(theme.config.links?.friends_url ?: '')}"
+      >
+        <h2 class="section-label" id="friends-title">常逛的朋友</h2>
+        <div class="section-bar-links">
+          <a
+            class="quiet-link"
+            th:if="${not #strings.isEmpty(friendsUrl)}"
+            th:href="@{${friendsUrl}}"
+          >
+            <span>朋友圈</span>
+          </a>
+          <span
+            class="control-sep"
+            aria-hidden="true"
+            th:if="${not #strings.isEmpty(friendsUrl)}">·</span
+          >
+          <a class="quiet-link" href="/links" th:href="@{/links}">
+            <span>全部友链</span>
+            <span class="quiet-arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+      </header>
+
+      <ul class="friend-wall">
+        <li
+          th:each="link, iter : ${displayLinks}"
+          th:if="${iter.index < 12}"
+        >
+          <a
+            class="friend-chip"
+            th:href="${link.spec.url}"
+            target="_blank"
+            rel="noopener"
+            th:attr="data-tip=${not #strings.isEmpty(link.spec.description) ? link.spec.description : null}"
+          >
+            <img
+              class="friend-chip-avatar"
+              th:if="${not #strings.isEmpty(link.spec.logo)}"
+              th:src="${link.spec.logo}"
+              width="26"
+              height="26"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            <span
+              class="friend-chip-char"
+              th:if="${#strings.isEmpty(link.spec.logo)}"
+              th:text="${not #strings.isEmpty(link.spec.displayName) ? #strings.substring(link.spec.displayName, 0, 1) : '友'}"
+              aria-hidden="true">友</span
+            >
+            <span class="friend-chip-name" th:text="${link.spec.displayName}"
+              >站点名称</span
+            >
+            <Icon name="external" size={11} class="friend-chip-ext" />
+          </a>
+        </li>
+
+        <li th:if="${#lists.size(displayLinks) > 12}">
+          <a class="friend-chip friend-chip-more" href="/links" th:href="@{/links}">
+            <span
+              th:text="${'+' + (#lists.size(displayLinks) - 12) + ' 位朋友'}"
+              >更多朋友</span
+            >
+            <span class="quiet-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+  </th:block>
+</th:block>

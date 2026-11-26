@@ -1,0 +1,14 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import "../../styles/error.css";
+---
+
+<Layout page="error" title="|出错了 - ${site.title}|">
+  <meta slot="head" name="robots" content="noindex, nofollow" />
+  <section class="error-page wrap">
+    <p class="error-code num" th:text="${error.status}">500</p>
+    <h1 class="error-title" th:text="${error.title}">页面暂时无法打开</h1>
+    <p class="error-text">请稍后刷新重试。如果问题持续，请联系站点管理员。</p>
+    <a class="ink-button" href="/">返回首页</a>
+  </section>
+</Layout>

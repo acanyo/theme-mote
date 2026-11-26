@@ -1,0 +1,72 @@
+/* ==========================================================================
+   Minimal Plus · Error & Plugin Pages & Context Menu
+   ========================================================================== */
+
+.error-page {
+  min-height: 56dvh;
+  padding: 64px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.error-code {
+  margin: 0 0 10px;
+  font-size: 46px;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  opacity: 0.78;
+}
+
+.error-title {
+  margin: 0 0 10px;
+  font-size: 24px;
+  font-weight: 620;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.error-text {
+  margin: 0 0 24px;
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+.error-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ink-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 15px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  transition:
+    color 0.16s ease,
+    border-color 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.ink-button:hover {
+  color: var(--ink);
+  background: var(--hover);
+}
+
+.ink-button.is-primary {
+  color: var(--bg);
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.ink-button.is-primary:hover {
+  opacity: 0.88;
+}

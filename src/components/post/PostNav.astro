@@ -1,0 +1,58 @@
+---
+/** Previous / next post links (postFinder.cursor). */
+---
+
+<th:block th:with="cursor = ${postFinder.cursor(post.metadata.name)}">
+  <nav
+    class="post-nav wrap--text"
+    aria-label="相邻文章"
+    th:if="${cursor.hasPrevious() or cursor.hasNext()}"
+  >
+    <a
+      class="post-nav-link is-prev"
+      th:if="${cursor.hasPrevious()}"
+      th:href="@{${cursor.previous.status.permalink}}"
+    >
+      <span class="post-nav-label">
+        <span class="post-nav-arrow" aria-hidden="true">←</span>
+        <span>上一篇</span>
+      </span>
+      <span class="post-nav-title" th:text="${cursor.previous.spec.title}"
+        >上一篇</span
+      >
+    </a>
+    <div
+      class="post-nav-link is-prev is-empty"
+      th:if="${not cursor.hasPrevious()}"
+    >
+      <span class="post-nav-label">
+        <span class="post-nav-dot" aria-hidden="true"></span>
+        <span>已是最新</span>
+      </span>
+      <span class="post-nav-note">这是最近写下的一篇，新的想法还在路上</span>
+    </div>
+
+    <a
+      class="post-nav-link is-next"
+      th:if="${cursor.hasNext()}"
+      th:href="@{${cursor.next.status.permalink}}"
+    >
+      <span class="post-nav-label">
+        <span>下一篇</span>
+        <span class="post-nav-arrow" aria-hidden="true">→</span>
+      </span>
+      <span class="post-nav-title" th:text="${cursor.next.spec.title}"
+        >下一篇</span
+      >
+    </a>
+    <div
+      class="post-nav-link is-next is-empty"
+      th:if="${not cursor.hasNext()}"
+    >
+      <span class="post-nav-label">
+        <span>最初一篇</span>
+      </span>
+      <span class="post-nav-note">已经翻到时间线的起点啦</span>
+    </div>
+  </nav>
+</th:block>

@@ -1,0 +1,46 @@
+---
+/**
+ * Quiet 2–3 row related-reading list below Prev/Next cards (same primary category, or first tag fallback).
+ */
+---
+
+<th:block
+  th:with="relCat = ${not #lists.isEmpty(post.categories) ? post.categories[0] : null}, relTag = ${relCat == null and not #lists.isEmpty(post.tags) ? post.tags[0] : null}, relSource = ${relCat != null ? postFinder.listByCategory(1, 4, relCat.metadata.name).items : (relTag != null ? postFinder.listByTag(1, 4, relTag.metadata.name).items : null)}"
+>
+  <section
+    class="related-posts"
+    aria-labelledby="related-posts-title"
+    th:if="${relSource != null and #lists.size(relSource) > 1}"
+  >
+    <header class="related-head">
+      <h2 class="related-title" id="related-posts-title">继续阅读</h2>
+      <a
+        class="related-more"
+        th:if="${relCat != null}"
+        th:href="@{${relCat.status.permalink}}"
+        th:text="|更多「${relCat.spec.displayName}」 →|"
+        >更多 →</a
+      >
+    </header>
+
+    <ul class="related-list">
+      <li
+        class="related-item"
+        th:each="item : ${relSource}"
+        th:if="${item.metadata.name != post.metadata.name}"
+      >
+        <a class="related-link" th:href="@{${item.status.permalink}}">
+          <span class="related-link-title" th:text="${item.spec.title}"
+            >相关文章标题</span
+          >
+          <time
+            class="related-link-date num"
+            th:datetime="${item.spec.publishTime}"
+            th:text="${#temporals.format(item.spec.publishTime, 'yyyy-MM-dd')}"
+            >2026-11-24</time
+          >
+        </a>
+      </li>
+    </ul>
+  </section>
+</th:block>

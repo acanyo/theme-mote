@@ -1,0 +1,76 @@
+---
+import Icon from "../common/Icon.astro";
+---
+
+<button
+  class="progress-drop"
+  type="button"
+  data-progress-drop
+  aria-label="回到顶部"
+  hidden
+>
+  <svg class="progress-ring" viewBox="0 0 48 48" aria-hidden="true">
+    <circle class="progress-track" cx="24" cy="24" r="21"></circle>
+    <circle class="progress-value" cx="24" cy="24" r="21" pathLength="100"
+    ></circle>
+  </svg>
+  <Icon name="arrowUp" size={18} class="progress-arrow" />
+</button>
+<style>
+  .progress-drop {
+    position: fixed;
+    right: var(--gutter);
+    bottom: calc(var(--gutter) + env(safe-area-inset-bottom, 0px));
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--accent);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 0.2s,
+      transform 0.2s,
+      background-color 0.2s;
+    pointer-events: none;
+  }
+  .progress-drop.is-shown {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  .progress-drop:hover {
+    background: var(--accent-soft);
+  }
+  .progress-ring,
+  :global(.progress-arrow) {
+    grid-area: 1 / 1;
+  }
+  .progress-ring {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+  .progress-track,
+  .progress-value {
+    fill: none;
+    stroke-width: 1.5;
+  }
+  .progress-track {
+    stroke: var(--line);
+  }
+  .progress-value {
+    stroke: var(--accent);
+    stroke-dasharray: 100;
+    stroke-dashoffset: calc(100 - var(--p, 0) * 100);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.15s linear;
+  }
+</style>

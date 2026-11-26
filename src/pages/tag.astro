@@ -1,59 +1,55 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import PageHead from "../components/common/PageHead.astro";
+import PostList from "../components/post/PostList.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import "../styles/taxonomy.css";
 ---
 
-<Layout>
-  <Fragment slot="head">
-    <title th:text="|${tag.spec.displayName} - ${site.title}|"></title>
-  </Fragment>
-
-  <div class="page-heading">
-    <h1 th:text="${tag.spec.displayName}"></h1>
-    <p class="page-meta">
-      <span th:text="|${posts.total} 篇文章|"></span>
-    </p>
+<Layout page="tag" title="|${tag.spec.displayName} - ${site.title}|">
+  <SeoHead
+    slot="head"
+    type="website"
+    titleExpr="'#' + (tag.spec.displayName ?: '标签') + ' - ' + (site.title ?: 'Mote')"
+    descExpr="site.subtitle ?: ''"
+    imageExpr="tag.spec.cover ?: ''"
+    pathExpr="tag.status?.permalink ?: ''"
+    crumbParentNameExpr="'#' + (tag.spec.displayName ?: '标签')"
+    crumbParentPathExpr="tag.status?.permalink ?: ''"
+    jsonLdKind="CollectionPage"
+  />
+  <div class="taxonomy-detail-top wrap">
+    <a class="taxonomy-back" href="/tags" th:href="@{/tags}">
+      <span class="back-arrow" aria-hidden="true">←</span>
+      <span>全部标签</span>
+    </a>
   </div>
 
-  <ul class="post-feed__list" role="list">
-    <li th:each="post : ${posts.items}" class="post-feed__item">
-      <a class="post-feed__link" th:href="@{${post.status.permalink}}">
-        <div class="post-feed__body">
-          <p
-            class="post-feed__date"
-            th:text="${#dates.format(post.spec.publishTime, 'yyyy-MM-dd')}"
-          >
-          </p>
-          <h2 class="post-feed__title" th:text="${post.spec.title}"></h2>
-          <p class="post-feed__excerpt" th:text="${post.status.excerpt}"></p>
-        </div>
-        <img
-          th:unless="${#strings.isEmpty(post.spec.cover)}"
-          class="post-feed__image"
-          th:src="${post.spec.cover}"
-        />
-      </a>
-    </li>
-  </ul>
+  <PageHead title="|# ${tag.spec.displayName}|" fallback="标签">
+    <p class="num" th:text="|共 ${posts.total} 篇文章|">共 0 篇文章</p>
+  </PageHead>
 
-  <div th:if="${posts.total == 0}" class="feed-empty">暂无文章。</div>
-
-  <nav
-    th:if="${posts.totalPages gt 1}"
-    class="pagination"
-    aria-label="Pagination"
+  <th:block
+    th:with="allTags = ${tagFinder.listAll()}, activeTags = ${allTags != null ? allTags.?[postCount != null and postCount > 0] : null}"
   >
-    <a
-      th:if="${posts.hasPrevious()}"
-      th:href="@{${posts.prevUrl}}"
-      class="pagination__prev">&larr; 较新</a
+    <nav
+      class="taxonomy-switcher wrap"
+      aria-label="切换标签"
+      th:if="${activeTags != null and #lists.size(activeTags) > 1}"
     >
-    <span
-      class="pagination__info"
-      th:text="|${posts.page} / ${posts.totalPages}|"></span>
-    <a
-      th:if="${posts.hasNext()}"
-      th:href="@{${posts.nextUrl}}"
-      class="pagination__next">较旧 &rarr;</a
-    >
-  </nav>
+      <th:block th:each="item, iter : ${activeTags}">
+        <a
+          class="taxonomy-switch-tab"
+          th:if="${iter.index < 10}"
+          th:href="@{${item.status.permalink}}"
+          th:classappend="${item.metadata.name == tag.metadata.name} ? 'is-active'"
+        >
+          <span th:text="|#${item.spec.displayName}|">#标签</span>
+          <span class="num" th:text="${item.postCount}">0</span>
+        </a>
+      </th:block>
+    </nav>
+  </th:block>
+
+  <PostList empty="这个标签下还没有文章。" />
 </Layout>

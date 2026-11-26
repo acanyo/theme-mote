@@ -1,0 +1,445 @@
+---
+/**
+ * Halo 2.26-compliant SEO & GEO (Generative Engine Optimization) Head component:
+ * - Never duplicates Halo core's built-in <meta name="description"> or <meta name="keywords">
+ * - Emits AI/search snippet authorization (max-snippet:-1, max-image-preview:large),
+ *   RSS & optional LLMs.txt machine-discovery links, Open Graph, Twitter Card & Canonical
+ * - Emits connected Schema.org @graph JSON-LD (WebSite, Person + sameAs, BlogPosting +
+ *   Speakable + keywords/articleSection/isBasedOn, WebPage, CollectionPage, ProfilePage,
+ *   and BreadcrumbList) with independent conflict-avoidance switches
+ */
+interface Props {
+  type?: "website" | "article" | "profile";
+  titleExpr: string;
+  descExpr?: string;
+  abstractExpr?: string;
+  imageExpr?: string;
+  pathExpr?: string;
+  publishedTimeExpr?: string;
+  modifiedTimeExpr?: string;
+  authorNameExpr?: string;
+  authorUrlExpr?: string;
+  authorBioExpr?: string;
+  sectionExpr?: string;
+  keywordsExpr?: string;
+  sourceUrlExpr?: string;
+  crumbParentNameExpr?: string;
+  crumbParentPathExpr?: string;
+  jsonLdKind?:
+    | "WebSite"
+    | "BlogPosting"
+    | "WebPage"
+    | "CollectionPage"
+    | "ProfilePage";
+}
+
+const {
+  type = "website",
+  titleExpr,
+  descExpr = "site.subtitle ?: ''",
+  abstractExpr = "''",
+  imageExpr = "''",
+  pathExpr = "'/'",
+  publishedTimeExpr = "''",
+  modifiedTimeExpr = "''",
+  authorNameExpr = "theme.config.basic?.title ?: site.title ?: ''",
+  authorUrlExpr = "''",
+  authorBioExpr = "theme.config.home?.now ?: site.subtitle ?: ''",
+  sectionExpr = "''",
+  keywordsExpr = "''",
+  sourceUrlExpr = "''",
+  crumbParentNameExpr = "''",
+  crumbParentPathExpr = "''",
+  jsonLdKind,
+} = Astro.props;
+
+const withExpr = [
+  `seoEnableMeta = \${theme.config.seo?.enable_seo_meta != false}`,
+  `seoEnableLd = \${theme.config.seo?.enable_json_ld != false}`,
+  `seoLang = \${site.language ?: 'zh-CN'}`,
+  `seoBase = \${not #strings.isEmpty(site.url) ? (#strings.endsWith(site.url, '/') ? #strings.substring(site.url, 0, #strings.length(site.url) - 1) : site.url) : ''}`,
+  `seoHomeUrl = \${not #strings.isEmpty(seoBase) ? seoBase + '/' : '/'}`,
+  `seoWebsiteId = \${seoHomeUrl + '#website'}`,
+  `seoPersonId = \${seoHomeUrl + '#person'}`,
+  `seoSiteOwner = \${theme.config.basic?.title ?: theme.config.home?.title ?: site.title ?: 'Mote'}`,
+  `seoSiteBio = \${theme.config.home?.now ?: site.subtitle ?: ''}`,
+  `seoSocials = \${not #lists.isEmpty(theme.config.footer?.socials) ? theme.config.footer.socials : theme.config.home?.socials}`,
+  `seoSameAs = \${not #lists.isEmpty(seoSocials) ? seoSocials.?[#this['url'] != null and not #strings.isEmpty(#this['url'])].![#this['url']] : {}}`,
+  `seoTitle = \${(${titleExpr}) ?: site.title ?: 'Mote'}`,
+  `seoRawDesc = \${(${descExpr}) ?: ''}`,
+  `seoDesc = \${not #strings.isEmpty(seoRawDesc) ? seoRawDesc : (site.subtitle ?: '')}`,
+  `seoRawAbstract = \${(${abstractExpr}) ?: ''}`,
+  `seoAbstract = \${not #strings.isEmpty(seoRawAbstract) ? seoRawAbstract : seoDesc}`,
+  `seoPath = \${(${pathExpr}) ?: ''}`,
+  `seoCanonical = \${not #strings.isEmpty(seoPath) ? ((#strings.startsWith(seoPath, 'http://') or #strings.startsWith(seoPath, 'https://')) ? seoPath : (not #strings.isEmpty(seoBase) ? seoBase + (#strings.startsWith(seoPath, '/') ? seoPath : '/' + seoPath) : seoPath)) : seoHomeUrl}`,
+  `seoRawImg = \${(${imageExpr}) ?: ''}`,
+  `seoImgFallback = \${not #strings.isEmpty(theme.config.seo?.default_og_image) ? theme.config.seo.default_og_image : (site.logo ?: '')}`,
+  `seoImgPicked = \${not #strings.isEmpty(seoRawImg) ? seoRawImg : seoImgFallback}`,
+  `seoImage = \${not #strings.isEmpty(seoImgPicked) ? ((#strings.startsWith(seoImgPicked, 'http://') or #strings.startsWith(seoImgPicked, 'https://')) ? seoImgPicked : (not #strings.isEmpty(seoBase) ? seoBase + (#strings.startsWith(seoImgPicked, '/') ? seoImgPicked : '/' + seoImgPicked) : seoImgPicked)) : ''}`,
+  `seoPublished = \${(${publishedTimeExpr}) ?: ''}`,
+  `seoModified = \${(${modifiedTimeExpr}) ?: ''}`,
+  `seoAuthorName = \${(${authorNameExpr}) ?: seoSiteOwner}`,
+  `seoAuthorBio = \${(${authorBioExpr}) ?: seoSiteBio}`,
+  `seoAuthorRawUrl = \${(${authorUrlExpr}) ?: ''}`,
+  `seoAuthorUrl = \${not #strings.isEmpty(seoAuthorRawUrl) ? ((#strings.startsWith(seoAuthorRawUrl, 'http://') or #strings.startsWith(seoAuthorRawUrl, 'https://')) ? seoAuthorRawUrl : (not #strings.isEmpty(seoBase) ? seoBase + (#strings.startsWith(seoAuthorRawUrl, '/') ? seoAuthorRawUrl : '/' + seoAuthorRawUrl) : seoAuthorRawUrl)) : seoHomeUrl}`,
+  `seoSection = \${(${sectionExpr}) ?: ''}`,
+  `seoKeywords = \${(${keywordsExpr}) ?: ''}`,
+  `seoSourceUrl = \${(${sourceUrlExpr}) ?: ''}`,
+  `seoCrumbName = \${(${crumbParentNameExpr}) ?: ''}`,
+  `seoCrumbRawPath = \${(${crumbParentPathExpr}) ?: ''}`,
+  `seoCrumbUrl = \${not #strings.isEmpty(seoCrumbRawPath) ? ((#strings.startsWith(seoCrumbRawPath, 'http://') or #strings.startsWith(seoCrumbRawPath, 'https://')) ? seoCrumbRawPath : (not #strings.isEmpty(seoBase) ? seoBase + (#strings.startsWith(seoCrumbRawPath, '/') ? seoCrumbRawPath : '/' + seoCrumbRawPath) : seoCrumbRawPath)) : ''}`,
+  `seoLlmsRaw = \${#strings.trim(theme.config.seo?.llms_txt_url ?: '')}`,
+  `seoLlmsUrl = \${not #strings.isEmpty(seoLlmsRaw) ? ((#strings.startsWith(seoLlmsRaw, 'http://') or #strings.startsWith(seoLlmsRaw, 'https://')) ? seoLlmsRaw : (not #strings.isEmpty(seoBase) ? seoBase + (#strings.startsWith(seoLlmsRaw, '/') ? seoLlmsRaw : '/' + seoLlmsRaw) : seoLlmsRaw)) : ''}`,
+].join(", ");
+---
+
+<th:block th:with={withExpr}>
+  <th:block th:if="${seoEnableMeta}">
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <link
+      rel="canonical"
+      th:if="${not #strings.isEmpty(seoCanonical)}"
+      th:href="${seoCanonical}"
+    />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      th:if="${pluginFinder.available('PluginFeed')}"
+      th:title="|${site.title} RSS|"
+      href="/feed.xml"
+      th:href="@{/feed.xml}"
+    />
+    <link
+      rel="alternate"
+      type="text/plain"
+      title="LLMs.txt"
+      th:if="${not #strings.isEmpty(seoLlmsUrl)}"
+      th:href="${seoLlmsUrl}"
+    />
+    <meta property="og:site_name" th:content="${site.title}" />
+    <meta property="og:locale" th:content="${seoLang}" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" th:content="${seoTitle}" />
+    <meta
+      property="og:description"
+      th:if="${not #strings.isEmpty(seoDesc)}"
+      th:content="${seoDesc}"
+    />
+    <meta
+      property="og:url"
+      th:if="${not #strings.isEmpty(seoCanonical)}"
+      th:content="${seoCanonical}"
+    />
+    <meta
+      property="og:image"
+      th:if="${not #strings.isEmpty(seoImage)}"
+      th:content="${seoImage}"
+    />
+    <meta
+      name="author"
+      th:if="${not #strings.isEmpty(seoAuthorName) and not #strings.isEmpty(seoPublished)}"
+      th:content="${seoAuthorName}"
+    />
+    <meta
+      property="article:section"
+      th:if="${not #strings.isEmpty(seoSection)}"
+      th:content="${seoSection}"
+    />
+    <meta
+      property="article:published_time"
+      th:if="${not #strings.isEmpty(seoPublished)}"
+      th:content="${seoPublished}"
+    />
+    <meta
+      property="article:modified_time"
+      th:if="${not #strings.isEmpty(seoModified)}"
+      th:content="${seoModified}"
+    />
+    <meta
+      name="twitter:card"
+      th:content="${not #strings.isEmpty(seoImage) ? 'summary_large_image' : 'summary'}"
+    />
+    <meta name="twitter:title" th:content="${seoTitle}" />
+    <meta
+      name="twitter:description"
+      th:if="${not #strings.isEmpty(seoDesc)}"
+      th:content="${seoDesc}"
+    />
+    <meta
+      name="twitter:image"
+      th:if="${not #strings.isEmpty(seoImage)}"
+      th:content="${seoImage}"
+    />
+  </th:block>
+
+  {
+    jsonLdKind === "WebSite" && (
+      <script
+        type="application/ld+json"
+        is:inline
+        th:if="${seoEnableLd}"
+        th:inline="javascript"
+      >
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebSite",
+              "@id": /*[[${seoWebsiteId}]]*/ "",
+              "name": /*[[${site.title}]]*/ "",
+              "description": /*[[${seoDesc}]]*/ "",
+              "url": /*[[${seoHomeUrl}]]*/ "",
+              "inLanguage": /*[[${seoLang}]]*/ "zh-CN",
+              "publisher": {
+                "@id": /*[[${seoPersonId}]]*/ ""
+              }
+            },
+            {
+              "@type": "Person",
+              "@id": /*[[${seoPersonId}]]*/ "",
+              "name": /*[[${seoSiteOwner}]]*/ "",
+              "description": /*[[${seoSiteBio}]]*/ "",
+              "url": /*[[${seoHomeUrl}]]*/ "",
+              "image": /*[[${seoImage}]]*/ "",
+              "sameAs": /*[[${seoSameAs}]]*/ []
+            }
+          ]
+        }
+      </script>
+    )
+  }
+
+  {
+    jsonLdKind === "BlogPosting" && (
+      <script
+        type="application/ld+json"
+        is:inline
+        th:if="${seoEnableLd}"
+        th:inline="javascript"
+      >
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "BlogPosting",
+              "@id": /*[[${seoCanonical + '#article'}]]*/ "",
+              "headline": /*[[${seoTitle}]]*/ "",
+              "abstract": /*[[${seoAbstract}]]*/ "",
+              "description": /*[[${seoDesc}]]*/ "",
+              "url": /*[[${seoCanonical}]]*/ "",
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": /*[[${seoCanonical}]]*/ ""
+              },
+              "isPartOf": {
+                "@type": "WebSite",
+                "@id": /*[[${seoWebsiteId}]]*/ "",
+                "name": /*[[${site.title}]]*/ "",
+                "url": /*[[${seoHomeUrl}]]*/ ""
+              },
+              "inLanguage": /*[[${seoLang}]]*/ "zh-CN",
+              "image": /*[[${seoImage}]]*/ "",
+              "articleSection": /*[[${seoSection}]]*/ "",
+              "keywords": /*[[${seoKeywords}]]*/ "",
+              "isBasedOn": /*[[${seoSourceUrl}]]*/ "",
+              "datePublished": /*[[${seoPublished}]]*/ "",
+              "dateModified": /*[[${seoModified}]]*/ "",
+              "speakable": {
+                "@type": "SpeakableSpecification",
+                "cssSelector": [
+                  ".article-title",
+                  ".article-lead",
+                  ".article-tldr",
+                  ".article-content"
+                ]
+              },
+              "author": {
+                "@type": "Person",
+                "name": /*[[${seoAuthorName}]]*/ "",
+                "description": /*[[${seoAuthorBio}]]*/ "",
+                "url": /*[[${seoAuthorUrl}]]*/ "",
+                "sameAs": /*[[${seoSameAs}]]*/ []
+              },
+              "publisher": {
+                "@type": "Person",
+                "@id": /*[[${seoPersonId}]]*/ "",
+                "name": /*[[${seoSiteOwner}]]*/ "",
+                "url": /*[[${seoHomeUrl}]]*/ ""
+              }
+            },
+            {
+              "@type": "BreadcrumbList",
+              "@id": /*[[${seoCanonical + '#breadcrumb'}]]*/ "",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": /*[[${site.title}]]*/ "",
+                  "item": /*[[${seoHomeUrl}]]*/ ""
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": /*[[${not #strings.isEmpty(seoCrumbName) ? seoCrumbName : '归档'}]]*/ "归档",
+                  "item": /*[[${not #strings.isEmpty(seoCrumbUrl) ? seoCrumbUrl : (seoBase + '/archives')}]]*/ ""
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": /*[[${seoTitle}]]*/ "",
+                  "item": /*[[${seoCanonical}]]*/ ""
+                }
+              ]
+            }
+          ]
+        }
+      </script>
+    )
+  }
+
+  {
+    jsonLdKind === "WebPage" && (
+      <script
+        type="application/ld+json"
+        is:inline
+        th:if="${seoEnableLd}"
+        th:inline="javascript"
+      >
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebPage",
+              "@id": /*[[${seoCanonical}]]*/ "",
+              "name": /*[[${seoTitle}]]*/ "",
+              "description": /*[[${seoDesc}]]*/ "",
+              "url": /*[[${seoCanonical}]]*/ "",
+              "inLanguage": /*[[${seoLang}]]*/ "zh-CN",
+              "isPartOf": {
+                "@id": /*[[${seoWebsiteId}]]*/ ""
+              }
+            },
+            {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": /*[[${site.title}]]*/ "",
+                  "item": /*[[${seoHomeUrl}]]*/ ""
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": /*[[${seoTitle}]]*/ "",
+                  "item": /*[[${seoCanonical}]]*/ ""
+                }
+              ]
+            }
+          ]
+        }
+      </script>
+    )
+  }
+
+  {
+    jsonLdKind === "CollectionPage" && (
+      <script
+        type="application/ld+json"
+        is:inline
+        th:if="${seoEnableLd}"
+        th:inline="javascript"
+      >
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "CollectionPage",
+              "@id": /*[[${seoCanonical}]]*/ "",
+              "name": /*[[${seoTitle}]]*/ "",
+              "description": /*[[${seoDesc}]]*/ "",
+              "url": /*[[${seoCanonical}]]*/ "",
+              "inLanguage": /*[[${seoLang}]]*/ "zh-CN",
+              "isPartOf": {
+                "@id": /*[[${seoWebsiteId}]]*/ ""
+              }
+            },
+            {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": /*[[${site.title}]]*/ "",
+                  "item": /*[[${seoHomeUrl}]]*/ ""
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": /*[[${not #strings.isEmpty(seoCrumbName) ? seoCrumbName : seoTitle}]]*/ "",
+                  "item": /*[[${not #strings.isEmpty(seoCrumbUrl) ? seoCrumbUrl : seoCanonical}]]*/ ""
+                }
+              ]
+            }
+          ]
+        }
+      </script>
+    )
+  }
+
+  {
+    jsonLdKind === "ProfilePage" && (
+      <script
+        type="application/ld+json"
+        is:inline
+        th:if="${seoEnableLd}"
+        th:inline="javascript"
+      >
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "ProfilePage",
+              "@id": /*[[${seoCanonical}]]*/ "",
+              "name": /*[[${seoTitle}]]*/ "",
+              "url": /*[[${seoCanonical}]]*/ "",
+              "inLanguage": /*[[${seoLang}]]*/ "zh-CN",
+              "isPartOf": {
+                "@id": /*[[${seoWebsiteId}]]*/ ""
+              },
+              "mainEntity": {
+                "@type": "Person",
+                "@id": /*[[${seoCanonical + '#person'}]]*/ "",
+                "name": /*[[${seoAuthorName}]]*/ "",
+                "description": /*[[${seoDesc}]]*/ "",
+                "image": /*[[${seoImage}]]*/ "",
+                "url": /*[[${seoCanonical}]]*/ "",
+                "sameAs": /*[[${seoSameAs}]]*/ []
+              }
+            },
+            {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": /*[[${site.title}]]*/ "",
+                  "item": /*[[${seoHomeUrl}]]*/ ""
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": /*[[${seoAuthorName}]]*/ "",
+                  "item": /*[[${seoCanonical}]]*/ ""
+                }
+              ]
+            }
+          ]
+        }
+      </script>
+    )
+  }
+</th:block>

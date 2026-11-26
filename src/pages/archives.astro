@@ -1,65 +1,203 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import PageHead from "../components/common/PageHead.astro";
+import Pagination from "../components/common/Pagination.astro";
+import Icon from "../components/common/Icon.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import "../styles/archive.css";
 ---
 
-<Layout pageTitle="归档">
-  <Fragment slot="head">
-    <title th:text="|归档 - ${site.title}|"></title>
-  </Fragment>
-
-  <section class="archive-list" aria-label="Archive list">
-    <th:block th:each="archive : ${archives.items}">
-      <th:block th:each="month : ${archive.months}">
-        <div class="archive-group">
-          <h2
-            class="archive-group__year"
-            th:text="|${archive.year} · ${month.month}|"
-          >
-          </h2>
-          <ul class="archive-group__items">
-            <li th:each="post : ${month.posts}" class="archive-entry">
-              <span
-                class="archive-entry__date"
-                th:text="${#dates.format(post.spec.publishTime, 'MM/dd')}"
-              ></span>
-              <div>
-                <h3 class="archive-entry__title">
-                  <a
-                    th:href="@{${post.status.permalink}}"
-                    th:text="${post.spec.title}"></a>
-                </h3>
-                <p
-                  class="archive-entry__summary"
-                  th:text="${post.status.excerpt}"
-                >
-                </p>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </th:block>
-    </th:block>
-
-    <div th:if="${archives.total == 0}" class="archive-empty">暂无文章。</div>
-  </section>
-
-  <nav
-    th:if="${archives.totalPages gt 1}"
-    class="pagination"
-    aria-label="Pagination"
+<Layout page="archives" title="|归档 - ${site.title}|">
+  <SeoHead
+    slot="head"
+    type="website"
+    titleExpr="'归档 - ' + (site.title ?: 'Mote')"
+    descExpr="site.subtitle ?: ''"
+    pathExpr="'/archives'"
+    crumbParentNameExpr="'归档'"
+    crumbParentPathExpr="'/archives'"
+    jsonLdKind="CollectionPage"
+  />
+  <div
+    class="archives-page"
+    th:with="stats = ${siteStatsFinder.getStats()}, enableHoverCover = ${theme.config.home?.enable_hover_cover != false}"
   >
-    <a
-      th:if="${archives.hasPrevious()}"
-      th:href="@{${archives.prevUrl}}"
-      class="pagination__prev">&larr; 较新</a
+    <PageHead title="'归档'" fallback="归档">
+      <div class="archive-head-bar">
+        <p class="archive-summary">
+          按时间顺序整理的全部文章，共
+          <span class="num" th:text="${stats?.post ?: 0}">0</span> 篇
+          <th:block th:if="${stats != null and stats.category > 0}">
+            <span class="archive-summary-sep" aria-hidden="true">·</span>
+            <span class="num" th:text="${stats.category}">0</span> 个分类
+          </th:block>
+        </p>
+
+        <div
+          class="archive-search-wrap"
+          th:if="${not #lists.isEmpty(archives.items)}"
+        >
+          <Icon name="search" size={13} class="archive-search-icon" />
+          <input
+            type="search"
+            class="archive-search-input"
+            placeholder="快速筛选标题或分类…"
+            aria-label="快速筛选归档文章"
+            data-archive-filter
+          />
+          <span
+            class="archive-search-count num"
+            data-archive-filter-count
+            hidden></span>
+        </div>
+      </div>
+    </PageHead>
+
+    <section class="archive wrap" aria-label="文章归档" data-archive-root>
+      <!-- Year Jump Strip (auto-shown when 2+ years are present) -->
+      <nav
+        class="archive-year-nav"
+        aria-label="按年份跳转"
+        data-archive-year-nav
+        th:if="${not #lists.isEmpty(archives.items) and #lists.size(archives.items) > 1}"
+      >
+        <a
+          class="archive-year-pill num"
+          th:each="archive : ${archives.items}"
+          th:href="|#year-${archive.year}|"
+          th:text="${archive.year}">2026</a
+        >
+      </nav>
+
+      <div
+        class="archive-years"
+        data-archive-list
+        th:if="${not #lists.isEmpty(archives.items)}"
+      >
+        <div
+          class="archive-year"
+          th:each="archive : ${archives.items}"
+          th:id="|year-${archive.year}|"
+          th:attr="data-year=${archive.year}"
+        >
+          <div class="archive-year-head">
+            <h2 class="archive-year-title num" th:text="${archive.year}">
+              2026
+            </h2>
+            <span class="archive-year-line" aria-hidden="true"></span>
+            <span class="archive-year-count num" data-year-count></span>
+          </div>
+
+          <div class="archive-months">
+            <section
+              class="archive-month"
+              th:each="month : ${archive.months}"
+              th:attr="data-month=${month.month}"
+            >
+              <h3 class="archive-month-title num" th:text="|${month.month} 月|">
+                11 月
+              </h3>
+              <ol class="archive-posts">
+                <li
+                  class="archive-post-item"
+                  th:each="post : ${month.posts}"
+                  th:attr="data-search-text=|${post.spec.title} ${not #lists.isEmpty(post.categories) ? post.categories[0].spec.displayName : ''}|"
+                >
+                  <a
+                    class="archive-post"
+                    th:href="@{${post.status.permalink}}"
+                    th:attr="data-hover-cover=${enableHoverCover and not #strings.isEmpty(post.spec.cover) ? post.spec.cover : null}"
+                  >
+                    <span class="archive-post-main">
+                      <span
+                        class="archive-post-title"
+                        th:text="${post.spec.title}">标题</span
+                      >
+                      <span class="archive-pin" th:if="${post.spec.pinned}"
+                        >置顶</span
+                      >
+                    </span>
+                    <span class="archive-post-meta">
+                      <span
+                        class="archive-post-cat"
+                        th:if="${not #lists.isEmpty(post.categories)}"
+                        th:text="${post.categories[0].spec.displayName}"
+                        >分类</span
+                      >
+                      <time
+                        class="num"
+                        th:datetime="${post.spec.publishTime}"
+                        th:text="${#temporals.format(post.spec.publishTime, 'MM-dd')}"
+                        >11-12</time
+                      >
+                    </span>
+                  </a>
+                </li>
+              </ol>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <p class="empty-note" data-archive-filter-empty hidden>
+        没有找到匹配的文章，换个关键词试试。
+      </p>
+
+      <p class="empty-note" th:if="${#lists.isEmpty(archives.items)}">
+        还没有发布文章。
+      </p>
+
+      <!-- Seamless Lazy Load-More (enhances Halo server pagination) -->
+      <div
+        class="archive-loader"
+        data-archive-loader
+        th:if="${archives.hasNext()}"
+        th:attr="data-next-url=@{${archives.nextUrl}},data-page=${archives.page},data-total-pages=${archives.totalPages}"
+      >
+        <button
+          type="button"
+          class="archive-load-btn"
+          data-archive-load-btn
+        >
+          <span data-archive-load-label>加载更早文章</span>
+          <span class="archive-load-meta num" data-archive-load-meta
+            th:text="|${archives.page} / ${archives.totalPages}|">1 / 2</span
+          >
+        </button>
+      </div>
+
+      <!-- Native pagination fallback only when JS is disabled -->
+      <noscript>
+        <div class="archive-pagination-fallback">
+          <Pagination list="archives" />
+        </div>
+      </noscript>
+    </section>
+
+    <div
+      class="hover-cover-preview"
+      data-hover-preview
+      aria-hidden="true"
+      th:if="${enableHoverCover}"
     >
-    <span
-      class="pagination__info"
-      th:text="|${archives.page} / ${archives.totalPages}|"></span>
-    <a
-      th:if="${archives.hasNext()}"
-      th:href="@{${archives.nextUrl}}"
-      class="pagination__next">较旧 &rarr;</a
-    >
-  </nav>
+      <div class="hover-cover-stage" data-hover-preview-stage>
+        <img
+          class="hover-cover-layer"
+          src=""
+          alt=""
+          data-hover-preview-layer="0"
+          data-img-placeholder-ignore
+          decoding="async"
+        />
+        <img
+          class="hover-cover-layer"
+          src=""
+          alt=""
+          data-hover-preview-layer="1"
+          data-img-placeholder-ignore
+          decoding="async"
+        />
+      </div>
+    </div>
+  </div>
 </Layout>

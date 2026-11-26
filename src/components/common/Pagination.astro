@@ -1,0 +1,38 @@
+---
+import Icon from "./Icon.astro";
+
+interface Props {
+  /** Name of the UrlContextListResult variable to paginate. */
+  list: string;
+}
+const { list } = Astro.props;
+---
+
+<nav
+  class="pagination"
+  aria-label="分页"
+  th:if={`\${${list}.hasPrevious() or ${list}.hasNext()}`}
+>
+  <a
+    class="page-btn"
+    rel="prev"
+    th:if={`\${${list}.hasPrevious()}`}
+    th:href={`@{\${${list}.prevUrl}}`}
+  >
+    <Icon name="arrowLeft" size={18} /><span>较新</span>
+  </a>
+  <span class="page-count num">
+    <span th:text={`\${${list}.page}`}>1</span>
+    <span class="page-sep" aria-hidden="true">/</span>
+    <span class="sr-only">共</span>
+    <span th:text={`\${${list}.totalPages}`}>1</span>
+  </span>
+  <a
+    class="page-btn"
+    rel="next"
+    th:if={`\${${list}.hasNext()}`}
+    th:href={`@{\${${list}.nextUrl}}`}
+  >
+    <span>较早</span><Icon name="arrowRight" size={18} />
+  </a>
+</nav>

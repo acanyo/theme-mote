@@ -1,0 +1,53 @@
+/* ==========================================================================
+   Swup Crisp Opacity Transition + Native View Transitions Fallback
+   (Opacity-only on #main so child GSAP stagger transforms never collide!)
+   ========================================================================== */
+
+.transition-main {
+  opacity: 1;
+  transition: opacity 0.14s ease-out;
+}
+
+html.is-animating .transition-main,
+html.is-leaving .transition-main {
+  opacity: 0;
+}
+
+/* Native Cross-Document View Transitions (used when Swup is disabled) */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.2s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html[data-motion="off"] .transition-main,
+html[data-motion-site="false"] .transition-main,
+html[data-page-transition="false"] .transition-main {
+  transition: none !important;
+}
+
+html[data-motion="off"]::view-transition-old(root),
+html[data-motion="off"]::view-transition-new(root),
+html[data-page-transition="false"]::view-transition-old(root),
+html[data-page-transition="false"]::view-transition-new(root) {
+  animation: none;
+}
+
+/* Native View Transitions API: Radial Theme Reveal (Light <-> Dark) */
+html[data-scheme-transition]::view-transition-old(root),
+html[data-scheme-transition]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html[data-scheme-transition]::view-transition-old(root) {
+  z-index: 1;
+}
+
+html[data-scheme-transition]::view-transition-new(root) {
+  z-index: 9999;
+}

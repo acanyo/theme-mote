@@ -1,40 +1,58 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import PageHead from "../components/common/PageHead.astro";
+import PostList from "../components/post/PostList.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import "../styles/taxonomy.css";
 ---
 
-<Layout>
-  <Fragment slot="head">
-    <title th:text="|${category.spec.displayName} - ${site.title}|"></title>
-  </Fragment>
-
-  <div class="page-heading">
-    <h1 th:text="${category.spec.displayName}"></h1>
-    <p class="page-meta">
-      <span th:text="|${posts.total} 篇文章|"></span>
-    </p>
+<Layout page="category" title="|${category.spec.displayName} - ${site.title}|">
+  <SeoHead
+    slot="head"
+    type="website"
+    titleExpr="(category.spec.displayName ?: '分类') + ' - ' + (site.title ?: 'Mote')"
+    descExpr="category.spec.description ?: ''"
+    imageExpr="category.spec.cover ?: ''"
+    pathExpr="category.status?.permalink ?: ''"
+    crumbParentNameExpr="category.spec.displayName ?: '分类'"
+    crumbParentPathExpr="category.status?.permalink ?: ''"
+    jsonLdKind="CollectionPage"
+  />
+  <div class="taxonomy-detail-top wrap">
+    <a class="taxonomy-back" href="/categories" th:href="@{/categories}">
+      <span class="back-arrow" aria-hidden="true">←</span>
+      <span>全部分类</span>
+    </a>
   </div>
 
-  <th:block th:replace="~{fragments/post-list}"></th:block>
+  <PageHead title="${category.spec.displayName}" fallback="分类">
+    <p
+      th:if="${not #strings.isEmpty(category.spec.description)}"
+      th:text="${category.spec.description}"
+    >
+    </p>
+    <p class="num" th:text="|共 ${posts.total} 篇文章|">共 0 篇文章</p>
+  </PageHead>
 
-  <div th:if="${posts.total == 0}" class="feed-empty">暂无文章。</div>
-
-  <nav
-    th:if="${posts.totalPages gt 1}"
-    class="pagination"
-    aria-label="Pagination"
+  <th:block
+    th:with="allCats = ${categoryFinder.listAll()}, activeCats = ${allCats != null ? allCats.?[postCount != null and postCount > 0] : null}"
   >
-    <a
-      th:if="${posts.hasPrevious()}"
-      th:href="@{${posts.prevUrl}}"
-      class="pagination__prev">&larr; 较新</a
+    <nav
+      class="taxonomy-switcher wrap"
+      aria-label="切换分类"
+      th:if="${activeCats != null and #lists.size(activeCats) > 1}"
     >
-    <span
-      class="pagination__info"
-      th:text="|${posts.page} / ${posts.totalPages}|"></span>
-    <a
-      th:if="${posts.hasNext()}"
-      th:href="@{${posts.nextUrl}}"
-      class="pagination__next">较旧 &rarr;</a
-    >
-  </nav>
+      <a
+        class="taxonomy-switch-tab"
+        th:each="item : ${activeCats}"
+        th:href="@{${item.status.permalink}}"
+        th:classappend="${item.metadata.name == category.metadata.name} ? 'is-active'"
+      >
+        <span th:text="${item.spec.displayName}">分类</span>
+        <span class="num" th:text="${item.postCount}">0</span>
+      </a>
+    </nav>
+  </th:block>
+
+  <PostList empty="这个分类下还没有文章。" />
 </Layout>

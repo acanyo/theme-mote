@@ -1,0 +1,74 @@
+---
+/**
+ * templates/douban.html: books / movies / music / games shelf for chengzhongxue/plugin-douban (/douban).
+ * Uses the plugin's public JSON API (/apis/api.douban.moony.la/v1alpha1/doubanmovies) with Swup-safe client rendering.
+ */
+import Layout from "../layouts/Layout.astro";
+import PageHead from "../components/common/PageHead.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import "../styles/douban.css";
+---
+
+<Layout page="douban" title="|${title ?: '书影音'} - ${site.title}|">
+  <SeoHead
+    slot="head"
+    type="website"
+    titleExpr="(title ?: '书影音') + ' - ' + (site.title ?: 'Mote')"
+    descExpr="site.subtitle ?: '读过的书、看过的电影、听过的唱片与玩过的游戏。'"
+    pathExpr="'/douban'"
+    jsonLdKind="CollectionPage"
+  />
+  <PageHead title="${title ?: '书影音'}" fallback="书影音">
+    <p>看过的光影、读过的书与留下的片段评分。</p>
+  </PageHead>
+
+  <section
+    class="douban wrap"
+    aria-label="豆瓣书影音记录"
+    data-douban-root
+  >
+    <div class="db-toolbar">
+      <nav class="db-type-tabs" role="tablist" aria-label="内容类型" data-db-types>
+        <button
+          type="button"
+          class="db-type-tab"
+          th:each="t, st : ${types}"
+          th:attr="data-db-type=${t.key},data-db-label=${t.name}"
+          th:classappend="${t.key == 'movie' or (st.index == 0 and #lists.size(types) == 1)} ? 'is-active'"
+        >
+          <span
+            class="db-type-name"
+            th:text="${t.key == 'movie' ? '电影' : (t.key == 'book' ? '图书' : (t.key == 'music' ? '音乐' : (t.key == 'game' ? '游戏' : (t.key == 'drama' ? '舞台剧' : (not #strings.isEmpty(t.name) ? t.name : t.key)))))}"
+            >电影</span
+          >
+          <span
+            class="db-type-count num"
+            th:if="${t.doubanCount != null and t.doubanCount > 0}"
+            th:text="${t.doubanCount}">0</span
+          >
+        </button>
+      </nav>
+
+      <div class="db-status-seg" role="radiogroup" aria-label="标记状态" data-db-statuses>
+        <button type="button" class="db-status-btn is-active" data-db-status="done" aria-checked="true">看过</button>
+        <button type="button" class="db-status-btn" data-db-status="doing" aria-checked="false">在看</button>
+        <button type="button" class="db-status-btn" data-db-status="mark" aria-checked="false">想看</button>
+      </div>
+    </div>
+
+    <div class="db-genres" data-db-genres hidden></div>
+
+    <div class="db-grid" data-db-grid aria-live="polite">
+      <div class="db-skeleton" aria-hidden="true"></div>
+      <div class="db-skeleton" aria-hidden="true"></div>
+      <div class="db-skeleton" aria-hidden="true"></div>
+      <div class="db-skeleton" aria-hidden="true"></div>
+    </div>
+
+    <p class="empty-note" data-db-empty hidden>这个分类下还没有记录。</p>
+
+    <div class="db-more-row" data-db-more-wrap hidden>
+      <button type="button" class="db-more-btn" data-db-more>加载更多</button>
+    </div>
+  </section>
+</Layout>

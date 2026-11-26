@@ -1,0 +1,300 @@
+---
+import Icon from "../common/Icon.astro";
+import { AVATAR } from "../../lib/expressions";
+import "../../styles/header.css";
+
+const fallbackMenu = [
+  { title: "文章", href: "/#writing" },
+  { title: "归档", href: "/archives" },
+  { title: "分类", href: "/categories" },
+  { title: "标签", href: "/tags" },
+];
+---
+
+<header
+  class="site-header"
+  data-header
+  th:attr="data-header-morph=${theme.config.basic?.header_morph != false}"
+  th:with={`avatar = \${${AVATAR}}, brandTitle = \${theme.config.basic?.title ?: theme.config.home?.title ?: site.title ?: 'Mote'}`}
+>
+  <div class="header-inner" data-header-dock>
+    <!-- Bare Editorial Brand (left margin at top, steps aside while scrolling) -->
+    <div class="header-wing header-wing--left">
+      <a
+        class="brand"
+        href="/"
+        th:href="@{/}"
+        th:attr="aria-label=|${brandTitle} · 首页|"
+      >
+        <img
+          class="brand-avatar"
+          th:if="${not #strings.isEmpty(avatar)}"
+          th:src="${avatar}"
+          width="24"
+          height="24"
+          alt=""
+        />
+        <span class="brand-name" th:text="${brandTitle}">Mote</span>
+      </a>
+    </div>
+
+    <!-- Center Stage: Bare Nav at Top -> Original Frosted Squircle Bookmark on Scroll -->
+    <div class="header-center">
+      <div class="center-capsule">
+        <!-- Compact frosted squircle nav (bare at top, hides on scroll-down, floats on scroll-up) -->
+        <div class="center-nav-slot">
+          <div class="nav-backdrop" data-nav-close aria-hidden="true"></div>
+          <nav
+            class="site-nav"
+            id="site-nav"
+            aria-label="主导航"
+            data-nav
+            th:with="menu = ${menuFinder.getPrimary()}"
+          >
+            <div class="mobile-nav-head">
+              <a class="mobile-nav-brand" href="/" th:href="@{/}">
+                <img
+                  class="brand-avatar"
+                  th:if="${not #strings.isEmpty(avatar)}"
+                  th:src="${avatar}"
+                  width="26"
+                  height="26"
+                  alt=""
+                />
+                <span class="brand-name" th:text="${brandTitle}">Mote</span>
+              </a>
+              <button
+                type="button"
+                class="mobile-nav-close"
+                data-nav-close
+                aria-label="关闭菜单"
+              >
+                <Icon name="close" size={16} />
+              </button>
+            </div>
+
+            <div class="mobile-nav-tools">
+              <p class="mobile-section-label">快捷</p>
+              <div class="mobile-tools-grid">
+                <button
+                  type="button"
+                  class="mobile-tool-pill scheme-btn"
+                  data-scheme-toggle
+                  th:if="${theme.config.basic?.show_scheme_toggle != false}"
+                >
+                  <Icon name="sun" size={14} class="scheme-sun" />
+                  <Icon name="moon" size={14} class="scheme-moon" />
+                  <span>明暗模式</span>
+                </button>
+                <button
+                  type="button"
+                  class="mobile-tool-pill"
+                  data-random-trigger
+                  th:if="${theme.config.basic?.show_random != false}"
+                >
+                  <Icon name="shuffle" size={14} />
+                  <span>随机漫步</span>
+                </button>
+                <button
+                  type="button"
+                  class="mobile-tool-pill"
+                  data-cc-open
+                  th:if="${theme.config.basic?.show_control_center != false}"
+                >
+                  <Icon name="sliders" size={14} />
+                  <span>阅读偏好</span>
+                </button>
+                <button
+                  type="button"
+                  class="mobile-tool-pill"
+                  data-search
+                  th:if="${pluginFinder.available('PluginSearchWidget')}"
+                >
+                  <Icon name="search" size={14} />
+                  <span>站内搜索</span>
+                </button>
+              </div>
+            </div>
+
+            <p class="mobile-section-label mobile-nav-label">导航</p>
+            <ul
+              class="nav-list"
+              th:if="${menu != null and not #lists.isEmpty(menu.menuItems)}"
+            >
+              <li
+                class="nav-item"
+                th:each="item : ${menu.menuItems}"
+                th:classappend="${not #lists.isEmpty(item.children)} ? 'has-sub'"
+              >
+                <a
+                  class="nav-link"
+                  th:href="@{${item.status.href}}"
+                  th:target="${item.spec.target?.value}"
+                  rel="noopener"
+                >
+                  <span class="nav-label" th:text="${item.status.displayName}">菜单</span>
+                  <th:block th:if="${not #lists.isEmpty(item.children)}">
+                    <svg
+                      class="nav-chevron"
+                      width="10"
+                      height="10"
+                      viewBox="0 0 12 12"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.65"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M3 4.5 6 7.5 9 4.5"></path>
+                    </svg>
+                  </th:block>
+                </a>
+                <ul class="nav-sub" th:if="${not #lists.isEmpty(item.children)}">
+                  <li th:each="child : ${item.children}">
+                    <a
+                      th:href="@{${child.status.href}}"
+                      th:target="${child.spec.target?.value}"
+                      rel="noopener"
+                      th:text="${child.status.displayName}">子菜单</a
+                    >
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <ul
+              class="nav-list"
+              th:if="${menu == null or #lists.isEmpty(menu.menuItems)}"
+            >
+              {
+                fallbackMenu.map((item) => (
+                  <li class="nav-item">
+                    <a class="nav-link" th:href={`@{${item.href}}`} href={item.href}>
+                      <span class="nav-label">{item.title}</span>
+                    </a>
+                  </li>
+                ))
+              }
+              <li class="nav-item" th:if="${pluginFinder.available('PluginMoments')}">
+                <a class="nav-link" th:href="@{/moments}" href="/moments">
+                  <span class="nav-label">瞬间</span>
+                </a>
+              </li>
+            </ul>
+            <th:block
+              th:with="navAllTags = ${tagFinder.listAll()}, navActiveTags = ${navAllTags != null ? navAllTags.?[postCount != null and postCount > 0] : null}"
+            >
+              <div
+                class="mobile-nav-tags"
+                th:if="${navActiveTags != null and not #lists.isEmpty(navActiveTags)}"
+              >
+                <div class="mobile-tags-head">
+                  <p class="mobile-section-label">标签</p>
+                  <a class="mobile-tags-all" href="/tags" th:href="@{/tags}">全部 →</a>
+                </div>
+                <div class="mobile-tag-cloud">
+                  <th:block th:each="t, iter : ${navActiveTags}">
+                    <a
+                      class="mobile-tag-chip"
+                      th:if="${iter.index < 10}"
+                      th:href="@{${t.status.permalink}}"
+                    >
+                      <span th:text="${t.spec.displayName}">标签</span>
+                      <em class="num" th:text="${t.postCount}">0</em>
+                    </a>
+                  </th:block>
+                </div>
+              </div>
+            </th:block>
+          </nav>
+
+          <span class="center-inline-tools" aria-label="快捷操作">
+            <span class="center-sep" aria-hidden="true"></span>
+            <button
+              class="mini-tool-btn scheme-btn"
+              type="button"
+              data-scheme-toggle
+              data-tip="切换深色模式"
+              aria-label="切换深色模式"
+            >
+              <Icon name="sun" size={14} class="scheme-sun" />
+              <Icon name="moon" size={13} class="scheme-moon" />
+            </button>
+            <button
+              class="mini-tool-btn"
+              type="button"
+              data-scroll-top
+              data-tip="回到顶部"
+              aria-label="回到顶部"
+            >
+              <Icon name="arrowUp" size={13} />
+            </button>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bare Editorial Actions (right margin at top, steps aside while scrolling) -->
+    <div class="header-wing header-wing--right">
+      <div class="header-actions">
+        <button
+          class="dock-btn"
+          type="button"
+          data-search
+          data-tip="站内搜索"
+          data-tip-kbd="⌘K"
+          aria-label="搜索文章"
+          th:if="${pluginFinder.available('PluginSearchWidget')}"
+        >
+          <Icon name="search" size={15} />
+        </button>
+
+        <button
+          class="dock-btn"
+          type="button"
+          data-random-trigger
+          data-tip="随机漫步读一篇"
+          aria-label="随机读一篇"
+          th:if="${theme.config.basic?.show_random != false}"
+        >
+          <Icon name="shuffle" size={15} />
+        </button>
+
+        <button
+          class="dock-btn scheme-btn"
+          type="button"
+          data-scheme-toggle
+          data-tip="切换深色模式"
+          aria-label="切换深色模式"
+          th:if="${theme.config.basic?.show_scheme_toggle != false}"
+        >
+          <Icon name="sun" size={15} class="scheme-sun" />
+          <Icon name="moon" size={15} class="scheme-moon" />
+        </button>
+
+        <button
+          class="dock-btn"
+          type="button"
+          data-cc-open
+          data-tip="阅读偏好与中控台"
+          aria-label="打开阅读偏好"
+          th:if="${theme.config.basic?.show_control_center != false}"
+        >
+          <Icon name="sliders" size={15} />
+        </button>
+
+        <button
+          class="dock-btn menu-btn"
+          type="button"
+          data-menu-toggle
+          aria-label="打开菜单"
+          aria-expanded="false"
+          aria-controls="site-nav"
+        >
+          <Icon name="menu" size={16} class="menu-open" />
+          <Icon name="close" size={16} class="menu-close" />
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

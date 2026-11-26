@@ -1,0 +1,243 @@
+---
+/**
+ * templates/portfolio.html: project list route provided by halo-plugin-portfolio (/portfolio).
+ */
+import Layout from "../layouts/Layout.astro";
+import PageHead from "../components/common/PageHead.astro";
+import Icon from "../components/common/Icon.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import "../styles/portfolio.css";
+---
+
+<Layout page="portfolio" title="|${title ?: '项目集'} - ${site.title}|">
+  <SeoHead
+    slot="head"
+    type="website"
+    titleExpr="(title ?: '项目集') + ' - ' + (site.title ?: 'Mote')"
+    descExpr="not #strings.isEmpty(description) ? description : (site.subtitle ?: '')"
+    pathExpr="'/portfolio'"
+    jsonLdKind="CollectionPage"
+  />
+  <PageHead title="${title ?: '项目集'}" fallback="项目集">
+    <p
+      th:text="${not #strings.isEmpty(description) ? description : '在做的小东西、开源项目与实用工具。'}"
+    >
+      在做的小东西、开源项目与实用工具。
+    </p>
+  </PageHead>
+
+  <section
+    class="portfolio wrap"
+    aria-label="项目列表"
+    th:with="activeType = ${filters != null ? filters['type'] : ''}, activePlatform = ${filters != null ? filters['platform'] : ''}, activeKeyword = ${filters != null ? filters['keyword'] : ''}, activeTag = ${filters != null ? filters['tag'] : ''}"
+  >
+    <div class="portfolio-toolbar">
+      <nav
+        class="portfolio-tabs"
+        aria-label="项目分类筛选"
+        th:if="${typeLabels != null and not #maps.isEmpty(typeLabels)}"
+      >
+        <a
+          class="portfolio-tab"
+          href="/portfolio"
+          th:href="@{/portfolio}"
+          th:classappend="${#strings.isEmpty(activeType)} ? 'is-active'"
+        >
+          全部
+        </a>
+        <a
+          class="portfolio-tab"
+          th:each="entry : ${typeLabels.entrySet()}"
+          th:href="@{/portfolio(type=${entry.key})}"
+          th:classappend="${activeType == entry.key} ? 'is-active'"
+          th:text="${entry.value}">类型</a
+        >
+      </nav>
+
+      <form class="portfolio-search" action="/portfolio" method="get" role="search">
+        <input
+          th:if="${not #strings.isEmpty(activeType)}"
+          type="hidden"
+          name="type"
+          th:value="${activeType}"
+        />
+        <input
+          th:if="${not #strings.isEmpty(activePlatform)}"
+          type="hidden"
+          name="platform"
+          th:value="${activePlatform}"
+        />
+        <Icon name="search" size={13} class="portfolio-search-icon" />
+        <input
+          type="search"
+          name="keyword"
+          class="portfolio-search-input"
+          placeholder="搜索项目..."
+          aria-label="搜索项目"
+          th:value="${activeKeyword}"
+        />
+      </form>
+    </div>
+
+    <div class="portfolio-active-filters" th:if="${hasFilters == true}">
+      <span class="portfolio-filter-chip" th:if="${not #strings.isEmpty(activePlatform)}">
+        平台：<strong
+          th:text="${platformLabels != null and platformLabels[activePlatform] != null ? platformLabels[activePlatform] : activePlatform}"
+        ></strong>
+      </span>
+      <span class="portfolio-filter-chip" th:if="${not #strings.isEmpty(activeTag)}">
+        标签：<strong th:text="${activeTag}"></strong>
+      </span>
+      <span class="portfolio-filter-chip" th:if="${not #strings.isEmpty(activeKeyword)}">
+        关键词：<strong th:text="${activeKeyword}"></strong>
+      </span>
+      <a class="portfolio-filter-clear" href="/portfolio" th:href="@{/portfolio}">
+        清除筛选
+      </a>
+    </div>
+
+    <div
+      class="portfolio-grid"
+      th:if="${projects != null and not #lists.isEmpty(projects.items)}"
+    >
+      <article class="portfolio-card" th:each="project : ${projects.items}">
+        <a
+          class="portfolio-card-cover"
+          th:if="${not #strings.isEmpty(project.cover)}"
+          th:href="@{/portfolio/{slug}(slug=${project.slug})}"
+          tabindex="-1"
+        >
+          <img
+            th:src="${project.cover}"
+            th:alt="${project.title}"
+            loading="lazy"
+            decoding="async"
+          />
+        </a>
+
+        <div class="portfolio-card-body">
+          <div class="portfolio-card-head">
+            <h2 class="portfolio-card-title">
+              <a
+                th:href="@{/portfolio/{slug}(slug=${project.slug})}"
+                th:text="${project.title}">项目标题</a
+              >
+            </h2>
+            <span
+              class="portfolio-featured-dot"
+              th:if="${project.featured == true}"
+              data-tip="推荐项目"
+              aria-label="推荐项目"
+            ></span>
+          </div>
+
+          <p
+            class="portfolio-card-summary"
+            th:if="${not #strings.isEmpty(project.summary)}"
+            th:text="${project.summary}"
+          >
+            项目简介
+          </p>
+
+          <div
+            class="portfolio-stacks"
+            th:if="${not #lists.isEmpty(project.techStacks)}"
+          >
+            <a
+              class="portfolio-stack-chip"
+              th:each="stack, st : ${project.techStacks}"
+              th:if="${st.index < 4}"
+              th:href="@{/portfolio(tag=${stack})}"
+              th:text="${stack}">Tech</a
+            >
+          </div>
+
+          <div class="portfolio-card-foot">
+            <div class="portfolio-card-meta">
+              <span
+                class="portfolio-meta-pill"
+                th:if="${not #strings.isEmpty(project.type)}"
+                th:text="${typeLabels != null and typeLabels[project.type] != null ? typeLabels[project.type] : project.type}"
+                >类型</span
+              >
+              <span
+                class="portfolio-meta-stat num"
+                th:if="${project.repository != null and project.repository.stars > 0}"
+              >
+                <Icon name="star" size={11} />
+                <span th:text="${project.repository.stars}">0</span>
+              </span>
+              <span
+                class="portfolio-meta-lang"
+                th:if="${project.repository != null and not #strings.isEmpty(project.repository.language)}"
+                th:text="${project.repository.language}"
+              ></span>
+            </div>
+
+            <div class="portfolio-card-links">
+              <a
+                class="portfolio-ext-link"
+                th:if="${not #strings.isEmpty(project.demoUrl)}"
+                th:href="${project.demoUrl}"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-tip="在线预览"
+              >
+                预览
+              </a>
+              <a
+                class="portfolio-ext-link"
+                th:if="${not #strings.isEmpty(project.repoUrl)}"
+                th:href="${project.repoUrl}"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-tip="源码仓库"
+              >
+                源码
+              </a>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <p
+      class="empty-note"
+      th:if="${projects == null or #lists.isEmpty(projects.items)}"
+    >
+      还没有公开的项目记录。
+    </p>
+
+    <nav
+      class="pagination"
+      aria-label="项目分页"
+      th:if="${totalPages != null and totalPages > 1}"
+    >
+      <a
+        class="page-btn"
+        th:if="${not #strings.isEmpty(previousPageUrl)}"
+        th:href="${previousPageUrl}"
+      >
+        <span aria-hidden="true">←</span>
+        <span>上一页</span>
+      </a>
+      <span th:if="${#strings.isEmpty(previousPageUrl)}"></span>
+
+      <span class="page-count num">
+        <span th:text="${currentPage ?: 1}">1</span>
+        <span>/</span>
+        <span th:text="${totalPages}">1</span>
+      </span>
+
+      <a
+        class="page-btn"
+        th:if="${not #strings.isEmpty(nextPageUrl)}"
+        th:href="${nextPageUrl}"
+      >
+        <span>下一页</span>
+        <span aria-hidden="true">→</span>
+      </a>
+      <span th:if="${#strings.isEmpty(nextPageUrl)}"></span>
+    </nav>
+  </section>
+</Layout>

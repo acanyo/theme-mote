@@ -1,0 +1,532 @@
+/* ==========================================================================
+   Mote Minimal Plus · Unboxed Editorial Micro-Journal (/moments & /moment)
+   - Zero Qzone card walls or double-framed timelines
+   - Unified underline tag filter matching Mote's site-wide navigation rhythm
+   - Tight edge-aligned Apple-Photos-style media mosaic & whisper interactions
+   ========================================================================== */
+@import "./prose.css";
+
+.moment-filter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-bottom: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.moment-tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 0 5px;
+  font-size: 13.5px;
+  color: var(--ink-3);
+  border-bottom: 1.5px solid transparent;
+  transition:
+    color var(--dur-quick) ease,
+    border-color var(--dur-quick) ease;
+}
+
+.moment-tag-pill .num {
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.moment-tag-pill:hover {
+  color: var(--ink);
+}
+
+.moment-tag-pill.is-active {
+  color: var(--ink);
+  font-weight: 560;
+  border-bottom-color: var(--accent);
+}
+
+.moment-tag-pill.is-active .num {
+  color: var(--accent);
+}
+
+/* Open Editorial Stream (pure hairline dividers, zero card box bloat) */
+.moment-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.moment-list-item {
+  position: relative;
+  padding: 26px 0 22px;
+}
+
+.moment-list-item + .moment-list-item {
+  border-top: 1px solid var(--line);
+}
+
+.moment {
+  display: flex;
+  flex-direction: column;
+}
+
+.moment--detail {
+  padding-bottom: 8px;
+}
+
+.moment-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-bottom: 11px;
+}
+
+.moment-who {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.moment-avatar,
+.moment-avatar-char {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.moment-avatar {
+  object-fit: cover;
+  box-shadow: 0 0 0 1px var(--line-strong);
+}
+
+.moment-avatar-char {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 580;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+}
+
+.moment-name {
+  font-size: 13.5px;
+  font-weight: 560;
+  color: var(--ink);
+}
+
+.moment-sep {
+  color: var(--ink-faint);
+}
+
+.moment-time {
+  font-size: 12px;
+  color: var(--ink-3);
+  transition: color var(--dur-quick) ease;
+}
+
+a.moment-time:hover {
+  color: var(--accent);
+}
+
+.moment-tags {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.moment-inline-tag {
+  font-size: 12px;
+  color: var(--ink-3);
+  transition: color var(--dur-quick) ease;
+}
+
+.moment-inline-tag:hover {
+  color: var(--accent);
+}
+
+/* Body Prose */
+.moment-body {
+  font-size: 15.5px;
+  line-height: 1.82;
+  color: var(--ink);
+}
+
+.moment--detail .moment-body {
+  font-size: 16.5px;
+  line-height: 1.86;
+}
+
+.moment-body[data-moment-clickable] {
+  cursor: pointer;
+}
+
+.moment-body a.tag {
+  display: none;
+}
+
+.moment-body > :first-child {
+  margin-top: 0;
+}
+
+.moment-body > :last-child {
+  margin-bottom: 0;
+}
+
+/* Tight Edge-Aligned Photo Mosaic (Apple Photos / Kinfolk Rhythm) */
+.moment-media {
+  margin-top: 14px;
+  display: grid;
+  gap: 6px;
+  width: 100%;
+}
+
+.moment-media.is-1 {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 520px;
+}
+
+.moment-media.is-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.moment-media.is-4 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 540px;
+}
+
+.moment-media.is-3,
+.moment-media.is-many {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.moment-photo {
+  display: block;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+  background: var(--surface);
+  cursor: zoom-in;
+}
+
+.moment-photo img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  transition: transform 0.5s var(--ease-out);
+}
+
+.moment-media.is-2 .moment-photo img,
+.moment-media.is-4 .moment-photo img {
+  aspect-ratio: 4 / 3;
+}
+
+.moment-media.is-1 .moment-photo img {
+  aspect-ratio: auto;
+  max-height: 440px;
+}
+
+.moment-photo:hover img {
+  transform: scale(1.035);
+}
+
+.moment-video,
+.moment-audio {
+  width: 100%;
+  border-radius: 10px;
+}
+
+/* Whisper Action Footer (no redundant inner border) */
+.moment-foot {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.moment-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: -8px;
+}
+
+.moment-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--ink-3);
+  border: 1px solid transparent;
+  transition:
+    color var(--dur-quick) ease,
+    background-color var(--dur-quick) ease,
+    border-color var(--dur-quick) ease,
+    transform var(--dur-quick) var(--ease-out);
+}
+
+.moment-action-btn:hover {
+  color: var(--ink);
+  background: var(--hover-soft);
+}
+
+.moment-action-btn:active {
+  transform: scale(0.95);
+}
+
+.moment-upvote-btn.is-upvoted {
+  color: #e11d48;
+  background: rgba(225, 29, 72, 0.06);
+  border-color: rgba(225, 29, 72, 0.22);
+}
+
+html.dark .moment-upvote-btn.is-upvoted {
+  color: #fb7185;
+  background: rgba(251, 113, 133, 0.1);
+  border-color: rgba(251, 113, 133, 0.25);
+}
+
+.moment-upvote-btn.is-upvoted .upvote-heart {
+  fill: currentColor;
+  animation: moteHeartPop 0.32s var(--ease-out);
+}
+
+@keyframes moteHeartPop {
+  0% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.22);
+  }
+  74% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.moment-detail-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--ink-faint);
+  opacity: 0;
+  transform: translateX(-2px);
+  transition:
+    color var(--dur-quick) ease,
+    opacity 0.18s ease,
+    transform 0.2s var(--ease-out);
+}
+
+.moment-list-item:hover .moment-detail-link,
+.moment-detail-link:focus-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.moment-detail-link:hover {
+  color: var(--accent);
+}
+
+/* On-Demand Inline Comment Drawer in /moments List */
+.moment-comment-toggle.is-active {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 24%, transparent);
+}
+
+.moment-comment-drawer {
+  margin-top: 14px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 44%, var(--bg));
+  animation: momentDrawerIn var(--dur-enter) var(--ease-out);
+}
+
+html.dark .moment-comment-drawer {
+  background: color-mix(in srgb, var(--surface) 66%, var(--bg));
+}
+
+.moment-comment-drawer[hidden] {
+  display: none;
+}
+
+@keyframes momentDrawerIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Moment Detail Topbar */
+.moments--detail {
+  padding-top: 26px;
+}
+
+.moment-detail-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.moment-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-3);
+  transition: color var(--dur-quick) ease;
+}
+
+.moment-back:hover {
+  color: var(--ink);
+}
+
+.moment-back .back-arrow {
+  display: inline-block;
+  transition: transform 0.2s var(--ease-out);
+}
+
+.moment-back:hover .back-arrow {
+  transform: translateX(-3px);
+}
+
+.moment-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+  transition:
+    color var(--dur-quick) ease,
+    border-color var(--dur-quick) ease,
+    transform var(--dur-quick) var(--ease-out);
+}
+
+.moment-copy-btn:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.moment-copy-btn:active {
+  transform: scale(0.96);
+}
+
+/* Shared Seamless Loader Bar */
+.list-loader {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.list-load-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--ink-2);
+  background: color-mix(in srgb, var(--surface) 60%, var(--bg));
+  border: 1px solid var(--line-strong);
+  transition:
+    color var(--dur-quick) ease,
+    border-color var(--dur-quick) ease,
+    background-color var(--dur-quick) ease,
+    transform var(--dur-quick) var(--ease-out);
+}
+
+.list-load-btn:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--hover);
+  border-color: var(--ink-3);
+}
+
+.list-load-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.list-load-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.list-load-meta {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.list-end-note {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.list-pagination-fallback[hidden] {
+  display: none;
+}
+
+@media (hover: none) {
+  .moment-detail-link {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .moment-filter {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    gap: 14px;
+  }
+  .moment-filter::-webkit-scrollbar {
+    display: none;
+  }
+  .moment-tag-pill {
+    flex-shrink: 0;
+  }
+  .moment-list-item {
+    padding: 20px 0 18px;
+  }
+  .moment-media {
+    gap: 5px;
+  }
+  .moment-photo {
+    border-radius: 8px;
+  }
+  .moment-action-btn {
+    min-height: 30px;
+  }
+  .moments--detail {
+    padding-top: 14px;
+  }
+}
