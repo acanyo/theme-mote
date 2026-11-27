@@ -1,0 +1,52 @@
+name: CD
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+    inputs:
+      release-tag:
+        description: "需要补发到应用市场的 GitHub Release 标签（例如 v1.0.0）"
+        required: true
+        type: string
+
+jobs:
+  cd:
+    if: github.event_name == 'release'
+    # https://github.com/halo-sigs/reusable-workflows?tab=readme-ov-file#theme
+    uses: halo-sigs/reusable-workflows/.github/workflows/theme-cd.yaml@v5
+    secrets:
+      halo-pat: ${{ secrets.HALO_PAT }}
+    permissions:
+      contents: write
+    with:
+      node-version: "22"
+      pnpm-version: "10"
+      app-id: app-43g7tawi
+      sync-github-readme: true
+
+  publish-existing:
+    name: Publish Existing Release to App Store
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Download GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.release-tag }}
+        run: |
+          mkdir -p dist
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern 'theme-mote-*.zip' --dir dist
+          echo "RELEASE_ID=$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json databaseId --jq .databaseId)" >> "$GITHUB_ENV"
+      - name: Publish to App Store
+        uses: halo-sigs/reusable-workflows/app-store-release-action@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          app-id: app-43g7tawi
+          release-id: ${{ env.RELEASE_ID }}
+          assets-dir: dist
+          halo-pat: ${{ secrets.HALO_PAT }}
+          sync-github-readme: true

@@ -5,9 +5,10 @@
   },
   "scripts": {
     "dev": "nodemon --config nodemon.json --exec 'astro build'",
-    "build": "astro build",
+    "build:templates": "astro build",
+    "build": "astro build && node scripts/package-theme.mjs",
     "check": "astro check",
-    "pack": "pnpm run check && pnpm run build && node -e \"const fs=require('fs'),cp=require('child_process');const v=fs.readFileSync('theme.yaml','utf8').match(/^  version:\\s*\\\"([^\\\"]+)\\\"/m)?.[1]||'release';const out='dist/theme-mote-'+v+'.zip';fs.mkdirSync('dist',{recursive:true});fs.rmSync(out,{force:true});cp.execFileSync('zip',['-rq',out,'theme.yaml','settings.yaml','annotation-setting.yaml','README.md','templates'],{stdio:'inherit'});console.log('Packed:',out,(fs.statSync(out).size/1024).toFixed(1)+'KB');\"",
+    "pack": "pnpm run check && pnpm run build",
     "format": "prettier --write ."
   },
   "prettier": {
