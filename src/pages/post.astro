@@ -13,7 +13,7 @@ import { AVATAR } from "../lib/expressions";
 import "../styles/article.css";
 ---
 
-<Layout page="post" title="|${post.spec.title} - ${site.title}|">
+<Layout page="post" titlePrefixExpr="post.spec.title">
   <th:block slot="head">
     <SeoHead
       type="article"

@@ -8,7 +8,7 @@ import SeoHead from "../components/common/SeoHead.astro";
 import "../styles/article.css";
 ---
 
-<Layout page="single" title="|${singlePage.spec.title} - ${site.title}|">
+<Layout page="single" titlePrefixExpr="singlePage.spec.title">
   <SeoHead
     slot="head"
     type="website"

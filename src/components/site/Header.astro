@@ -319,23 +319,57 @@ const fallbackMenu = [
             class="user-popover"
             data-user-popover
             role="menu"
-            aria-label="账号菜单"
+            aria-label="账号与足迹菜单"
             hidden
           >
             <div class="user-popover-head">
-              <span class="user-popover-name" data-user-name></span>
+              <div class="user-popover-name-row">
+                <span class="user-popover-name" data-user-name></span>
+                <span class="user-popover-tag" data-user-tag hidden>访客</span>
+              </div>
               <span class="user-popover-handle num" data-user-handle></span>
             </div>
+
             <div class="user-popover-group">
+              <button
+                type="button"
+                class="user-popover-item"
+                data-user-footprints
+                role="menuitem"
+              >
+                <Icon name="clock" size={13} />
+                <span>我的足迹</span>
+                <span
+                  class="user-popover-badge num"
+                  data-user-fp-badge
+                  hidden>0</span
+                >
+              </button>
+
+              <a
+                class="user-popover-item"
+                href="/login"
+                data-no-swup
+                data-user-login
+                role="menuitem"
+                hidden
+              >
+                <Icon name="user" size={13} />
+                <span>登录账号</span>
+              </a>
+
               <a
                 class="user-popover-item"
                 href="/uc"
                 data-no-swup
+                data-user-uc
                 role="menuitem"
+                hidden
               >
                 <Icon name="user" size={13} />
                 <span>个人中心</span>
               </a>
+
               <a
                 class="user-popover-item"
                 href="/console"
@@ -348,17 +382,31 @@ const fallbackMenu = [
                 <span>管理后台</span>
               </a>
             </div>
+
             <div class="user-popover-sep" aria-hidden="true"></div>
+
             <div class="user-popover-group">
               <a
                 class="user-popover-item is-danger"
                 href="/logout"
                 data-no-swup
+                data-user-logout
                 role="menuitem"
+                hidden
               >
                 <Icon name="logout" size={13} />
                 <span>退出登录</span>
               </a>
+              <button
+                type="button"
+                class="user-popover-item is-danger"
+                data-user-clear-guest
+                role="menuitem"
+                hidden
+              >
+                <Icon name="close" size={13} />
+                <span>清除访客信息</span>
+              </button>
             </div>
           </div>
         </div>

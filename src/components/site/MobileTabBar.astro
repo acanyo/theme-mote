@@ -1,0 +1,167 @@
+---
+import Icon from "../common/Icon.astro";
+import "../../styles/tabbar.css";
+
+const fallbackTabs = [
+  { title: "首页", href: "/", icon: "home" as const },
+  { title: "归档", href: "/archives", icon: "archive" as const },
+  { title: "分类", href: "/categories", icon: "folder" as const },
+  { title: "标签", href: "/tags", icon: "hash" as const },
+];
+---
+
+<div
+  class="mobile-tabbar-shell"
+  data-mobile-tabbar
+  th:if="${theme.config.basic?.mobile_tabbar != false}"
+  th:with="menu = ${menuFinder.getPrimary()}"
+>
+  <div class="tabbar-sub-backdrop" data-tabbar-sub-close aria-hidden="true">
+  </div>
+
+  <!-- Submenu Floating Sheet (rendered per top-4 item that has children) -->
+  <th:block th:if="${menu != null and not #lists.isEmpty(menu.menuItems)}">
+    <div
+      class="tabbar-sub-sheet"
+      th:each="item, iter : ${menu.menuItems}"
+      th:if="${iter.index < 4 and not #lists.isEmpty(item.children)}"
+      th:attr="data-tabbar-panel=${iter.index}"
+      role="menu"
+      th:aria-label="${item.status.displayName}"
+      hidden
+    >
+      <div class="tabbar-sheet-handle" aria-hidden="true"></div>
+      <div class="tabbar-sub-head">
+        <span th:text="${item.status.displayName}">分组</span>
+        <a
+          class="tabbar-sub-parent"
+          th:if="${not #strings.isEmpty(item.status.href) and item.status.href != '#' and item.status.href != 'javascript:;'}"
+          th:href="@{${item.status.href}}"
+          th:target="${item.spec.target?.value}"
+          rel="noopener"
+        >
+          进入主页 →
+        </a>
+      </div>
+      <div class="tabbar-sub-grid">
+        <a
+          class="tabbar-sub-link"
+          th:each="child : ${item.children}"
+          th:href="@{${child.status.href}}"
+          th:target="${child.spec.target?.value}"
+          rel="noopener"
+          role="menuitem"
+          th:text="${child.status.displayName}">子菜单</a
+        >
+      </div>
+    </div>
+  </th:block>
+
+  <nav class="mobile-tabbar" aria-label="底部导航">
+    <th:block th:if="${menu != null and not #lists.isEmpty(menu.menuItems)}">
+      <th:block th:each="item, iter : ${menu.menuItems}" th:if="${iter.index < 4}">
+        <th:block
+          th:with="href = ${item.status.href ?: ''}, label = ${item.status.displayName ?: ''}, hasSub = ${not #lists.isEmpty(item.children)}, iconKey = ${(href == '/' or #strings.contains(label, '首页')) ? 'home' : ((#strings.contains(href, '/moment') or #strings.contains(label, '瞬间') or #strings.contains(label, '微语') or #strings.contains(label, '动态')) ? 'feather' : ((#strings.contains(href, '/photo') or #strings.contains(label, '图库') or #strings.contains(label, '相册')) ? 'image' : ((#strings.contains(href, '/link') or #strings.contains(label, '友链') or #strings.contains(label, '朋友')) ? 'link' : ((#strings.contains(href, '/archive') or #strings.contains(label, '归档') or #strings.contains(label, '文库') or #strings.contains(label, '文章')) ? 'book' : ((#strings.contains(href, '/categor') or #strings.contains(label, '分类')) ? 'folder' : ((#strings.contains(href, '/tag') or #strings.contains(label, '标签')) ? 'hash' : ((#strings.contains(href, '/about') or #strings.contains(label, '关于') or #strings.contains(label, '我的')) ? 'user' : ((#strings.contains(href, '/guestbook') or #strings.contains(href, '/content') or #strings.contains(label, '留言')) ? 'chat' : 'sparkles'))))))))}"
+        >
+          <a
+            class="tabbar-item"
+            th:if="${not hasSub}"
+            th:href="@{${href}}"
+            th:target="${item.spec.target?.value}"
+            rel="noopener"
+            data-tabbar-link
+          >
+            <span class="tabbar-icon" aria-hidden="true">
+              <th:block th:switch="${iconKey}">
+                <th:block th:case="'home'"><Icon name="home" size={18} /></th:block>
+                <th:block th:case="'feather'"><Icon name="feather" size={18} /></th:block>
+                <th:block th:case="'image'"><Icon name="image" size={18} /></th:block>
+                <th:block th:case="'link'"><Icon name="link" size={18} /></th:block>
+                <th:block th:case="'book'"><Icon name="book" size={18} /></th:block>
+                <th:block th:case="'folder'"><Icon name="folder" size={18} /></th:block>
+                <th:block th:case="'hash'"><Icon name="hash" size={18} /></th:block>
+                <th:block th:case="'user'"><Icon name="user" size={18} /></th:block>
+                <th:block th:case="'chat'"><Icon name="chat" size={18} /></th:block>
+                <th:block th:case="*"><Icon name="sparkles" size={18} /></th:block>
+              </th:block>
+            </span>
+            <span class="tabbar-label" th:text="${label}">菜单</span>
+          </a>
+
+          <button
+            type="button"
+            class="tabbar-item"
+            th:if="${hasSub}"
+            th:attr="data-tabbar-sub=${iter.index}"
+            aria-haspopup="menu"
+            aria-expanded="false"
+          >
+            <span class="tabbar-icon" aria-hidden="true">
+              <th:block th:switch="${iconKey}">
+                <th:block th:case="'home'"><Icon name="home" size={18} /></th:block>
+                <th:block th:case="'feather'"><Icon name="feather" size={18} /></th:block>
+                <th:block th:case="'image'"><Icon name="image" size={18} /></th:block>
+                <th:block th:case="'link'"><Icon name="link" size={18} /></th:block>
+                <th:block th:case="'book'"><Icon name="book" size={18} /></th:block>
+                <th:block th:case="'folder'"><Icon name="folder" size={18} /></th:block>
+                <th:block th:case="'hash'"><Icon name="hash" size={18} /></th:block>
+                <th:block th:case="'user'"><Icon name="user" size={18} /></th:block>
+                <th:block th:case="'chat'"><Icon name="chat" size={18} /></th:block>
+                <th:block th:case="*"><Icon name="sparkles" size={18} /></th:block>
+              </th:block>
+            </span>
+            <span class="tabbar-label-row">
+              <span class="tabbar-label" th:text="${label}">分组</span>
+              <svg
+                class="tabbar-caret"
+                width="8"
+                height="8"
+                viewBox="0 0 12 12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M3 7.5 6 4.5 9 7.5"></path>
+              </svg>
+            </span>
+          </button>
+        </th:block>
+      </th:block>
+    </th:block>
+
+    <th:block th:if="${menu == null or #lists.isEmpty(menu.menuItems)}">
+      {
+        fallbackTabs.map((tab) => (
+          <a
+            class="tabbar-item"
+            href={tab.href}
+            th:href={`@{${tab.href}}`}
+            data-tabbar-link
+          >
+            <span class="tabbar-icon" aria-hidden="true">
+              <Icon name={tab.icon} size={18} />
+            </span>
+            <span class="tabbar-label">{tab.title}</span>
+          </a>
+        ))
+      }
+    </th:block>
+
+    <button
+      type="button"
+      class="tabbar-item tabbar-item--more"
+      data-menu-toggle
+      aria-label="展开全部导航"
+      aria-expanded="false"
+      aria-controls="site-nav"
+    >
+      <span class="tabbar-icon" aria-hidden="true">
+        <Icon name="grid" size={17} />
+      </span>
+      <span class="tabbar-label">更多</span>
+    </button>
+  </nav>
+</div>

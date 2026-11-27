@@ -113,9 +113,14 @@ spec:
           help: 切页时顶栏与雨声白噪音保持不断流。
         - $formkit: switch
           name: show_login
-          label: 顶栏显示登录 / 账号入口
+          label: 顶栏显示登录与足迹入口
           value: true
-          help: 未登录时显示登录图标，登录后自动切换为用户头像并展开个人中心与后台菜单。
+          help: 未登录时显示登录图标；访客在本站评论后自动展示访客头像（支持登录与查看本地足迹）；已登录用户展示账号头像与个人中心/后台菜单。
+        - $formkit: switch
+          name: mobile_tabbar
+          label: 移动端启用底部 TabControl 导航栏
+          value: true
+          help: 在手机端（≤720px）非文章页底部展示悬浮毛玻璃 TabBar（最多 4 个主导航 + 更多抽屉，支持子菜单上拉浮层）；关闭则恢复顶栏汉堡菜单。
 
     - group: home
       label: 首页与首屏
@@ -328,6 +333,101 @@ spec:
             - label: 30 条
               value: "30"
 
+    - group: about
+      label: 关于页面
+      formSchema:
+        - $formkit: text
+          name: eyebrow
+          label: 页眉小标（可选）
+          value: ""
+          placeholder: "ABOUT"
+          help: 显示在「关于我」独立页名片顶部的细字标签，留空默认显示 ABOUT。使用方式：在后台「页面」编辑或新建独立页（如 /about），在页面设置中选择「关于我（个人名片与自述页）」模板。
+        - $formkit: text
+          name: name
+          label: 个人名片主标题（可选）
+          value: ""
+          help: 留空自动使用「博主 / 站点名」或单页标题。
+        - $formkit: text
+          name: role
+          label: 身份 / 一句话头衔（可选）
+          value: ""
+          placeholder: "Java & Web 开发者 · Halo 主题与插件作者"
+          help: 显示在名字旁或下方的克制身份描述。
+        - $formkit: textarea
+          name: tagline
+          label: 简短自述导语（可选）
+          value: ""
+          help: 若该独立页填写了自定义摘要则优先显示单页摘要；否则显示此处导语或站点副标题。
+        - $formkit: attachment
+          name: avatar
+          label: 名片专属头像（可选）
+          value: ""
+          accepts:
+            - "image/*"
+          help: 留空自动复用站点头像或站点 Logo。
+        - $formkit: text
+          name: location
+          label: 所在地 / 此刻状态（可选）
+          value: ""
+          help: 显示在呼吸绿点旁；留空自动复用「首页与首屏」的此刻状态。
+        - $formkit: text
+          name: email
+          label: 联系邮箱（可选）
+          value: ""
+          help: 点击一键复制；留空自动复用「首页分区」收尾卡中的联系邮箱。
+        - $formkit: switch
+          name: show_stats
+          label: 显示站点脉搏数据条
+          value: true
+          help: 展示文章数、分类数、评论数与建站运行天数（未填建站日期时展示累计访问）。
+        - $formkit: switch
+          name: show_socials
+          label: 名片底部展示社交与留言入口
+          value: true
+          help: 自动复用「页脚与社交」中的社交链接与「首页分区」的留言板入口。
+        - $formkit: textarea
+          name: skills
+          label: 常用技术与工具（可选）
+          value: ""
+          placeholder: "Java, Spring Boot, TypeScript, Astro, Vue, Halo"
+          help: 使用英文或中文逗号分隔，渲染为等宽技术栈胶囊；留空不显示。
+        - $formkit: textarea
+          name: interests
+          label: 屏幕之外 / 兴趣关键词（可选）
+          value: ""
+          placeholder: "独立博客, 开源项目, 动漫, 散步摄影"
+          help: 使用英文或中文逗号分隔，渲染为柔和生活标签；留空不显示。
+        - $formkit: array
+          name: milestones
+          label: 个人历程 / 站点时间线（可选）
+          value: []
+          help: 按你希望展示的顺序添加里程碑节点；留空不显示。
+          itemLabels:
+            - type: text
+              label: $value.year
+            - type: text
+              label: $value.title
+          children:
+            - $formkit: text
+              name: year
+              label: 年份 / 时间
+              placeholder: "2026"
+              validation: required
+            - $formkit: text
+              name: title
+              label: 节点标题
+              validation: required
+            - $formkit: text
+              name: desc
+              label: 补充说明（可选）
+              value: ""
+        - $formkit: textarea
+          name: license
+          label: 文末版权 / 许可声明（可选）
+          value: ""
+          placeholder: "本站原创文章采用 CC BY-NC-SA 4.0 许可协议，转载请注明出处。"
+          help: 显示在正文末尾的细字版权声明，支持内联 HTML；留空不显示。
+
     - group: footer
       label: 页脚与社交
       formSchema:
@@ -430,6 +530,21 @@ spec:
               value: "180"
             - label: 365 天
               value: "365"
+        - $formkit: switch
+          name: show_site_subtitle
+          label: 首页标题展示站点副标题
+          value: true
+          help: 开启后，当系统设置填写了副标题（site.subtitle）时，首页浏览器标题与分享标题将自动拼接为「站点名 - 副标题」或「站点名 | 副标题」。
+        - $formkit: radio
+          name: title_separator
+          label: 站点标题分隔符
+          value: "-"
+          help: 用于首页「站点名 与 副标题」以及全站内页「页面标题 与 站点名」之间的连接符。
+          options:
+            - label: 短横线（ - ）
+              value: "-"
+            - label: 竖线（ | ）
+              value: "|"
         - $formkit: switch
           name: enable_seo_meta
           label: 输出 SEO / GEO Meta 与机器发现链接

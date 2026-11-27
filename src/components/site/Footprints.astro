@@ -1,0 +1,125 @@
+---
+import Icon from "../common/Icon.astro";
+import "../../styles/footprints.css";
+---
+
+<div class="cc" id="footprints-sheet" data-footprints aria-hidden="true">
+  <div class="cc-backdrop" data-close></div>
+  <section
+    class="cc-sheet fp-sheet"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="fp-title"
+    tabindex="-1"
+  >
+    <header class="cc-head">
+      <h2 id="fp-title">我的足迹</h2>
+      <div class="cc-head-actions">
+        <button
+          class="cc-reset-btn"
+          type="button"
+          data-fp-clear
+          data-tip="清空本地浏览、评论与喜欢记录"
+          hidden
+        >
+          清空
+        </button>
+        <button
+          class="cc-close-btn"
+          type="button"
+          data-close
+          aria-label="关闭我的足迹"
+        >
+          <Icon name="close" size={15} />
+        </button>
+      </div>
+    </header>
+
+    <div class="fp-identity">
+      <div class="fp-id-left">
+        <span class="fp-avatar-wrap">
+          <img
+            class="fp-avatar"
+            data-fp-avatar
+            data-img-placeholder-ignore
+            width="34"
+            height="34"
+            alt=""
+            hidden
+          />
+          <span class="fp-initial" data-fp-initial aria-hidden="true">访</span>
+        </span>
+        <div class="fp-id-copy">
+          <div class="fp-name-row">
+            <span class="fp-name" data-fp-name>访客</span>
+            <span class="fp-role" data-fp-role data-mode="anonymous">访客</span>
+          </div>
+          <span class="fp-sub" data-fp-sub>足迹仅保存在当前浏览器</span>
+        </div>
+      </div>
+
+      <a class="fp-login-btn" href="/login" data-no-swup data-fp-login>
+        <span>登录账号</span>
+      </a>
+    </div>
+
+    <div class="fp-toolbar">
+      <div class="fp-tabs" role="tablist" aria-label="足迹分类">
+        <button
+          type="button"
+          class="fp-tab is-active"
+          role="tab"
+          aria-selected="true"
+          data-fp-tab="all"
+        >
+          <span>全部</span>
+        </button>
+        <button
+          type="button"
+          class="fp-tab"
+          role="tab"
+          aria-selected="false"
+          data-fp-tab="visits"
+        >
+          <span>阅读</span>
+          <span class="fp-tab-num num" data-fp-count="visits">0</span>
+        </button>
+        <button
+          type="button"
+          class="fp-tab"
+          role="tab"
+          aria-selected="false"
+          data-fp-tab="comments"
+        >
+          <span>评论</span>
+          <span class="fp-tab-num num" data-fp-count="comments">0</span>
+        </button>
+        <button
+          type="button"
+          class="fp-tab"
+          role="tab"
+          aria-selected="false"
+          data-fp-tab="likes"
+        >
+          <span>喜欢</span>
+          <span class="fp-tab-num num" data-fp-count="likes">0</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="fp-body">
+      <ul class="fp-list" data-fp-list hidden></ul>
+      <div class="fp-empty" data-fp-empty>
+        <p>还没有留下足迹，随便逛逛文章或留下一条评论吧。</p>
+        <button type="button" class="fp-empty-btn" data-fp-random>
+          <Icon name="shuffle" size={13} />
+          <span>随机读一篇</span>
+        </button>
+      </div>
+    </div>
+
+    <footer class="fp-foot">
+      <span>仅保存在当前浏览器，不会上传至服务器</span>
+    </footer>
+  </section>
+</div>

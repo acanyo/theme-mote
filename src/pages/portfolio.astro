@@ -9,11 +9,11 @@ import SeoHead from "../components/common/SeoHead.astro";
 import "../styles/portfolio.css";
 ---
 
-<Layout page="portfolio" title="|${title ?: '项目集'} - ${site.title}|">
+<Layout page="portfolio" titlePrefixExpr="title ?: '项目集'">
   <SeoHead
     slot="head"
     type="website"
-    titleExpr="(title ?: '项目集') + ' - ' + (site.title ?: 'Mote')"
+    titleExpr="(title ?: '项目集') + ' ' + (theme.config.seo?.title_separator ?: '-') + ' ' + (site.title ?: 'Mote')"
     descExpr="not #strings.isEmpty(description) ? description : (site.subtitle ?: '')"
     pathExpr="'/portfolio'"
     jsonLdKind="CollectionPage"

@@ -42,18 +42,32 @@ img[data-img-state="loaded"] {
 }
 
 /* ==========================================================================
-   1. Framed Containers Loading State (.filmstrip-frame, .photo-card, etc.)
+   1. Framed Containers Loading State (instant CSS default + JS lifecycle)
    ========================================================================== */
 .filmstrip-frame,
 .photo-card,
 .photo-stage-frame,
 .article-cover,
 .moment-photo,
-.timeline-photo-btn {
+.timeline-photo-btn,
+.portfolio-cover,
+.eq-thumb,
+.db-cover {
   position: relative;
 }
 
-.is-img-loading {
+.is-img-loading,
+:is(
+    .filmstrip-frame,
+    .photo-card,
+    .photo-stage-frame,
+    .article-cover,
+    .moment-photo,
+    .timeline-photo-btn,
+    .portfolio-cover,
+    .eq-thumb,
+    .db-cover
+  ):not(.is-img-loaded):not(.is-img-error) {
   background-color: var(--surface);
   background-image: linear-gradient(
     105deg,
@@ -65,7 +79,19 @@ img[data-img-state="loaded"] {
   animation: moteImgShimmer 1.65s ease-in-out infinite;
 }
 
-html.dark .is-img-loading {
+html.dark .is-img-loading,
+html.dark
+  :is(
+    .filmstrip-frame,
+    .photo-card,
+    .photo-stage-frame,
+    .article-cover,
+    .moment-photo,
+    .timeline-photo-btn,
+    .portfolio-cover,
+    .eq-thumb,
+    .db-cover
+  ):not(.is-img-loaded):not(.is-img-error) {
   background-image: linear-gradient(
     105deg,
     var(--surface) 28%,
@@ -74,28 +100,26 @@ html.dark .is-img-loading {
   );
 }
 
-/* Optional user-configured custom loading placeholder image */
-html[data-has-loading-placeholder="true"] .is-img-loading {
+/* Optional user-configured custom loading placeholder image (visible immediately at 0ms) */
+html[data-has-loading-placeholder="true"] .is-img-loading,
+html[data-has-loading-placeholder="true"]
+  :is(
+    .filmstrip-frame,
+    .photo-card,
+    .photo-stage-frame,
+    .article-cover,
+    .moment-photo,
+    .timeline-photo-btn,
+    .portfolio-cover,
+    .eq-thumb,
+    .db-cover
+  ):not(.is-img-loaded):not(.is-img-error) {
+  background-color: var(--surface);
   background-image: var(--img-loading-bg);
-  background-size: cover;
+  background-repeat: no-repeat;
   background-position: center;
+  background-size: contain;
   animation: none;
-}
-
-html[data-has-loading-placeholder="true"] .is-img-loading::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.22) 50%,
-    transparent 70%
-  );
-  background-size: 240% 100%;
-  animation: moteImgShimmer 1.8s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 1;
 }
 
 /* Guarantee visible stage height while exhibition photo / cover loads */
@@ -138,9 +162,11 @@ html.dark .prose img[data-img-state="loading"] {
 }
 
 html[data-has-loading-placeholder="true"] .prose img[data-img-state="loading"] {
+  background-color: var(--surface);
   background-image: var(--img-loading-bg);
-  background-size: cover;
+  background-repeat: no-repeat;
   background-position: center;
+  background-size: contain;
   animation: none;
 }
 
@@ -285,7 +311,11 @@ html[data-image-cursor] a.photo-card.is-img-error {
 .colophon-avatar[data-img-state="loading"],
 .moment-avatar[data-img-state="loading"],
 .friend-badge-img[data-img-state="loading"],
-.link-avatar[data-img-state="loading"] {
+.friend-chip-avatar[data-img-state="loading"],
+.link-avatar[data-img-state="loading"],
+.site-snippet-avatar[data-img-state="loading"],
+.author-avatar[data-img-state="loading"],
+.hero-avatar[data-img-state="loading"] {
   opacity: 1;
   background: var(--surface);
 }

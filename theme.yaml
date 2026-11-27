@@ -6,7 +6,12 @@ spec:
   displayName: Mote
   author:
     name: Handsome
-  description: 一款极简耐看的 Halo 单栏个人博客主题，专注中文阅读体验，融合封面取色、平滑切页与独立站生活记录。
+    website: https://www.xhhao.com
+  description: 一款极简耐看的 Halo 单栏个人博客主题，专注中文阅读体验，融合封面取色、Swup 平滑切页、移动端底部 TabBar 与独立站生活记录。
+  logo: /themes/theme-mote/assets/logo.svg
+  homepage: https://www.xhhao.com
+  repo: https://github.com/acanyo/theme-mote.git
+  issues: https://github.com/acanyo/theme-mote/issues
   settingName: theme-mote-setting
   configMapName: theme-mote-configmap
   version: "1.0.0"
@@ -22,3 +27,6 @@ spec:
       - name: 留言板（极简书信页）
         description: 独立留言板页面，展示简短欢迎导语并直接衔接评论区，支持随封面图取色。
         file: page_guestbook.html
+      - name: 关于我（个人名片与自述页）
+        description: 独立「关于我」页面模板，整合个人名片、站点脉搏、技能与兴趣标签、历程时间线与书信正文，支持随封面图取色。
+        file: page_about.html

@@ -542,10 +542,17 @@ html.dark .user-popover {
 .user-popover-head {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   padding: 6px 9px 7px;
   border-bottom: 1px solid var(--line);
   margin-bottom: 4px;
+}
+
+.user-popover-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
 }
 
 .user-popover-name {
@@ -556,6 +563,22 @@ html.dark .user-popover {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.user-popover-tag {
+  flex-shrink: 0;
+  padding: 1px 5px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 520;
+  line-height: 1.3;
+  color: var(--ink-3);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.user-popover-tag[hidden] {
+  display: none;
 }
 
 .user-popover-handle {
@@ -574,6 +597,7 @@ html.dark .user-popover {
 }
 
 .user-popover-item {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -581,10 +605,29 @@ html.dark .user-popover {
   border-radius: 7px;
   font-size: 12.5px;
   color: var(--ink-2);
+  text-align: left;
   white-space: nowrap;
   transition:
     background-color var(--dur-quick) ease,
     color var(--dur-quick) ease;
+}
+
+.user-popover-badge {
+  margin-left: auto;
+  padding: 0 5px;
+  min-width: 18px;
+  height: 16px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10.5px;
+  color: var(--ink-3);
+  background: var(--surface);
+}
+
+.user-popover-badge[hidden] {
+  display: none;
 }
 
 .user-popover-item[hidden] {

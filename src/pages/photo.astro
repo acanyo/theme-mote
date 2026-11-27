@@ -9,7 +9,7 @@ import "../styles/photos.css";
 
 <Layout
   page="photos"
-  title="|${photo.spec.displayName ?: title ?: '图库'} - ${site.title}|"
+  titlePrefixExpr="photo.spec.displayName ?: title ?: '图库'"
 >
   <article class="photo-detail">
     <header class="photo-detail-head wrap">

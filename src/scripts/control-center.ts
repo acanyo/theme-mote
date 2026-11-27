@@ -19,6 +19,7 @@ import {
   type SchemeMode,
 } from "./scheme";
 import { createOverlay, type Overlay } from "./overlay";
+import { OPEN_FOOTPRINTS_EVENT } from "./footprints";
 import { toast } from "./toast";
 
 export function initControlCenter(showShortcuts: () => void): Overlay | null {
@@ -129,6 +130,10 @@ export function initControlCenter(showShortcuts: () => void): Overlay | null {
     random: () => {
       overlay.close();
       if (!openRandomPost()) toast("还没有其他文章");
+    },
+    footprints: () => {
+      overlay.close();
+      document.dispatchEvent(new CustomEvent(OPEN_FOOTPRINTS_EVENT));
     },
     search: () => {
       overlay.close();

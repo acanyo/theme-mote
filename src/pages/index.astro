@@ -15,7 +15,7 @@ import "../styles/home.css";
   <SeoHead
     slot="head"
     type="website"
-    titleExpr="site.title"
+    titleExpr="(theme.config.seo?.show_site_subtitle != false and not #strings.isEmpty(site.subtitle)) ? (site.title + ' ' + (theme.config.seo?.title_separator ?: '-') + ' ' + site.subtitle) : site.title"
     descExpr="site.subtitle ?: ''"
     pathExpr="'/'"
     jsonLdKind="WebSite"

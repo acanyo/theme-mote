@@ -14,6 +14,7 @@ import {
 } from "./image-placeholder";
 import { initTooltip } from "./tooltip";
 import { initMoteGlobal, initMotePage } from "./mote";
+import { initFootprints, recordCurrentVisit } from "./footprints";
 import { initUserMenu } from "./user";
 import { initSwup } from "./swup";
 import { animatePageEnter } from "./animation/mote-motion";
@@ -27,6 +28,7 @@ export function initSite() {
   initPageTransition();
   initImagePlaceholdersGlobal();
   initMoteGlobal();
+  initFootprints();
   initUserMenu();
   const imageCursor = initImageCursor();
   const tooltip = initTooltip();
@@ -51,6 +53,7 @@ export function initSite() {
     nav?.syncPage();
     progress.refresh();
     initSince();
+    recordCurrentVisit();
     cleanups.push(initImagePlaceholdersPage());
     cleanups.push(initMotePage());
     if (isSwupVisit) {

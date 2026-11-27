@@ -8,11 +8,11 @@ import SeoHead from "../components/common/SeoHead.astro";
 import "../styles/moments.css";
 ---
 
-<Layout page="moments" title="|瞬间 - ${site.title}|">
+<Layout page="moments" titlePrefixExpr="'瞬间'">
   <SeoHead
     slot="head"
     type="website"
-    titleExpr="'瞬间 - ' + (site.title ?: 'Mote')"
+    titleExpr="'瞬间 ' + (theme.config.seo?.title_separator ?: '-') + ' ' + (site.title ?: 'Mote')"
     descExpr="site.subtitle ?: ''"
     pathExpr="'/moments'"
   />

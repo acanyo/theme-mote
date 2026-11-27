@@ -426,7 +426,8 @@ html.dark .cc-switch {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
   padding: 12px 20px 14px;
   border-top: 1px solid var(--line);
   background: color-mix(in srgb, var(--surface) 58%, var(--bg));
@@ -437,9 +438,9 @@ html.dark .cc-foot {
 }
 
 .cc-foot-btn {
-  flex: 1 1 0;
+  flex: 1 1 auto;
   height: 32px;
-  padding: 0 8px;
+  padding: 0 9px;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
@@ -447,6 +448,7 @@ html.dark .cc-foot {
   gap: 5px;
   font-size: 12px;
   font-weight: 480;
+  white-space: nowrap;
   color: var(--ink-2);
   background: var(--bg);
   border: 1px solid var(--line);

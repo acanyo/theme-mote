@@ -10,7 +10,7 @@ import "../styles/author.css";
 
 <Layout
   page="author"
-  title="|${author.spec.displayName ?: '作者'} - ${site.title}|"
+  titlePrefixExpr="author.spec.displayName ?: '作者'"
 >
   <SeoHead
     slot="head"

@@ -11,11 +11,11 @@ import "../styles/article.css";
 import "../styles/guestbook.css";
 ---
 
-<Layout page="single" title="|${singlePage.spec.title ?: '留言板'} - ${site.title}|">
+<Layout page="single" titlePrefixExpr="singlePage.spec.title ?: '留言板'">
   <SeoHead
     slot="head"
     type="website"
-    titleExpr="(singlePage.spec.title ?: '留言板') + ' - ' + (site.title ?: 'Mote')"
+    titleExpr="(singlePage.spec.title ?: '留言板') + ' ' + (theme.config.seo?.title_separator ?: '-') + ' ' + (site.title ?: 'Mote')"
     descExpr="not #strings.isEmpty(singlePage.status?.excerpt) ? singlePage.status.excerpt : (singlePage.spec.excerpt?.raw ?: '路过这里，欢迎留下一句近况、一条建议，或者打个招呼。')"
     imageExpr="singlePage.spec.cover ?: ''"
     pathExpr="singlePage.status?.permalink ?: '/guestbook'"

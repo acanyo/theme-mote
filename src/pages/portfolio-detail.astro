@@ -10,11 +10,11 @@ import "../styles/article.css";
 import "../styles/portfolio.css";
 ---
 
-<Layout page="post" title="|${title ?: project.title} - ${site.title}|">
+<Layout page="post" titlePrefixExpr="title ?: project.title">
   <SeoHead
     slot="head"
     type="website"
-    titleExpr="(project != null ? project.title : (title ?: '项目详情')) + ' - ' + (site.title ?: 'Mote')"
+    titleExpr="(project != null ? project.title : (title ?: '项目详情')) + ' ' + (theme.config.seo?.title_separator ?: '-') + ' ' + (site.title ?: 'Mote')"
     descExpr="not #strings.isEmpty(description) ? description : (project?.summary ?: '')"
     imageExpr="project?.cover ?: ''"
     pathExpr="project != null ? ('/portfolio/' + project.slug) : '/portfolio'"

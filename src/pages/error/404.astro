@@ -3,7 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import "../../styles/error.css";
 ---
 
-<Layout page="error" title="|页面不存在 - ${site.title}|">
+<Layout page="error" titlePrefixExpr="'页面不存在'">
   <meta slot="head" name="robots" content="noindex, nofollow" />
   <section class="error-page wrap">
     <p class="error-code num">404</p>

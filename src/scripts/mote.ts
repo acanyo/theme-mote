@@ -9,15 +9,9 @@
  */
 import { copyText, openRandomPost } from "./actions";
 import { gsap, settleEase, travelEase } from "./animation/engine";
-import { initArchives } from "./archives";
 import { initCoverPalette } from "./cover-palette";
-import { initDouban } from "./douban";
-import { initLinkApply } from "./link-apply";
-import { initLinkFeeds } from "./link-feeds";
-import { initListEnhancements } from "./list-enhancements";
 import { motionAllowed } from "./motion";
 import { createOverlay } from "./overlay";
-import { initShareCard } from "./share-card";
 import { toast } from "./toast";
 import { handleUpvoteClick, syncUpvotedButtons } from "./upvote";
 
@@ -1312,16 +1306,46 @@ function initSponsorModal(): () => void {
 
 /** Mounted on initial load and after every Swup page swap. */
 export function initMotePage(): () => void {
+  let disposed = false;
+  const asyncCleanups: Array<() => void> = [];
+
+  const mountLazy = (
+    selector: string,
+    loader: () => Promise<() => void>,
+  ) => {
+    if (!document.querySelector(selector)) return;
+    void loader().then((cleanup) => {
+      if (disposed) {
+        cleanup();
+      } else {
+        asyncCleanups.push(cleanup);
+      }
+    });
+  };
+
+  initIconifyIcons(document.getElementById("main") ?? document);
   initCategoryFilter();
   initPhotoGroupFilter();
   initEquipmentGroupFilter();
-  const cleanupArchives = initArchives();
-  const cleanupLists = initListEnhancements();
-  const cleanupLinkApply = initLinkApply();
-  const cleanupLinkFeeds = initLinkFeeds();
-  const cleanupDouban = initDouban();
+  mountLazy("[data-archive-root]", () =>
+    import("./archives").then((m) => m.initArchives()),
+  );
+  mountLazy("[data-quick-filter], [data-list-root]", () =>
+    import("./list-enhancements").then((m) => m.initListEnhancements()),
+  );
+  mountLazy("[data-link-modal]", () =>
+    import("./link-apply").then((m) => m.initLinkApply()),
+  );
+  mountLazy("[data-friends-page]", () =>
+    import("./link-feeds").then((m) => m.initLinkFeeds()),
+  );
+  mountLazy("[data-douban-root]", () =>
+    import("./douban").then((m) => m.initDouban()),
+  );
+  mountLazy("[data-share-modal]", () =>
+    import("./share-card").then((m) => m.initShareCard()),
+  );
   const cleanupCoverPalette = initCoverPalette();
-  const cleanupShareCard = initShareCard();
   const cleanupSponsor = initSponsorModal();
   initExcerptToggle();
   initReadingTime();
@@ -1333,13 +1357,10 @@ export function initMotePage(): () => void {
   initCodeCopy();
   const cleanupHoverPreview = initHoverCoverPreview();
   return () => {
-    cleanupArchives();
-    cleanupLists();
-    cleanupLinkApply();
-    cleanupLinkFeeds();
-    cleanupDouban();
+    disposed = true;
+    asyncCleanups.forEach((fn) => fn());
+    asyncCleanups.length = 0;
     cleanupCoverPalette();
-    cleanupShareCard();
     cleanupSponsor();
     cleanupHoverPreview();
   };

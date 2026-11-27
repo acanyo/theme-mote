@@ -13,11 +13,11 @@ import "../styles/links.css";
 import "../styles/comments.css";
 ---
 
-<Layout page="links" title="|${linksTitle ?: '友链'} - ${site.title}|">
+<Layout page="links" titlePrefixExpr="linksTitle ?: '友链'">
   <SeoHead
     slot="head"
     type="website"
-    titleExpr="(linksTitle ?: '友链') + ' - ' + (site.title ?: 'Mote')"
+    titleExpr="(linksTitle ?: '友链') + ' ' + (theme.config.seo?.title_separator ?: '-') + ' ' + (site.title ?: 'Mote')"
     descExpr="site.subtitle ?: ''"
     pathExpr="'/links'"
   />

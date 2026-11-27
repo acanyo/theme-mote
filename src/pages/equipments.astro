@@ -10,11 +10,11 @@ import SeoHead from "../components/common/SeoHead.astro";
 import "../styles/equipments.css";
 ---
 
-<Layout page="equipments" title="|${title ?: '我的装备'} - ${site.title}|">
+<Layout page="equipments" titlePrefixExpr="title ?: '我的装备'">
   <SeoHead
     slot="head"
     type="website"
-    titleExpr="(title ?: '我的装备') + ' - ' + (site.title ?: 'Mote')"
+    titleExpr="(title ?: '我的装备') + ' ' + (theme.config.seo?.title_separator ?: '-') + ' ' + (site.title ?: 'Mote')"
     descExpr="site.subtitle ?: '日常陪伴写作、设计与开发的工具和器物。'"
     pathExpr="'/equipments'"
     jsonLdKind="CollectionPage"

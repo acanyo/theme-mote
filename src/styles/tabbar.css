@@ -1,0 +1,401 @@
+/* ==========================================================================
+   Mote Minimal Plus · Native Edge-to-Edge Mobile TabControl & Bottom Sheets
+   - Flush docked iOS / WeChat style TabBar on <= 720px non-post pages
+   - Restrained active state: crisp accent icon + label + 2.5px top indicator
+   - Unified Bottom Sheets (with grabber handle) for both submenus & "更多"
+   ========================================================================== */
+
+.mobile-tabbar-shell {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  html[data-mobile-tabbar="true"]
+    body:not([data-page="post"])
+    .mobile-tabbar-shell {
+    display: block;
+  }
+
+  /* Hide top hamburger & redundant tools (already inside "更多" Bottom Sheet) */
+  html[data-mobile-tabbar="true"][data-compact]
+    body:not([data-page="post"])
+    .site-header
+    .header-actions
+    :is(.menu-btn, [data-random-trigger], [data-scheme-toggle], [data-cc-open]) {
+    display: none;
+  }
+
+  /* Unstick mobile top bar on TabBar pages so it scrolls naturally out of view */
+  html[data-mobile-tabbar="true"][data-compact]
+    body:not([data-page="post"])
+    .site-header {
+    position: relative;
+  }
+
+  html[data-mobile-tabbar="true"][data-compact]
+    body.is-nav-open
+    .site-shell {
+    z-index: 200;
+  }
+
+  html[data-mobile-tabbar="true"][data-compact]
+    body:not([data-page="post"])
+    .site-header.is-open {
+    z-index: 200;
+  }
+
+  html[data-mobile-tabbar="true"][data-compact]
+    body:not([data-page="post"])
+    .site-header::after {
+    display: none;
+  }
+
+  /* Improve mobile dark-mode header icon legibility */
+  html.dark[data-compact] .site-header .dock-btn {
+    color: #9ca0aa;
+  }
+
+  /* Generous footer clearance above the docked 54px TabBar */
+  html[data-mobile-tabbar="true"] body:not([data-page="post"]) .site-footer {
+    padding-bottom: max(86px, calc(70px + env(safe-area-inset-bottom)));
+  }
+
+  /* Lift floating scroll/random pill cleanly above the docked TabBar */
+  html[data-mobile-tabbar="true"]
+    body:not([data-page="post"])
+    .mobile-float-dock {
+    left: auto;
+    right: 16px;
+    bottom: max(70px, calc(66px + env(safe-area-inset-bottom)));
+    transform: translate3d(0, 12px, 0) scale(0.95);
+  }
+
+  html[data-mobile-tabbar="true"]
+    body:not([data-page="post"])
+    .mobile-float-dock.is-visible {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  /* Edge-to-edge Docked TabBar */
+  .mobile-tabbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 95;
+    padding: 0 6px env(safe-area-inset-bottom);
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    align-items: stretch;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 -4px 20px -10px rgba(15, 23, 42, 0.08);
+  }
+
+  html.dark .mobile-tabbar {
+    background: rgba(20, 21, 24, 0.9);
+    border-top-color: rgba(255, 255, 255, 0.09);
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.42);
+  }
+
+  .tabbar-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 54px;
+    padding: 4px 2px 3px;
+    border-radius: 0;
+    color: var(--ink-3);
+    text-decoration: none;
+    transition:
+      color var(--dur-quick) ease,
+      transform var(--dur-quick) var(--ease-out);
+  }
+
+  html.dark .tabbar-item {
+    color: #9397a1;
+  }
+
+  .tabbar-item:focus {
+    outline: none;
+  }
+
+  .tabbar-item:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    outline-offset: -3px;
+    border-radius: 8px;
+  }
+
+  /* Subtle top hairline indicator for active / open tab */
+  .tabbar-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 18px;
+    height: 2.5px;
+    border-radius: 0 0 999px 999px;
+    background: var(--accent);
+    opacity: 0;
+    transform: translateX(-50%) scaleX(0.4);
+    transition:
+      opacity 0.18s ease,
+      transform 0.22s var(--ease-out);
+  }
+
+  .tabbar-item:active .tabbar-icon {
+    transform: scale(0.9);
+  }
+
+  .tabbar-item.is-current,
+  .tabbar-item.is-open {
+    color: var(--accent);
+  }
+
+  .tabbar-item.is-current::before,
+  .tabbar-item.is-open::before {
+    opacity: 1;
+    transform: translateX(-50%) scaleX(1);
+  }
+
+  .tabbar-item.is-current .tabbar-icon svg,
+  .tabbar-item.is-open .tabbar-icon svg {
+    stroke-width: 2;
+  }
+
+  .tabbar-item.is-current .tabbar-label,
+  .tabbar-item.is-open .tabbar-label {
+    font-weight: 600;
+  }
+
+  .tabbar-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    transition: transform var(--dur-quick) var(--ease-out);
+  }
+
+  .tabbar-label-row {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    max-width: 100%;
+  }
+
+  .tabbar-label {
+    font-size: 10.5px;
+    font-weight: 500;
+    line-height: 1.15;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tabbar-caret {
+    flex-shrink: 0;
+    opacity: 0.65;
+    transition:
+      transform 0.2s var(--ease-out),
+      opacity var(--dur-quick) ease;
+  }
+
+  .tabbar-item.is-open .tabbar-caret {
+    opacity: 1;
+    transform: rotate(180deg);
+  }
+
+  /* Submenu scrim & docked Bottom Sheet seamlessly anchored above TabBar */
+  .tabbar-sub-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 92;
+    background: rgba(15, 23, 42, 0.28);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.2s ease,
+      visibility 0s linear 0.2s;
+  }
+
+  html.dark .tabbar-sub-backdrop {
+    background: rgba(0, 0, 0, 0.56);
+  }
+
+  .mobile-tabbar-shell.has-sub-open .tabbar-sub-backdrop {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+      opacity 0.2s ease,
+      visibility 0s linear 0s;
+  }
+
+  .tabbar-sub-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(54px + env(safe-area-inset-bottom));
+    z-index: 94;
+    padding: 8px 16px 16px;
+    border-radius: 20px 20px 0 0;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 -14px 40px -12px rgba(15, 23, 42, 0.16);
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+    pointer-events: none;
+    transition:
+      opacity 0.18s ease,
+      transform 0.24s var(--ease-out);
+  }
+
+  .tabbar-sub-sheet[hidden] {
+    display: none;
+  }
+
+  .tabbar-sub-sheet.is-open {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    pointer-events: auto;
+  }
+
+  html.dark .tabbar-sub-sheet {
+    background: rgba(22, 23, 27, 0.97);
+    border-top-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -16px 44px rgba(0, 0, 0, 0.56);
+  }
+
+  .tabbar-sheet-handle {
+    width: 34px;
+    height: 4px;
+    margin: 0 auto 10px;
+    border-radius: 999px;
+    background: var(--line-strong);
+  }
+
+  .tabbar-sub-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 2px 10px;
+    font-size: 12.5px;
+    font-weight: 560;
+    color: var(--ink-2);
+  }
+
+  .tabbar-sub-parent {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  .tabbar-sub-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .tabbar-sub-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 40px;
+    padding: 0 13px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    font-weight: 480;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    transition:
+      color var(--dur-quick) ease,
+      border-color var(--dur-quick) ease,
+      background-color var(--dur-quick) ease;
+  }
+
+  html.dark .tabbar-sub-link {
+    background: #1e2025;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .tabbar-sub-link:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .tabbar-sub-link.is-current {
+    color: var(--accent);
+    font-weight: 560;
+    background: var(--accent-soft);
+    border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+  }
+
+  /* ========================================================================
+     Unified Bottom Sheet for "更多" Full Hub Drawer (.site-nav)
+     Replaces side-sliding drawer with a cohesive bottom-up sheet on TabBar mode
+     ======================================================================== */
+  html[data-mobile-tabbar="true"][data-compact] .site-header .site-nav {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: 82dvh;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 22px 22px 0 0;
+    box-shadow: 0 -20px 56px -12px rgba(15, 23, 42, 0.24);
+    padding: 0 16px max(24px, calc(16px + env(safe-area-inset-bottom)));
+    transform: translate3d(0, 100%, 0);
+  }
+
+  html.dark[data-mobile-tabbar="true"][data-compact] .site-header .site-nav {
+    border-top-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -24px 64px rgba(0, 0, 0, 0.68);
+  }
+
+  html[data-mobile-tabbar="true"][data-compact]
+    .site-header.is-open
+    .site-nav {
+    transform: translate3d(0, 0, 0);
+  }
+
+  html[data-mobile-tabbar="true"][data-compact]
+    .site-header
+    .mobile-nav-head {
+    position: sticky;
+    top: 0;
+    padding: 18px 14px 12px 16px;
+    border-radius: 22px 22px 0 0;
+  }
+
+  html[data-mobile-tabbar="true"][data-compact]
+    .site-header
+    .mobile-nav-head::before {
+    content: "";
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--line-strong);
+  }
+}

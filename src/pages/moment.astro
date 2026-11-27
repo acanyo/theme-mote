@@ -9,7 +9,7 @@ import "../styles/moments.css";
 
 <Layout
   page="moment"
-  title="|${moment.owner?.displayName ?: site.title} 的瞬间 - ${site.title}|"
+  titlePrefixExpr="(moment.owner?.displayName ?: site.title) + ' 的瞬间'"
 >
   <section class="moments moments--detail wrap--text" aria-label="瞬间">
     <header class="moment-detail-bar">

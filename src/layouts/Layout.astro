@@ -6,20 +6,32 @@ import "../styles/image-cursor.css";
 import "../styles/image-placeholder.css";
 import "../styles/feedback.css";
 import "../styles/transitions.css";
+import "../styles/page.css";
+import "../styles/posts.css";
+import "../styles/comments.css";
+import "../styles/guestbook.css";
 import "../styles/print.css";
 import Header from "../components/site/Header.astro";
 import Footer from "../components/site/Footer.astro";
+import MobileTabBar from "../components/site/MobileTabBar.astro";
 import ControlCenter from "../components/site/ControlCenter.astro";
+import Footprints from "../components/site/Footprints.astro";
 import Shortcuts from "../components/site/Shortcuts.astro";
 
 interface Props {
   title?: string;
+  titlePrefixExpr?: string;
   page: string;
   contract?: boolean;
 }
 
-const { title = "${site.title}", page, contract = false } = Astro.props;
+const { title, titlePrefixExpr, page, contract = false } = Astro.props;
 const htmlAttrs = contract ? { "th:fragment": "html (head, content)" } : {};
+const resolvedTitleExpr = titlePrefixExpr
+  ? `\${(${titlePrefixExpr}) + ' ' + (theme.config.seo?.title_separator ?: '-') + ' ' + (site.title ?: 'Mote')}`
+  : title
+    ? title
+    : "${(theme.config.seo?.show_site_subtitle != false and not #strings.isEmpty(site.subtitle)) ? (site.title + ' ' + (theme.config.seo?.title_separator ?: '-') + ' ' + site.subtitle) : site.title}";
 ---
 
 <!doctype html>
@@ -37,17 +49,31 @@ const htmlAttrs = contract ? { "th:fragment": "html (head, content)" } : {};
   data-code-copy="true"
   th:lang="${site.language ?: 'zh-CN'}"
   th:with="primaryColor = ${theme.config.basic?.primary_color ?: theme.config.style?.primary_color}, secondaryColor = ${theme.config.basic?.secondary_color ?: theme.config.style?.secondary_color}, schemeDefault = ${theme.config.basic?.color_scheme ?: theme.config.style?.color_scheme ?: 'light'}, ambientBg = ${theme.config.basic?.ambient_bg ?: theme.config.style?.ambient_bg ?: 'home'}, imageCursor = ${theme.config.basic?.image_cursor ?: 'viewfinder'}, imgLoadingSrc = ${theme.config.basic?.image_loading_placeholder ?: ''}, imgErrorSrc = ${theme.config.basic?.image_error_placeholder ?: ''}, pageTrans = ${theme.config.basic?.page_transition != null ? theme.config.basic.page_transition : (theme.config.motion?.page_transition != false)}"
-  th:style="|${not #strings.isEmpty(primaryColor) ? '--theme-primary:' + primaryColor + ';' : ''}${not #strings.isEmpty(secondaryColor) ? '--theme-secondary:' + secondaryColor + ';' : ''}${not #strings.isEmpty(imgLoadingSrc) ? '--img-loading-bg:url(' + imgLoadingSrc + ');' : ''}|"
-  th:attr="data-palette='custom',data-palette-default='custom',data-scheme-default=${schemeDefault},data-ambient-bg=${ambientBg},data-image-cursor=${imageCursor},data-cover-palette=${theme.config.basic?.cover_palette != false},data-cover-palette-api=${theme.config.basic?.cover_palette_api ?: ''},data-has-loading-placeholder=${not #strings.isEmpty(imgLoadingSrc)},data-img-error-src=${imgErrorSrc},data-lightbox-enabled=${theme.config.post?.enable_lightbox != false},data-code-copy=${theme.config.post?.enable_code_copy != false},data-excerpt-default=${theme.config.home?.show_excerpt_default == true},data-motion-site=${theme.config.motion?.enabled != false},data-page-transition=${pageTrans}"
+  th:style="|${not #strings.isEmpty(primaryColor) ? '--theme-primary:' + primaryColor + ';' : ''}${not #strings.isEmpty(secondaryColor) ? '--theme-secondary:' + secondaryColor + ';' : ''}|"
+  th:attr="data-palette='custom',data-palette-default='custom',data-scheme-default=${schemeDefault},data-ambient-bg=${ambientBg},data-image-cursor=${imageCursor},data-cover-palette=${theme.config.basic?.cover_palette != false},data-cover-palette-api=${theme.config.basic?.cover_palette_api ?: ''},data-has-loading-placeholder=${not #strings.isEmpty(imgLoadingSrc)},data-loading-placeholder-src=${imgLoadingSrc},data-img-error-src=${imgErrorSrc},data-lightbox-enabled=${theme.config.post?.enable_lightbox != false},data-code-copy=${theme.config.post?.enable_code_copy != false},data-excerpt-default=${theme.config.home?.show_excerpt_default == true},data-motion-site=${theme.config.motion?.enabled != false},data-page-transition=${pageTrans},data-mobile-tabbar=${theme.config.basic?.mobile_tabbar != false}"
   {...htmlAttrs}
 >
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#ffffff" />
+    <link
+      rel="preload"
+      as="image"
+      fetchpriority="high"
+      th:if="${not #strings.isEmpty(imgLoadingSrc)}"
+      th:href="${imgLoadingSrc}"
+    />
     <script is:inline>
       (() => {
         const root = document.documentElement;
+        const lp = (root.dataset.loadingPlaceholderSrc || "").trim();
+        if (lp) {
+          root.style.setProperty(
+            "--img-loading-bg",
+            'url("' + lp.replace(/"/g, "%22") + '")',
+          );
+        }
         let storedScheme;
         try {
           storedScheme = localStorage.getItem("mote-scheme");
@@ -109,9 +135,15 @@ const htmlAttrs = contract ? { "th:fragment": "html (head, content)" } : {};
           </th:block>
         </>
       ) : (
-        <title th:text={title}>Mote</title>
+        <title th:text={resolvedTitleExpr}></title>
       )
     }
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/themes/theme-mote/assets/logo.svg"
+      th:if="${#strings.isEmpty(site.favicon)}"
+    />
     <link
       rel="icon"
       type="image/png"
@@ -122,6 +154,16 @@ const htmlAttrs = contract ? { "th:fragment": "html (head, content)" } : {};
   </head>
   <body data-page={page}>
     <a class="skip-link" href="#main">跳到正文</a>
+    <div class="nav-progress" data-nav-progress aria-hidden="true">
+      <div class="nav-progress-bar" data-nav-progress-bar></div>
+    </div>
+    <div class="nav-loader" data-nav-loader aria-hidden="true">
+      <span class="nav-loader-motes" aria-hidden="true">
+        <i class="nav-mote nav-mote--a"></i>
+        <i class="nav-mote nav-mote--b"></i>
+      </span>
+      <span class="nav-loader-text" data-nav-loader-text>正在前往…</span>
+    </div>
     <div
       class="read-progress"
       aria-hidden="true"
@@ -142,7 +184,9 @@ const htmlAttrs = contract ? { "th:fragment": "html (head, content)" } : {};
       </main>
       <Footer />
     </div>
+    <MobileTabBar />
     <ControlCenter />
+    <Footprints />
     <Shortcuts />
     <!-- Thyuu-Inspired Smart Mobile Bottom Utility Pill (non-post pages on <1180px) -->
     <div

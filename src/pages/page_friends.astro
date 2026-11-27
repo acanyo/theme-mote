@@ -14,7 +14,7 @@ import "../styles/comments.css";
 
 <Layout
   page="friends"
-  title="|${singlePage.spec.title ?: '朋友圈'} - ${site.title}|"
+  titlePrefixExpr="singlePage.spec.title ?: '朋友圈'"
 >
   <SeoHead
     slot="head"

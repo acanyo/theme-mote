@@ -13,10 +13,10 @@ const IGNORE_SELECTOR =
   "[data-captcha-img], [data-logo-preview-img], [data-reader-cover], [data-lightbox-img], [data-img-placeholder-ignore]";
 
 const FRAME_SELECTOR =
-  ".filmstrip-frame, .photo-card, .photo-stage-frame, .article-cover, .moment-photo, .timeline-photo-btn";
+  ".filmstrip-frame, .photo-card, .photo-stage-frame, .article-cover, .moment-photo, .timeline-photo-btn, .portfolio-cover, .eq-thumb, .db-cover";
 
 const AVATAR_SELECTOR =
-  ".brand-avatar, .byline-avatar, .colophon-avatar, .moment-avatar, .friend-badge-img, .link-avatar, .minimal-project-icon img";
+  ".brand-avatar, .byline-avatar, .colophon-avatar, .moment-avatar, .friend-badge-img, .friend-chip-avatar, .link-avatar, .site-snippet-avatar, .author-avatar, .hero-avatar, .about-avatar, .minimal-project-icon img";
 
 const BROKEN_ICON_SVG = `<svg class="img-error-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"></rect><circle cx="9" cy="10" r="1.4"></circle><path d="m21 16-4.2-4.2a1.5 1.5 0 0 0-2.1 0L9 17.5"></path><path d="m3 3 18 18"></path></svg>`;
 
@@ -71,6 +71,7 @@ function finalizeLoaded(img: HTMLImageElement) {
   const frame = findFrame(img);
   if (frame) {
     frame.classList.remove("is-img-loading", "is-img-error");
+    frame.classList.add("is-img-loaded");
     clearFrameOverlay(frame);
   } else {
     clearProseCard(img);
@@ -197,7 +198,7 @@ function markError(img: HTMLImageElement) {
   const frame = findFrame(img);
 
   if (frame) {
-    frame.classList.remove("is-img-loading");
+    frame.classList.remove("is-img-loading", "is-img-loaded");
     frame.classList.add("is-img-error");
     clearFrameOverlay(frame);
 
@@ -255,7 +256,7 @@ export function markImageLoading(img: HTMLImageElement) {
   img.dataset.imgState = "loading";
   const frame = findFrame(img);
   if (frame) {
-    frame.classList.remove("is-img-error");
+    frame.classList.remove("is-img-error", "is-img-loaded");
     frame.classList.add("is-img-loading");
     clearFrameOverlay(frame);
   } else {

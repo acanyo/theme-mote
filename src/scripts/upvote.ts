@@ -7,6 +7,7 @@
 import { gsap } from "./animation/engine";
 import { motionAllowed } from "./motion";
 import { toast } from "./toast";
+import { recordLikeFootprint } from "./footprints";
 
 const STORAGE_KEY = "mote-upvoted";
 const UPVOTE_API = "/apis/api.halo.run/v1alpha1/trackers/upvote";
@@ -124,6 +125,22 @@ export async function handleUpvoteClick(btn: HTMLButtonElement) {
 
     upvoted.add(key);
     saveUpvoted(upvoted);
+    const momentEl = btn.closest<HTMLElement>(".moment");
+    const likePath =
+      momentEl?.querySelector<HTMLAnchorElement>("a.moment-time, a.moment-link")?.getAttribute("href") ||
+      location.pathname;
+    const likeTitle =
+      plural === "moments"
+        ? (momentEl?.querySelector<HTMLElement>(".moment-body")?.textContent?.trim().slice(0, 48) || "一条瞬间")
+        : (document.querySelector<HTMLElement>("#main .article-title, #main h1")?.textContent?.trim() ||
+            document.title.replace(/\s+[-|]\s+[^-|]+$/, "").trim() ||
+            location.pathname);
+    recordLikeFootprint({
+      key,
+      path: likePath,
+      title: likeTitle,
+      kind: plural === "moments" ? "瞬间" : "文章",
+    });
     toast("谢谢你的喜欢", "heart");
   } catch {
     /* Rollback optimistic state */

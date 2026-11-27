@@ -1,0 +1,345 @@
+---
+/**
+ * templates/page_about.html: Editorial "About Me" custom single-page template.
+ * Create or edit a SinglePage in Halo Console (e.g. /about) and select
+ * "关于我（个人名片与自述页）".
+ */
+import Layout from "../layouts/Layout.astro";
+import ArticleCover from "../components/post/ArticleCover.astro";
+import Comments from "../components/post/Comments.astro";
+import Icon from "../components/common/Icon.astro";
+import SeoHead from "../components/common/SeoHead.astro";
+import { AVATAR } from "../lib/expressions";
+import "../styles/article.css";
+import "../styles/about.css";
+---
+
+<Layout page="single" titlePrefixExpr="singlePage.spec.title ?: '关于'">
+  <SeoHead
+    slot="head"
+    type="profile"
+    titleExpr="(singlePage.spec.title ?: '关于') + ' ' + (theme.config.seo?.title_separator ?: '-') + ' ' + (site.title ?: 'Mote')"
+    descExpr="not #strings.isEmpty(singlePage.status?.excerpt) ? singlePage.status.excerpt : (singlePage.spec.excerpt?.raw ?: (theme.config.about?.tagline ?: (site.subtitle ?: '')))"
+    imageExpr="not #strings.isEmpty(singlePage.spec.cover) ? singlePage.spec.cover : (theme.config.about?.avatar ?: (theme.config.basic?.avatar ?: (site.logo ?: '')))"
+    pathExpr="singlePage.status?.permalink ?: '/about'"
+    authorNameExpr="not #strings.isEmpty(theme.config.about?.name) ? theme.config.about.name : (theme.config.basic?.title ?: site.title ?: 'Mote')"
+    authorBioExpr="not #strings.isEmpty(theme.config.about?.role) ? theme.config.about.role : (theme.config.home?.now ?: site.subtitle ?: '')"
+    jsonLdKind="ProfilePage"
+  />
+
+  <article
+    class="about-page wrap--text"
+    th:with={`fallbackAvatar = \${${AVATAR}}, hideCover = \${#annotations.getOrDefault(singlePage, 'mote/hide_cover', 'false') == 'true'}, hideTopbar = \${#annotations.getOrDefault(singlePage, 'mote/hide_topbar', 'false') == 'true'}, customNotice = \${#strings.trim(#annotations.getOrDefault(singlePage, 'mote/notice_text', ''))}, customAccent = \${#strings.trim(#annotations.getOrDefault(singlePage, 'mote/accent_color', ''))}, eyebrow = \${not #strings.isEmpty(#strings.trim(theme.config.about?.eyebrow ?: '')) ? #strings.trim(theme.config.about.eyebrow) : 'ABOUT'}, aboutName = \${not #strings.isEmpty(#strings.trim(theme.config.about?.name ?: '')) ? #strings.trim(theme.config.about.name) : (not #strings.isEmpty(#strings.trim(theme.config.basic?.title ?: '')) ? #strings.trim(theme.config.basic.title) : (singlePage.spec.title ?: site.title ?: 'Mote'))}, aboutRole = \${#strings.trim(theme.config.about?.role ?: '')}, aboutLead = \${singlePage.spec.excerpt?.autoGenerate == false and not #strings.isEmpty(singlePage.spec.excerpt?.raw) ? singlePage.spec.excerpt.raw : (not #strings.isEmpty(#strings.trim(theme.config.about?.tagline ?: '')) ? #strings.trim(theme.config.about.tagline) : (site.subtitle ?: ''))}, aboutAvatar = \${not #strings.isEmpty(theme.config.about?.avatar) ? theme.config.about.avatar : fallbackAvatar}, aboutLocation = \${not #strings.isEmpty(#strings.trim(theme.config.about?.location ?: '')) ? #strings.trim(theme.config.about.location) : #strings.trim(theme.config.home?.location ?: '')}, aboutEmail = \${not #strings.isEmpty(#strings.trim(theme.config.about?.email ?: '')) ? #strings.trim(theme.config.about.email) : #strings.trim(theme.config.modules?.closing_email ?: '')}, since = \${#strings.trim(theme.config.footer?.since ?: theme.config.sidebar?.since ?: '')}, socials = \${not #lists.isEmpty(theme.config.footer?.socials) ? theme.config.footer.socials : theme.config.home?.socials}, guestbookUrl = \${#strings.trim(theme.config.modules?.closing_link ?: '')}, guestbookLabel = \${not #strings.isEmpty(theme.config.modules?.closing_link_label) ? theme.config.modules.closing_link_label : '去留言'}, showStats = \${theme.config.about?.show_stats != false}, showSocials = \${theme.config.about?.show_socials != false}, stats = \${showStats ? siteStatsFinder.getStats() : null}, skillsRaw = \${#strings.trim(theme.config.about?.skills ?: '')}, interestsRaw = \${#strings.trim(theme.config.about?.interests ?: '')}, skillList = \${not #strings.isEmpty(skillsRaw) ? #strings.arraySplit(#strings.replace(skillsRaw, '，', ','), ',') : null}, interestList = \${not #strings.isEmpty(interestsRaw) ? #strings.arraySplit(#strings.replace(interestsRaw, '，', ','), ',') : null}, hasSkills = \${not #strings.isEmpty(skillsRaw)}, hasInterests = \${not #strings.isEmpty(interestsRaw)}, milestones = \${theme.config.about?.milestones}, hasMilestones = \${not #lists.isEmpty(milestones)}, aboutLicense = \${#strings.trim(theme.config.about?.license ?: '')}, hasContent = \${not #strings.isEmpty(#strings.trim(singlePage.content?.content ?: ''))}, hasStatusLine = \${not #strings.isEmpty(aboutLocation) or not #strings.isEmpty(since)}, hasSocialRow = \${showSocials and (not #strings.isEmpty(aboutEmail) or not #lists.isEmpty(socials) or not #strings.isEmpty(guestbookUrl))}`}
+    th:attr="data-cover-palette-src=${not #strings.isEmpty(singlePage.spec.cover) ? singlePage.spec.cover : null},data-cover-palette-accent=${not #strings.isEmpty(customAccent) ? customAccent : null}"
+  >
+    <!-- 1. Editorial Identity Card -->
+    <header class="about-hero">
+      <div class="about-hero-top">
+        <div class="about-identity">
+          <p class="about-eyebrow" th:text="${eyebrow}">ABOUT</p>
+          <div class="about-name-row">
+            <h1 class="about-name" th:text="${aboutName}">Handsome</h1>
+            <span
+              class="about-role"
+              th:if="${not #strings.isEmpty(aboutRole)}"
+              th:text="${aboutRole}">开发者 · 创作者</span
+            >
+          </div>
+          <p
+            class="about-lead"
+            th:if="${not #strings.isEmpty(aboutLead)}"
+            th:text="${aboutLead}"
+          >
+            写代码、做产品，也记录技术之外的日常。
+          </p>
+
+          <div class="about-status" th:if="${hasStatusLine}">
+            <span
+              class="about-status-item"
+              th:if="${not #strings.isEmpty(aboutLocation)}"
+            >
+              <span class="about-live-dot" aria-hidden="true"></span>
+              <span th:text="${aboutLocation}">正在打磨主题与写作</span>
+            </span>
+            <span
+              class="about-status-sep"
+              aria-hidden="true"
+              th:if="${not #strings.isEmpty(aboutLocation) and not #strings.isEmpty(since)}"
+              >·</span
+            >
+            <span
+              class="about-status-item"
+              th:if="${not #strings.isEmpty(since)}"
+            >
+              建站第 <span class="num" th:attr="data-since=${since}">—</span> 天
+            </span>
+          </div>
+        </div>
+
+        <div
+          class="about-portrait"
+          th:if="${not #strings.isEmpty(aboutAvatar)}"
+        >
+          <img
+            class="about-avatar"
+            th:src="${aboutAvatar}"
+            th:alt="${aboutName}"
+            width="80"
+            height="80"
+            loading="eager"
+            decoding="async"
+          />
+        </div>
+      </div>
+
+      <div class="about-actions" th:if="${hasSocialRow}">
+        <button
+          type="button"
+          class="about-pill is-primary"
+          th:if="${not #strings.isEmpty(aboutEmail)}"
+          th:attr="data-copy-email=${aboutEmail}"
+          data-tip="点击复制邮箱"
+        >
+          <Icon name="mail" size={13} />
+          <span class="num" th:text="${aboutEmail}">hello@example.com</span>
+          <Icon name="copy" size={11} class="about-pill-copy" />
+        </button>
+
+        <a
+          class="about-pill"
+          th:each="social : ${socials}"
+          th:href="${social.url}"
+          target="_blank"
+          rel="noopener me"
+        >
+          <span
+            class="about-pill-icon"
+            aria-hidden="true"
+            th:if="${not #strings.isEmpty(social.icon)}"
+            th:attr="data-iconify=${not #strings.startsWith(#strings.trim(social.icon), '<svg') ? #strings.trim(social.icon) : null}"
+            th:utext="${#strings.startsWith(#strings.trim(social.icon), '<svg') ? social.icon : ''}"
+          ></span>
+          <span th:text="${social.name}">GitHub</span>
+        </a>
+
+        <a
+          class="about-pill is-quiet"
+          th:if="${not #strings.isEmpty(guestbookUrl)}"
+          th:href="${guestbookUrl}"
+        >
+          <Icon name="chat" size={13} />
+          <span th:text="${guestbookLabel}">去留言</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- 2. Editorial Site Pulse Ledger -->
+    <section
+      class="about-stats"
+      aria-label="站点脉搏"
+      th:if="${showStats and stats != null}"
+    >
+      <a class="about-stat" href="/archives" th:href="@{/archives}">
+        <span class="about-stat-val num" th:text="${stats.post ?: 0}">0</span>
+        <span class="about-stat-label">篇文章</span>
+      </a>
+      <a class="about-stat" href="/categories" th:href="@{/categories}">
+        <span class="about-stat-val num" th:text="${stats.category ?: 0}">0</span>
+        <span class="about-stat-label">个专栏</span>
+      </a>
+      <div class="about-stat">
+        <span class="about-stat-val num" th:text="${stats.comment ?: 0}">0</span>
+        <span class="about-stat-label">条对话</span>
+      </div>
+      <div class="about-stat" th:if="${not #strings.isEmpty(since)}">
+        <span class="about-stat-val num" th:attr="data-since=${since}">—</span>
+        <span class="about-stat-label">天相伴</span>
+      </div>
+      <div class="about-stat" th:if="${#strings.isEmpty(since)}">
+        <span class="about-stat-val num" th:text="${stats.visit ?: 0}">0</span>
+        <span class="about-stat-label">次来访</span>
+      </div>
+    </section>
+
+    <!-- 3. Optional Cover Image -->
+    <div
+      class="about-cover"
+      th:if="${not hideCover and not #strings.isEmpty(singlePage.spec.cover)}"
+    >
+      <ArticleCover item="singlePage" />
+    </div>
+
+    <!-- 4. Optional Skills & Interests Facets -->
+    <section
+      class="about-facets"
+      th:classappend="${hasSkills and hasInterests} ? 'is-dual' : 'is-single'"
+      aria-label="常用工具与兴趣"
+      th:if="${hasSkills or hasInterests}"
+    >
+      <div class="about-facet" th:if="${hasSkills}">
+        <h2 class="about-section-label">
+          <Icon name="code" size={13} />
+          <span>技术与工具</span>
+        </h2>
+        <ul class="about-chips" role="list">
+          <li
+            th:each="item : ${skillList}"
+            th:if="${not #strings.isEmpty(#strings.trim(item))}"
+          >
+            <span
+              class="about-chip about-chip--tech"
+              th:text="${#strings.trim(item)}">Java</span
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div class="about-facet" th:if="${hasInterests}">
+        <h2 class="about-section-label">
+          <Icon name="sparkles" size={13} />
+          <span>屏幕之外</span>
+        </h2>
+        <ul class="about-chips" role="list">
+          <li
+            th:each="item : ${interestList}"
+            th:if="${not #strings.isEmpty(#strings.trim(item))}"
+          >
+            <span
+              class="about-chip about-chip--life"
+              th:text="${#strings.trim(item)}">独立博客</span
+            >
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 5. Optional Editorial Milestones Timeline -->
+    <section
+      class="about-section about-timeline-sec"
+      aria-labelledby="about-timeline-heading"
+      th:if="${hasMilestones}"
+    >
+      <h2 class="about-section-label" id="about-timeline-heading">
+        <Icon name="timeline" size={13} />
+        <span>一路走来</span>
+      </h2>
+      <ol class="about-timeline">
+        <li
+          class="about-milestone"
+          th:each="m : ${milestones}"
+          th:if="${not #strings.isEmpty(m.title)}"
+        >
+          <span class="about-milestone-year num" th:text="${m.year ?: ''}"
+            >2026</span
+          >
+          <span class="about-milestone-axis" aria-hidden="true">
+            <i class="about-milestone-dot"></i>
+          </span>
+          <div class="about-milestone-body">
+            <strong class="about-milestone-title" th:text="${m.title}"
+              >节点标题</strong
+            >
+            <p
+              class="about-milestone-desc"
+              th:if="${not #strings.isEmpty(m.desc)}"
+              th:text="${m.desc}"
+            >
+              补充说明
+            </p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- 6. Main Self-Introduction Prose (Halo SinglePage Content) -->
+    <section
+      class="about-section about-story"
+      aria-label="个人自述"
+      th:if="${hasContent or not #strings.isEmpty(customNotice)}"
+    >
+      <div class="about-story-bar" th:if="${not hideTopbar}">
+        <span class="about-section-label">
+          <Icon name="feather" size={13} />
+          <span>关于这里</span>
+        </span>
+
+        <div class="reader-tools" role="toolbar" aria-label="阅读排版控制">
+          <button
+            type="button"
+            class="reader-tool-btn"
+            data-prose-font-toggle
+            aria-pressed="false"
+            title="切换无衬线 / 书刊衬线字体"
+          >
+            书刊体
+          </button>
+          <button
+            type="button"
+            class="reader-tool-btn"
+            data-prose-size-cycle
+            title="切换正文字号（标准 / 舒适 / 紧凑）"
+          >
+            <span data-prose-size-label>A</span>
+          </button>
+          <button
+            type="button"
+            class="reader-tool-btn"
+            data-copy-link
+            title="复制页面链接"
+            aria-label="复制页面链接"
+          >
+            <Icon name="link" size={13} />
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="article-notices"
+        th:if="${not #strings.isEmpty(customNotice)}"
+      >
+        <div class="article-notice article-notice--custom" role="note">
+          <svg
+            class="article-notice-icon"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M12 10v6"></path>
+            <circle cx="12" cy="7.2" r="0.6" fill="currentColor"></circle>
+          </svg>
+          <p th:text="${customNotice}">自定义提示</p>
+        </div>
+      </div>
+
+      <div
+        class="about-prose prose"
+        th:if="${hasContent}"
+        th:utext="${singlePage.content.content}"
+        data-article-body
+      >
+      </div>
+    </section>
+
+    <!-- 7. Optional Fine-Print License / Colophon -->
+    <aside
+      class="about-license"
+      aria-label="许可声明"
+      th:if="${not #strings.isEmpty(aboutLicense)}"
+    >
+      <Icon name="bookmark" size={13} class="about-license-icon" />
+      <p class="about-license-text" th:utext="${aboutLicense}"></p>
+    </aside>
+
+    <!-- 8. Comments -->
+    <div class="about-comments">
+      <Comments kind="SinglePage" item="singlePage" />
+    </div>
+  </article>
+</Layout>

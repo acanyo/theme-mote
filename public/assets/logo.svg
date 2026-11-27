@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <clipPath id="clipA"><rect x="16" y="16" width="480" height="480" rx="116"/></clipPath>
+    <radialGradient id="washRightA" cx="86%" cy="14%" r="66%">
+      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.22"/>
+      <stop offset="56%" stop-color="#60a5fa" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="washLeftA" cx="14%" cy="88%" r="62%">
+      <stop offset="0%" stop-color="#f0b890" stop-opacity="0.34"/>
+      <stop offset="58%" stop-color="#f0b890" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moteGlowA" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.26"/>
+      <stop offset="100%" stop-color="#2563eb" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="moteGradA" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+  </defs>
+  <g clip-path="url(#clipA)">
+    <rect x="16" y="16" width="480" height="480" fill="#ffffff"/>
+    <rect x="16" y="16" width="480" height="480" fill="url(#washRightA)"/>
+    <rect x="16" y="16" width="480" height="480" fill="url(#washLeftA)"/>
+  </g>
+  <rect x="17.5" y="17.5" width="477" height="477" rx="114.5" stroke="#0f172a" stroke-opacity="0.09" stroke-width="3"/>
+  <path d="M134 352 V226 C134 186 164 162 196 162 C228 162 252 186 252 226 V352 M252 226 C252 186 282 162 314 162 C346 162 370 186 370 226 V352"
+    stroke="#18181b" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="378" cy="132" r="52" fill="url(#moteGlowA)"/>
+  <circle cx="378" cy="132" r="24" fill="url(#moteGradA)"/>
+</svg>

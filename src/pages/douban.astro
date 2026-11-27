@@ -9,11 +9,11 @@ import SeoHead from "../components/common/SeoHead.astro";
 import "../styles/douban.css";
 ---
 
-<Layout page="douban" title="|${title ?: '书影音'} - ${site.title}|">
+<Layout page="douban" titlePrefixExpr="title ?: '书影音'">
   <SeoHead
     slot="head"
     type="website"
-    titleExpr="(title ?: '书影音') + ' - ' + (site.title ?: 'Mote')"
+    titleExpr="(title ?: '书影音') + ' ' + (theme.config.seo?.title_separator ?: '-') + ' ' + (site.title ?: 'Mote')"
     descExpr="site.subtitle ?: '读过的书、看过的电影、听过的唱片与玩过的游戏。'"
     pathExpr="'/douban'"
     jsonLdKind="CollectionPage"

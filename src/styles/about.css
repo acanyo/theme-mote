@@ -1,0 +1,648 @@
+/* ==========================================================================
+   Mote Minimal Plus · Editorial "About Me" Custom Page (page_about.html)
+   Quiet single-column monograph: Identity Card + Pulse Ledger + Facets + Story
+   ========================================================================== */
+
+.about-page {
+  padding: 28px 0 18px;
+}
+
+/* ==========================================================================
+   1. Editorial Identity Hero
+   ========================================================================== */
+.about-hero {
+  position: relative;
+  padding: 26px 26px 22px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(
+      420px 200px at 100% 0%,
+      color-mix(in srgb, var(--accent) 7%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      340px 180px at 0% 100%,
+      color-mix(in srgb, var(--accent-secondary) 8%, transparent),
+      transparent 72%
+    ),
+    var(--bg);
+  overflow: hidden;
+}
+
+html.dark .about-hero {
+  background:
+    radial-gradient(
+      420px 200px at 100% 0%,
+      color-mix(in srgb, var(--accent) 10%, transparent),
+      transparent 74%
+    ),
+    radial-gradient(
+      340px 180px at 0% 100%,
+      color-mix(in srgb, var(--accent-secondary) 8%, transparent),
+      transparent 74%
+    ),
+    color-mix(in srgb, var(--surface) 72%, var(--bg));
+}
+
+.about-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.about-identity {
+  min-width: 0;
+  flex: 1;
+}
+
+.about-eyebrow {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 550;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.about-name-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}
+
+.about-name {
+  margin: 0;
+  font-size: clamp(24px, 3.2vw, 30px);
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -0.028em;
+  color: var(--ink);
+}
+
+.about-role {
+  font-size: 13px;
+  font-weight: 480;
+  color: var(--ink-3);
+  line-height: 1.5;
+}
+
+.about-lead {
+  margin: 12px 0 0;
+  font-size: 15px;
+  line-height: 1.78;
+  color: var(--ink-2);
+}
+
+.about-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-top: 14px;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.about-status-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.about-status-sep {
+  color: var(--ink-faint);
+}
+
+.about-live-dot {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--dot-green);
+  flex-shrink: 0;
+}
+
+.about-live-dot::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: var(--dot-green);
+  opacity: 0.24;
+  animation: aboutStatusPulse 3.2s ease-out infinite;
+}
+
+@keyframes aboutStatusPulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.32;
+  }
+  70% {
+    transform: scale(1.75);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.75);
+    opacity: 0;
+  }
+}
+
+.about-portrait {
+  flex-shrink: 0;
+  padding: 3px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  box-shadow: 0 8px 24px -14px rgba(15, 23, 42, 0.16);
+}
+
+html.dark .about-portrait {
+  background: var(--surface);
+  box-shadow: 0 10px 28px -12px rgba(0, 0, 0, 0.52);
+}
+
+.about-avatar {
+  display: block;
+  width: 76px;
+  height: 76px;
+  border-radius: 18px;
+  object-fit: cover;
+  transition: transform 0.35s var(--ease-out);
+}
+
+.about-portrait:hover .about-avatar {
+  transform: scale(1.03);
+}
+
+/* Social & Contact Pill Row */
+.about-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.about-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink-2);
+  font-size: 12.5px;
+  font-weight: 480;
+  line-height: 1;
+  transition:
+    color 0.16s ease,
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    transform 0.16s var(--ease-out);
+}
+
+html.dark .about-pill {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.about-pill:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+  background: var(--hover);
+  transform: translateY(-1px);
+}
+
+.about-pill.is-primary {
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--line));
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.about-pill.is-primary:hover {
+  border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+
+.about-pill.is-quiet {
+  margin-left: auto;
+  color: var(--ink-3);
+}
+
+.about-pill.is-quiet:hover {
+  color: var(--ink);
+}
+
+.about-pill-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.about-pill-icon svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+.about-pill-copy {
+  opacity: 0.65;
+}
+
+/* ==========================================================================
+   2. Editorial Site Pulse Ledger
+   ========================================================================== */
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+html.dark .about-stats {
+  background: color-mix(in srgb, var(--surface) 52%, var(--bg));
+}
+
+.about-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 15px 10px;
+  text-align: center;
+  position: relative;
+  transition: background-color 0.18s ease;
+}
+
+.about-stat + .about-stat::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 22%;
+  bottom: 22%;
+  width: 1px;
+  background: var(--line);
+}
+
+a.about-stat:hover {
+  background: var(--hover-soft);
+}
+
+a.about-stat:hover .about-stat-val {
+  color: var(--accent);
+}
+
+.about-stat-val {
+  font-size: 20px;
+  font-weight: 620;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  transition: color 0.18s ease;
+}
+
+.about-stat-label {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* ==========================================================================
+   3. Optional Cover
+   ========================================================================== */
+.about-cover {
+  margin-top: 24px;
+}
+
+/* ==========================================================================
+   4. Shared Section Label + Skills & Interests Facets
+   ========================================================================== */
+.about-section {
+  margin-top: 34px;
+}
+
+.about-section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 14px;
+  font-size: 12.5px;
+  font-weight: 560;
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
+}
+
+.about-section-label svg {
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+.about-facets {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.about-facets.is-dual {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.about-facet {
+  padding: 18px 20px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+
+html.dark .about-facet {
+  background: color-mix(in srgb, var(--surface) 52%, var(--bg));
+}
+
+.about-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 8px;
+  line-height: 1.2;
+  transition:
+    border-color 0.16s ease,
+    color 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.about-chip--tech {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.about-chip--tech:hover {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 32%, var(--line));
+  background: var(--accent-soft);
+}
+
+.about-chip--life {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  background: color-mix(in srgb, var(--accent-secondary) 11%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent-secondary) 22%, var(--line));
+  border-radius: 999px;
+  padding: 5px 11px;
+}
+
+html.dark .about-chip--life {
+  background: color-mix(in srgb, var(--accent-secondary) 9%, var(--surface));
+  border-color: color-mix(in srgb, var(--accent-secondary) 20%, var(--line));
+}
+
+/* ==========================================================================
+   5. Editorial Milestones Timeline
+   ========================================================================== */
+.about-timeline-sec {
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.about-timeline {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-milestone {
+  display: grid;
+  grid-template-columns: 64px 18px minmax(0, 1fr);
+  gap: 0 12px;
+  align-items: start;
+}
+
+.about-milestone + .about-milestone .about-milestone-body {
+  padding-top: 2px;
+}
+
+.about-milestone-year {
+  padding-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 520;
+  color: var(--ink-3);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.about-milestone-axis {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  min-height: 28px;
+}
+
+.about-milestone-axis::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  bottom: -10px;
+  width: 1px;
+  background: var(--line);
+}
+
+.about-milestone:last-child .about-milestone-axis::before {
+  display: none;
+}
+
+.about-milestone-dot {
+  position: relative;
+  z-index: 1;
+  margin-top: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1.5px solid var(--accent);
+  display: block;
+}
+
+.about-milestone-body {
+  padding-bottom: 18px;
+}
+
+.about-milestone:last-child .about-milestone-body {
+  padding-bottom: 4px;
+}
+
+.about-milestone-title {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 560;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.about-milestone-desc {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  line-height: 1.68;
+  color: var(--ink-2);
+}
+
+/* ==========================================================================
+   6. Story Prose + Compact Reader Controls
+   ========================================================================== */
+.about-story {
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.about-story-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.about-story-bar .about-section-label {
+  margin: 0;
+}
+
+.about-prose > :first-child {
+  margin-top: 0;
+}
+
+/* ==========================================================================
+   7. Fine-Print License Strip + Comments
+   ========================================================================== */
+.about-license {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 28px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--ink-3);
+}
+
+.about-license-icon {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: var(--ink-3);
+}
+
+.about-license-text {
+  margin: 0;
+}
+
+.about-license-text a {
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 3px;
+}
+
+.about-license-text a:hover {
+  color: var(--ink);
+  text-decoration-color: var(--ink);
+}
+
+.about-comments .comments {
+  margin-top: 34px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+}
+
+/* ==========================================================================
+   8. Responsive Refinements
+   ========================================================================== */
+@media (max-width: 640px) {
+  .about-page {
+    padding-top: 14px;
+  }
+
+  .about-hero {
+    padding: 20px 18px 18px;
+    border-radius: 16px;
+  }
+
+  .about-hero-top {
+    gap: 14px;
+  }
+
+  .about-portrait {
+    border-radius: 18px;
+  }
+
+  .about-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+  }
+
+  .about-pill.is-quiet {
+    margin-left: 0;
+  }
+
+  .about-facets.is-dual {
+    grid-template-columns: 1fr;
+  }
+
+  .about-facet {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .about-stat:nth-child(3)::before {
+    display: none;
+  }
+
+  .about-stat:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+
+  .about-milestone {
+    grid-template-columns: 52px 14px minmax(0, 1fr);
+    gap: 0 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-live-dot::after {
+    animation: none;
+    display: none;
+  }
+}

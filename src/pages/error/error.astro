@@ -3,7 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import "../../styles/error.css";
 ---
 
-<Layout page="error" title="|出错了 - ${site.title}|">
+<Layout page="error" titlePrefixExpr="'出错了'">
   <meta slot="head" name="robots" content="noindex, nofollow" />
   <section class="error-page wrap">
     <p class="error-code num" th:text="${error.status}">500</p>

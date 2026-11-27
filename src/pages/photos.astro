@@ -11,11 +11,11 @@ import SeoHead from "../components/common/SeoHead.astro";
 import "../styles/photos.css";
 ---
 
-<Layout page="photos" title="|${title ?: '图库'} - ${site.title}|">
+<Layout page="photos" titlePrefixExpr="title ?: '图库'">
   <SeoHead
     slot="head"
     type="website"
-    titleExpr="(title ?: '图库') + ' - ' + (site.title ?: 'Mote')"
+    titleExpr="(title ?: '图库') + ' ' + (theme.config.seo?.title_separator ?: '-') + ' ' + (site.title ?: 'Mote')"
     descExpr="site.subtitle ?: ''"
     pathExpr="'/photos'"
   />
@@ -38,7 +38,7 @@ import "../styles/photos.css";
             class="photo-tab"
             href="/photos"
             th:href="@{${photoUrl != null ? photoUrl.list('') : '/photos'}}"
-            th:classappend="${param.group == null or #strings.isEmpty(param.group[0])} ? 'is-active'"
+            th:classappend="${param.group == null or #lists.isEmpty(param.group) or #strings.isEmpty(param.group[0])} ? 'is-active'"
           >
             全部
           </a>

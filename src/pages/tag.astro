@@ -6,11 +6,11 @@ import SeoHead from "../components/common/SeoHead.astro";
 import "../styles/taxonomy.css";
 ---
 
-<Layout page="tag" title="|${tag.spec.displayName} - ${site.title}|">
+<Layout page="tag" titlePrefixExpr="tag.spec.displayName ?: '标签'">
   <SeoHead
     slot="head"
     type="website"
-    titleExpr="'#' + (tag.spec.displayName ?: '标签') + ' - ' + (site.title ?: 'Mote')"
+    titleExpr="'#' + (tag.spec.displayName ?: '标签') + ' ' + (theme.config.seo?.title_separator ?: '-') + ' ' + (site.title ?: 'Mote')"
     descExpr="site.subtitle ?: ''"
     imageExpr="tag.spec.cover ?: ''"
     pathExpr="tag.status?.permalink ?: ''"
