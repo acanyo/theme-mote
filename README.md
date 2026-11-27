@@ -105,7 +105,7 @@
 
 ## 开发与打包
 
-需要 Node.js >= 22.12 与 pnpm（Halo 要求 `>= 2.22.1`，`layout.html` 插件布局契约需 `>= 2.26.0`）：
+需要 Node.js >= 22.12 与 pnpm（Halo 版本要求 `>= 2.27.0`）：
 
 ```sh
 pnpm install
