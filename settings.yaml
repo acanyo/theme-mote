@@ -193,7 +193,7 @@ spec:
         - $formkit: switch
           if: "$get(intro_mode).value !== 'hidden' && ($get(intro_mode).value !== 'custom' || $get(intro_custom_show_now).value === true)"
           name: enable_rain
-          label: 显示「雨声」白噪音开关
+          label: 显示白噪音开关（支持细雨 / 壁炉 / 夜风 / 书房）
           value: true
         - $formkit: switch
           name: show_excerpt_default
@@ -244,6 +244,12 @@ spec:
           label: 显示「在做的小东西」
           value: true
           help: 需安装项目集插件（portfolio），优先展示推荐项目并提供 /portfolio 列表与详情页，未安装时自动隐藏。
+        - $formkit: text
+          name: equipments_lede
+          label: 装备页导语（可选）
+          value: ""
+          placeholder: "日常陪伴写作、设计与开发的工具和器物。"
+          help: 显示在 /equipments 装备页标题下方，留空使用默认文案（需安装装备管理插件）。
         - $formkit: switch
           name: show_closing
           id: show_closing

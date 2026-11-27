@@ -219,7 +219,6 @@ html.dark .fp-tab.is-active {
   overflow-y: auto;
   max-height: 52dvh;
   padding: 8px 12px 14px;
-  scrollbar-width: thin;
 }
 
 .fp-list {

@@ -8,27 +8,17 @@
  * - Delegated random post trigger
  */
 import { copyText, openRandomPost } from "./actions";
+import {
+  selectAmbientPreset,
+  syncAmbientButtons,
+  toggleAmbientAudio,
+} from "./ambient-audio";
 import { gsap, settleEase, travelEase } from "./animation/engine";
 import { initCoverPalette } from "./cover-palette";
 import { motionAllowed } from "./motion";
 import { createOverlay } from "./overlay";
 import { toast } from "./toast";
 import { handleUpvoteClick, syncUpvotedButtons } from "./upvote";
-
-/* Persistent module-level Rain Audio state so rain keeps playing across Swup visits */
-let rainCtx: AudioContext | null = null;
-let rainGain: GainNode | null = null;
-let rainPlaying = false;
-
-function syncRainButtons() {
-  const tip = rainPlaying ? "关闭细雨白噪音" : "开启细雨白噪音";
-  document
-    .querySelectorAll<HTMLButtonElement>("[data-rain-toggle]")
-    .forEach((btn) => {
-      btn.setAttribute("aria-pressed", String(rainPlaying));
-      btn.dataset.tip = tip;
-    });
-}
 
 const PROSE_SIZES = ["md", "lg", "sm"] as const;
 type ProseSize = (typeof PROSE_SIZES)[number];
@@ -116,78 +106,6 @@ function cycleProseSize() {
   const idx = PROSE_SIZES.indexOf(current);
   const next = PROSE_SIZES[(idx + 1) % PROSE_SIZES.length];
   setProseSize(next);
-}
-
-function toggleRainAudio() {
-  if (rainPlaying) {
-    if (rainCtx && rainGain) {
-      rainGain.gain.cancelScheduledValues(rainCtx.currentTime);
-      rainGain.gain.linearRampToValueAtTime(0.0001, rainCtx.currentTime + 0.35);
-    }
-    rainPlaying = false;
-    syncRainButtons();
-    toast("已关闭细雨白噪音", "info");
-    return;
-  }
-
-  const AudioCtx =
-    window.AudioContext ||
-    (window as unknown as { webkitAudioContext?: typeof AudioContext })
-      .webkitAudioContext;
-  if (!AudioCtx) {
-    toast("当前浏览器不支持音频播放");
-    return;
-  }
-
-  if (!rainCtx) {
-    rainCtx = new AudioCtx();
-    const bufferSize = rainCtx.sampleRate * 3;
-    const buffer = rainCtx.createBuffer(1, bufferSize, rainCtx.sampleRate);
-    const data = buffer.getChannelData(0);
-    let b0 = 0,
-      b1 = 0,
-      b2 = 0,
-      b3 = 0,
-      b4 = 0,
-      b5 = 0,
-      b6 = 0;
-    for (let i = 0; i < bufferSize; i++) {
-      const white = Math.random() * 2 - 1;
-      b0 = 0.99886 * b0 + white * 0.0555179;
-      b1 = 0.99332 * b1 + white * 0.0750759;
-      b2 = 0.969 * b2 + white * 0.153852;
-      b3 = 0.8665 * b3 + white * 0.3104856;
-      b4 = 0.55 * b4 + white * 0.5329522;
-      b5 = -0.7616 * b5 - white * 0.016898;
-      data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.035;
-      b6 = white * 0.115926;
-    }
-
-    const source = rainCtx.createBufferSource();
-    source.buffer = buffer;
-    source.loop = true;
-
-    const filter = rainCtx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.value = 1150;
-
-    rainGain = rainCtx.createGain();
-    rainGain.gain.value = 0.0001;
-
-    source.connect(filter);
-    filter.connect(rainGain);
-    rainGain.connect(rainCtx.destination);
-    source.start();
-  }
-
-  if (rainCtx.state === "suspended") void rainCtx.resume();
-  if (rainGain) {
-    rainGain.gain.cancelScheduledValues(rainCtx.currentTime);
-    rainGain.gain.linearRampToValueAtTime(0.32, rainCtx.currentTime + 0.6);
-  }
-  rainPlaying = true;
-  syncRainButtons();
-  toast("已开启细雨白噪音", "info");
 }
 
 function initCategoryFilter() {
@@ -624,11 +542,21 @@ function initLightbox() {
   const retryBtn = modal?.querySelector<HTMLButtonElement>(
     "[data-lightbox-retry]",
   );
+  const capWrap = modal?.querySelector<HTMLElement>("[data-lightbox-caption]");
+  const capTitle = modal?.querySelector<HTMLElement>("[data-lightbox-cap-title]");
+  const capSub = modal?.querySelector<HTMLElement>("[data-lightbox-cap-sub]");
+  const capIndex = modal?.querySelector<HTMLElement>("[data-lightbox-index]");
   if (!modal || !img || !closeBtn || !prevBtn || !nextBtn) return;
 
   gsap.set(modal, { autoAlpha: 0 });
 
-  let items: string[] = [];
+  interface LightboxItem {
+    src: string;
+    title?: string;
+    sub?: string;
+  }
+
+  let items: LightboxItem[] = [];
   let index = 0;
   let isOpen = false;
   let currentUrl = "";
@@ -645,7 +573,8 @@ function initLightbox() {
   });
 
   const render = (direction = 0, bustCache = false) => {
-    const raw = items[index] ?? "";
+    const entry = items[index];
+    const raw = entry?.src ?? "";
     currentUrl = raw;
     let src = raw;
     if (bustCache && raw) {
@@ -656,6 +585,7 @@ function initLightbox() {
     modal.classList.remove("is-error");
     modal.classList.add("is-loading");
     img.src = src;
+    img.alt = entry?.title ?? "";
     if (img.complete && img.naturalWidth > 0) {
       modal.classList.remove("is-loading");
     }
@@ -663,6 +593,19 @@ function initLightbox() {
     const multi = items.length > 1;
     prevBtn.hidden = !multi;
     nextBtn.hidden = !multi;
+
+    if (capWrap && capTitle && capSub && capIndex) {
+      const titleText = (entry?.title ?? "").trim();
+      const subText = (entry?.sub ?? "").trim();
+      const hasMeta = Boolean(titleText || subText);
+      capTitle.textContent = titleText;
+      capTitle.hidden = !titleText;
+      capSub.textContent = subText;
+      capSub.hidden = !subText;
+      capIndex.textContent = multi ? `${index + 1} / ${items.length}` : "";
+      capIndex.hidden = !multi || !hasMeta;
+      capWrap.hidden = !hasMeta;
+    }
 
     if (direction !== 0 && motionAllowed()) {
       gsap.fromTo(
@@ -681,8 +624,8 @@ function initLightbox() {
     }
   };
 
-  const open = (urls: string[], startIndex = 0) => {
-    items = urls.filter(Boolean);
+  const open = (entries: LightboxItem[], startIndex = 0) => {
+    items = entries.filter((entry) => Boolean(entry.src));
     if (!items.length) return;
     index = Math.min(Math.max(startIndex, 0), items.length - 1);
     isOpen = true;
@@ -739,6 +682,15 @@ function initLightbox() {
     render(delta);
   };
 
+  const extractItem = (node: HTMLElement): LightboxItem => {
+    const innerImg = node.querySelector<HTMLImageElement>("img");
+    return {
+      src: node.dataset.lightboxTrigger ?? "",
+      title: node.dataset.lightboxTitle || innerImg?.alt || "",
+      sub: node.dataset.lightboxSub || "",
+    };
+  };
+
   document.addEventListener("click", (event) => {
     const target = event.target;
     if (!(target instanceof Element)) return;
@@ -750,11 +702,12 @@ function initLightbox() {
       if (gallery) {
         const nodes = Array.from(
           gallery.querySelectorAll<HTMLElement>("[data-lightbox-trigger]"),
-        );
-        const urls = nodes.map((n) => n.dataset.lightboxTrigger ?? "");
-        open(urls, nodes.indexOf(trigger));
+        ).filter((node) => !node.closest("[hidden]"));
+        const entries = nodes.map(extractItem);
+        const idx = nodes.indexOf(trigger);
+        open(entries, idx >= 0 ? idx : 0);
       } else {
-        open([trigger.dataset.lightboxTrigger ?? ""], 0);
+        open([extractItem(trigger)], 0);
       }
       return;
     }
@@ -763,7 +716,8 @@ function initLightbox() {
       ".article-cover img, .prose img",
     );
     if (photo && !photo.closest("a")) {
-      open([photo.currentSrc || photo.src], 0);
+      const cap = (photo.title || photo.alt || "").trim();
+      open([{ src: photo.currentSrc || photo.src, title: cap }], 0);
     }
   });
 
@@ -1020,8 +974,14 @@ export function initMoteGlobal() {
     }
     const rainBtn = target.closest<HTMLElement>("[data-rain-toggle]");
     if (rainBtn) {
-      toggleRainAudio();
+      toggleAmbientAudio();
       if (event.detail > 0) rainBtn.blur();
+      return;
+    }
+    const ambientPick = target.closest<HTMLElement>("[data-ambient-pick]");
+    if (ambientPick) {
+      selectAmbientPreset(ambientPick.dataset.ambientPick);
+      if (event.detail > 0) ambientPick.blur();
       return;
     }
     const fontBtn = target.closest<HTMLElement>("[data-prose-font-toggle]");
@@ -1233,31 +1193,6 @@ function initArticleTldr() {
   textEl.replaceWith(list);
 }
 
-function initEquipmentGroupFilter() {
-  const buttons = Array.from(
-    document.querySelectorAll<HTMLButtonElement>("[data-eq-filter]"),
-  );
-  const groups = Array.from(
-    document.querySelectorAll<HTMLElement>("[data-eq-group]"),
-  );
-  if (buttons.length === 0 || groups.length === 0) return;
-
-  buttons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const target = btn.dataset.eqFilter ?? "all";
-      buttons.forEach((b) => {
-        const active = b === btn;
-        b.classList.toggle("is-active", active);
-        b.setAttribute("aria-pressed", String(active));
-      });
-      groups.forEach((group) => {
-        group.hidden =
-          target !== "all" && group.dataset.eqGroup !== target;
-      });
-    });
-  });
-}
-
 function initSponsorModal(): () => void {
   const modal = document.querySelector<HTMLElement>("[data-sponsor-modal]");
   const trigger = document.querySelector<HTMLButtonElement>("[data-sponsor-open]");
@@ -1326,7 +1261,9 @@ export function initMotePage(): () => void {
   initIconifyIcons(document.getElementById("main") ?? document);
   initCategoryFilter();
   initPhotoGroupFilter();
-  initEquipmentGroupFilter();
+  mountLazy("[data-eq-root]", () =>
+    import("./equipments").then((m) => m.initEquipments()),
+  );
   mountLazy("[data-archive-root]", () =>
     import("./archives").then((m) => m.initArchives()),
   );
@@ -1345,13 +1282,21 @@ export function initMotePage(): () => void {
   mountLazy("[data-share-modal]", () =>
     import("./share-card").then((m) => m.initShareCard()),
   );
+  mountLazy(".prose", () =>
+    import("./prose-enhancements").then((m) => m.initProseEnhancements()),
+  );
+  if (document.body.dataset.page === "post") {
+    mountLazy("[data-article-body]", () =>
+      import("./reading-resume").then((m) => m.initReadingResume()),
+    );
+  }
   const cleanupCoverPalette = initCoverPalette();
   const cleanupSponsor = initSponsorModal();
   initExcerptToggle();
   initReadingTime();
   initOutdatedNotice();
   initArticleTldr();
-  syncRainButtons();
+  syncAmbientButtons();
   syncReaderControls();
   syncUpvotedButtons();
   initCodeCopy();

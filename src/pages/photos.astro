@@ -84,7 +84,7 @@ import "../styles/photos.css";
               type="button"
               class="photo-card is-zoom"
               th:if="${photoUrl == null}"
-              th:attr="data-lightbox-trigger=${photo.spec.url}"
+              th:attr="data-lightbox-trigger=${photo.spec.url},data-lightbox-title=${photo.spec.displayName ?: ''},data-lightbox-sub=${photo.spec.description ?: ''}"
               th:aria-label="|查看原图：${photo.spec.displayName ?: '照片'}|"
             >
               <img
@@ -168,7 +168,7 @@ import "../styles/photos.css";
                   type="button"
                   class="photo-card is-zoom"
                   th:each="photo : ${group.photos}"
-                  th:attr="data-lightbox-trigger=${photo.spec.url}"
+                  th:attr="data-lightbox-trigger=${photo.spec.url},data-lightbox-title=${photo.spec.displayName ?: ''},data-lightbox-sub=${photo.spec.description ?: ''}"
                   th:aria-label="|查看原图：${photo.spec.displayName ?: '照片'}|"
                 >
                   <img

@@ -27,7 +27,8 @@ img[data-img-state] {
 .photo-card img[data-img-state],
 .timeline-photo-btn img[data-img-state],
 .moment-photo img[data-img-state],
-.article-cover img[data-img-state] {
+.article-cover img[data-img-state],
+.eq-thumb img[data-img-state] {
   transition:
     opacity 0.34s var(--ease-out),
     transform 0.5s var(--ease-out);

@@ -4,6 +4,7 @@
  * (font/size), rain & motion toggles, preference reset, and quick shortcuts.
  */
 import { openRandomPost, openSearch } from "./actions";
+import { resetAmbientPreset } from "./ambient-audio";
 import { COVER_PALETTE_EVENT } from "./cover-palette";
 import { MOTION_EVENT } from "./motion";
 import {
@@ -120,6 +121,7 @@ export function initControlCenter(showShortcuts: () => void): Overlay | null {
     }
     delete document.documentElement.dataset.proseFont;
     delete document.documentElement.dataset.proseSize;
+    resetAmbientPreset();
     document.dispatchEvent(new CustomEvent(MOTION_EVENT));
     document.dispatchEvent(new CustomEvent("mote:reader-sync"));
     toast("已恢复默认阅读偏好", "success");

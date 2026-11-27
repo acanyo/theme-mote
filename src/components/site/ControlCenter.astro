@@ -210,21 +210,70 @@ import "../../styles/control-center.css";
 
       <!-- 3. Atmosphere & Accessibility Toggles -->
       <div class="cc-section">
-        <button
-          type="button"
-          class="cc-switch-row"
-          data-rain-toggle
-          aria-pressed="false"
+        <div
+          class="cc-ambient-group"
           th:if="${theme.config.home?.enable_rain != false}"
         >
-          <span class="cc-switch-info">
-            <span class="cc-row-label">细雨白噪音</span>
-            <span class="cc-row-desc">切页时持续轻柔播放</span>
-          </span>
-          <span class="cc-switch" aria-hidden="true">
-            <span class="cc-switch-thumb"></span>
-          </span>
-        </button>
+          <button
+            type="button"
+            class="cc-switch-row"
+            data-rain-toggle
+            aria-pressed="false"
+          >
+            <span class="cc-switch-info">
+              <span class="cc-row-label" data-ambient-label>细雨白噪音</span>
+              <span class="cc-row-desc" data-ambient-desc
+                >纯 Web Audio 合成，切页不断流</span
+              >
+            </span>
+            <span class="cc-switch" aria-hidden="true">
+              <span class="cc-switch-thumb"></span>
+            </span>
+          </button>
+
+          <div
+            class="cc-seg cc-ambient-seg"
+            role="radiogroup"
+            aria-label="环境白噪音音色"
+          >
+            <button
+              type="button"
+              class="cc-seg-btn is-active"
+              role="radio"
+              aria-checked="true"
+              data-ambient-pick="rain"
+            >
+              细雨
+            </button>
+            <button
+              type="button"
+              class="cc-seg-btn"
+              role="radio"
+              aria-checked="false"
+              data-ambient-pick="fire"
+            >
+              壁炉
+            </button>
+            <button
+              type="button"
+              class="cc-seg-btn"
+              role="radio"
+              aria-checked="false"
+              data-ambient-pick="wind"
+            >
+              夜风
+            </button>
+            <button
+              type="button"
+              class="cc-seg-btn"
+              role="radio"
+              aria-checked="false"
+              data-ambient-pick="study"
+            >
+              书房
+            </button>
+          </div>
+        </div>
 
         <button
           type="button"

@@ -50,7 +50,6 @@ html.dark .cc-backdrop {
   box-shadow:
     0 24px 64px -16px rgba(15, 23, 42, 0.22),
     0 4px 14px -4px rgba(15, 23, 42, 0.06);
-  scrollbar-width: thin;
   opacity: 0;
   transform: translate3d(0, 8px, 0) scale(0.975);
   will-change: transform, opacity;
@@ -235,6 +234,23 @@ html.dark .cc-seg {
 
 .cc-seg-btn--serif {
   font-family: "Noto Serif SC", "Songti SC", "STSong", Georgia, serif;
+}
+
+.cc-ambient-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cc-ambient-seg {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+}
+
+.cc-ambient-seg .cc-seg-btn {
+  min-width: 0;
+  padding: 0 6px;
 }
 
 .cc-seg-btn.is-active,
